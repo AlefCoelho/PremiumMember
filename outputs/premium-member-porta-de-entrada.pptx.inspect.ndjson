@@ -1,0 +1,148 @@
+{"kind":"deck","id":"pr/2fpy0n","name":"Deck"}
+{"kind":"layout","layoutId":"5a87b1ab-a5b2-4fb0-8167-e675e855c082","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"07081e4e-4412-42f5-ab35-0bb205157e6b","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/304z1t","slide":1,"title":"PREMIUM MEMBER","textShapes":5}
+{"kind":"shape","id":"sh/54zidony","slide":1,"bbox":[0,0,760,720]}
+{"kind":"shape","id":"sh/cj6tovah","slide":1,"bbox":[72,64,170,44]}
+{"kind":"textbox","id":"sh/nap4r65w","slide":1,"text":"PREMIUM MEMBER","textPreview":"PREMIUM MEMBER","textChars":14,"textLines":1,"bbox":[88,74,150,24]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":1,"text":"A porta de entrada para quem cansou de esperar","textPreview":"A porta de entrada para quem cansou de esperar","textChars":46,"textLines":1,"bbox":[72,155,850,172]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":1,"text":"Um projeto para transformar indicação em oportunidade: sem escritório, sem estoque, com um celular e uma oferta digital pronta para compartilhar.","textPreview":"Um projeto para transformar indicação em oportunidade: sem escritório, sem estoque, com um celular e uma oferta digital pronta para compa...","textChars":145,"textLines":1,"bbox":[72,365,610,132]}
+{"kind":"textbox","id":"sh/cvixczed","slide":1,"text":"Mensagem central: não dependa de promessa. Construa distribuição.","textPreview":"Mensagem central: não dependa de promessa. Construa distribuição.","textChars":65,"textLines":1,"bbox":[72,540,620,44]}
+{"kind":"textbox","id":"sh/jm1cfa9w","slide":1,"text":"Premium Member | 01","textPreview":"Premium Member | 01","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"image","id":"im/rqd4vmtw","slide":1,"name":"","alt":"Pessoa brasileira com celular em cena urbana noturna","bbox":[610,0,670,720]}
+{"kind":"notes","id":"nt/304z1t","slide":1,"text":""}
+{"kind":"slide","id":"sl/5ufbg5","slide":2,"title":"O CLIMA NO BRASIL VIROU COMBUSTÍVEL","textShapes":11}
+{"kind":"textbox","id":"sh/8v6psfil","slide":2,"text":"O CLIMA NO BRASIL VIROU COMBUSTÍVEL","textPreview":"O CLIMA NO BRASIL VIROU COMBUSTÍVEL","textChars":35,"textLines":1,"bbox":[72,54,700,30]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":2,"text":"Quando o bolso aperta, a pessoa procura saída","textPreview":"Quando o bolso aperta, a pessoa procura saída","textChars":45,"textLines":1,"bbox":[72,104,850,126]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":2,"text":"A insatisfação política não precisa virar só reclamação. Ela pode virar movimento: mais gente buscando renda extra, autonomia e uma forma simples de começar.","textPreview":"A insatisfação política não precisa virar só reclamação. Ela pode virar movimento: mais gente buscando renda extra, autonomia e uma forma...","textChars":157,"textLines":1,"bbox":[72,250,760,118]}
+{"kind":"shape","id":"sh/x4nap4r6","slide":2,"bbox":[72,410,330,168]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":2,"text":"52%","textPreview":"52%","textChars":3,"textLines":1,"bbox":[96,428,260,52]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":2,"text":"desaprovam o governo, segundo PoderData/AYA divulgado pela CNN em 25.jun.2026","textPreview":"desaprovam o governo, segundo PoderData/AYA divulgado pela CNN em 25.jun.2026","textChars":77,"textLines":1,"bbox":[96,488,280,76]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":2,"bbox":[448,410,330,168]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":2,"text":"38%","textPreview":"38%","textChars":3,"textLines":1,"bbox":[472,428,260,52]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":2,"text":"avaliam o governo como negativo no Datafolha de 20.jun.2026","textPreview":"avaliam o governo como negativo no Datafolha de 20.jun.2026","textChars":59,"textLines":1,"bbox":[472,488,280,76]}
+{"kind":"shape","id":"sh/ed8v6psf","slide":2,"bbox":[824,410,330,168]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":2,"text":"48%","textPreview":"48%","textChars":3,"textLines":1,"bbox":[848,428,260,52]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":2,"text":"desaprovam no levantamento Quaest divulgado em 10.jun.2026","textPreview":"desaprovam no levantamento Quaest divulgado em 10.jun.2026","textChars":58,"textLines":1,"bbox":[848,488,280,76]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":2,"text":"Fontes: CNN Brasil/PoderData AYA; Folha/Datafolha; Poder360/Quaest.","textPreview":"Fontes: CNN Brasil/PoderData AYA; Folha/Datafolha; Poder360/Quaest.","textChars":67,"textLines":1,"bbox":[72,620,1080,30]}
+{"kind":"textbox","id":"sh/i5sneloj","slide":2,"text":"Premium Member | 02","textPreview":"Premium Member | 02","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/5ufbg5","slide":2,"text":""}
+{"kind":"slide","id":"sl/4krc1v","slide":3,"title":"A DOR REAL NAO E IDEOLOGICA","textShapes":12}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":3,"text":"A DOR REAL NAO E IDEOLOGICA","textPreview":"A DOR REAL NAO E IDEOLOGICA","textChars":27,"textLines":1,"bbox":[72,50,700,30]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":3,"text":"O problema e simples: o salario chega menor que o mes","textPreview":"O problema e simples: o salario chega menor que o mes","textChars":53,"textLines":1,"bbox":[72,100,900,92]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":3,"text":"Para quem e CLT, o risco nao e trabalhar. O risco e depender de uma unica fonte de renda enquanto tudo sobe, muda e aperta.","textPreview":"Para quem e CLT, o risco nao e trabalhar. O risco e depender de uma unica fonte de renda enquanto tudo sobe, muda e aperta.","textChars":123,"textLines":1,"bbox":[72,210,800,76]}
+{"kind":"shape","id":"sh/8v6psfil","slide":3,"bbox":[72,340,330,168]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":3,"text":"59%","textPreview":"59%","textChars":3,"textLines":1,"bbox":[96,358,260,52]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":3,"text":"dizem que a renda familiar nao cobre as despesas","textPreview":"dizem que a renda familiar nao cobre as despesas","textChars":48,"textLines":1,"bbox":[96,418,280,76]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":3,"bbox":[448,340,330,168]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":3,"text":"45%","textPreview":"45%","textChars":3,"textLines":1,"bbox":[472,358,260,52]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":3,"text":"buscaram renda alternativa nos ultimos meses","textPreview":"buscaram renda alternativa nos ultimos meses","textChars":44,"textLines":1,"bbox":[472,418,280,76]}
+{"kind":"shape","id":"sh/pg3ex0nu","slide":3,"bbox":[824,340,330,168]}
+{"kind":"textbox","id":"sh/wval87ed","slide":3,"text":"54%","textPreview":"54%","textChars":3,"textLines":1,"bbox":[848,358,260,52]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":3,"text":"dos trabalhadores nao chegam ao fim do mes com salario, segundo Serasa Experian","textPreview":"dos trabalhadores nao chegam ao fim do mes com salario, segundo Serasa Experian","textChars":79,"textLines":1,"bbox":[848,418,280,76]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":3,"text":"Tradução comercial: existe uma massa de pessoas pronta para ouvir uma proposta de renda adicional simples.","textPreview":"Tradução comercial: existe uma massa de pessoas pronta para ouvir uma proposta de renda adicional simples.","textChars":106,"textLines":1,"bbox":[72,540,1030,44]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":3,"text":"Fontes: Datafolha via Folha/Poder360; Serasa Experian.","textPreview":"Fontes: Datafolha via Folha/Poder360; Serasa Experian.","textChars":54,"textLines":1,"bbox":[72,620,1080,30]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":3,"text":"Premium Member | 03","textPreview":"Premium Member | 03","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/4krc1v","slide":3,"text":""}
+{"kind":"slide","id":"sl/tpnppo","slide":4,"title":"O novo ponto comercial ja esta no bolso","textShapes":11}
+{"kind":"textbox","id":"sh/ji5snelo","slide":4,"text":"O novo ponto comercial ja esta no bolso","textPreview":"O novo ponto comercial ja esta no bolso","textChars":39,"textLines":1,"bbox":[72,78,850,114]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":4,"text":"A vitrine nao precisa de aluguel. O vendedor nao precisa de balcão. O primeiro ativo e o alcance: WhatsApp, Instagram, Telegram, comunidade e conversa direta.","textPreview":"A vitrine nao precisa de aluguel. O vendedor nao precisa de balcão. O primeiro ativo e o alcance: WhatsApp, Instagram, Telegram, comunida...","textChars":158,"textLines":1,"bbox":[72,220,730,116]}
+{"kind":"shape","id":"sh/1kre1w7m","slide":4,"bbox":[72,390,330,168]}
+{"kind":"textbox","id":"sh/ulwval87","slide":4,"text":"88%","textPreview":"88%","textChars":3,"textLines":1,"bbox":[96,408,260,52]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":4,"text":"da população brasileira acessou internet, segundo TIC Domicilios 2025","textPreview":"da população brasileira acessou internet, segundo TIC Domicilios 2025","textChars":69,"textLines":1,"bbox":[96,468,280,76]}
+{"kind":"shape","id":"sh/crmhk3q5","slide":4,"bbox":[448,390,330,168]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":4,"text":"65%","textPreview":"65%","textChars":3,"textLines":1,"bbox":[472,408,260,52]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":4,"text":"usam internet exclusivamente pelo celular","textPreview":"usam internet exclusivamente pelo celular","textChars":41,"textLines":1,"bbox":[472,468,280,76]}
+{"kind":"shape","id":"sh/j2t83itg","slide":4,"bbox":[824,390,330,168]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":4,"text":"150 mi","textPreview":"150 mi","textChars":6,"textLines":1,"bbox":[848,408,260,52]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":4,"text":"identidades ativas em redes sociais no Brasil, segundo DataReportal 2026","textPreview":"identidades ativas em redes sociais no Brasil, segundo DataReportal 2026","textChars":72,"textLines":1,"bbox":[848,468,280,76]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":4,"text":"Compartilhar deixou de ser distração. Para quem tem oferta e processo, compartilhar vira distribuição.","textPreview":"Compartilhar deixou de ser distração. Para quem tem oferta e processo, compartilhar vira distribuição.","textChars":102,"textLines":1,"bbox":[72,560,950,44]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":4,"text":"Fontes: TIC Domicilios 2025 / Cetic.br; DataReportal Digital 2026 Brazil.","textPreview":"Fontes: TIC Domicilios 2025 / Cetic.br; DataReportal Digital 2026 Brazil.","textChars":73,"textLines":1,"bbox":[72,620,1080,30]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":4,"text":"Premium Member | 04","textPreview":"Premium Member | 04","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/tpnppo","slide":4,"text":""}
+{"kind":"slide","id":"sl/w5f1xa","slide":5,"title":"A VIRADA","textShapes":9}
+{"kind":"textbox","id":"sh/g7adsji5","slide":5,"text":"A VIRADA","textPreview":"A VIRADA","textChars":8,"textLines":1,"bbox":[72,54,700,30]}
+{"kind":"textbox","id":"sh/rmhk3q5o","slide":5,"text":"Nao venda tempo. Venda acesso.","textPreview":"Nao venda tempo. Venda acesso.","textChars":30,"textLines":1,"bbox":[72,110,850,94]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":5,"text":"O CLT comum tenta trocar mais horas por mais dinheiro. O afiliado inteligente compartilha uma solução pronta e recebe por uma venda que ele ajudou a gerar.","textPreview":"O CLT comum tenta trocar mais horas por mais dinheiro. O afiliado inteligente compartilha uma solução pronta e recebe por uma venda que e...","textChars":155,"textLines":1,"bbox":[72,240,800,100]}
+{"kind":"shape","id":"sh/90je9cvi","slide":5,"bbox":[72,390,500,110]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":5,"text":"Modelo antigo","textPreview":"Modelo antigo","textChars":13,"textLines":1,"bbox":[102,415,250,34]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":5,"text":"mais turno, mais cansaço, renda travada","textPreview":"mais turno, mais cansaço, renda travada","textChars":39,"textLines":1,"bbox":[102,462,400,28]}
+{"kind":"shape","id":"sh/yd0z6103","slide":5,"bbox":[650,390,500,110]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":5,"text":"Modelo Premium Member","textPreview":"Modelo Premium Member","textChars":21,"textLines":1,"bbox":[680,415,360,34]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":5,"text":"link, indicação, comissão, acompanhamento","textPreview":"link, indicação, comissão, acompanhamento","textChars":41,"textLines":1,"bbox":[680,462,410,28]}
+{"kind":"textbox","id":"sh/ahoza1gv","slide":5,"text":"Sem promessa de renda garantida. Com processo claro para quem executa.","textPreview":"Sem promessa de renda garantida. Com processo claro para quem executa.","textChars":70,"textLines":1,"bbox":[72,580,850,34]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":5,"text":"Premium Member | 05","textPreview":"Premium Member | 05","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/w5f1xa","slide":5,"text":""}
+{"kind":"slide","id":"sl/ntehq3","slide":6,"title":"O que e o Premium Member?","textShapes":13}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":6,"text":"O que e o Premium Member?","textPreview":"O que e o Premium Member?","textChars":25,"textLines":1,"bbox":[72,72,820,62]}
+{"kind":"textbox","id":"sh/cbulwval","slide":6,"text":"Uma central para transformar pessoas comuns em indicadores organizados de produtos digitais de trading.","textPreview":"Uma central para transformar pessoas comuns em indicadores organizados de produtos digitais de trading.","textChars":103,"textLines":1,"bbox":[72,152,900,66]}
+{"kind":"shape","id":"sh/5sneloj2","slide":6,"bbox":[72,285,350,150]}
+{"kind":"textbox","id":"sh/ytsvu9kn","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[94,303,54,46]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":6,"text":"Link exclusivo","textPreview":"Link exclusivo","textChars":14,"textLines":1,"bbox":[158,307,230,34]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":6,"text":"Cada membro recebe um link rastreavel para divulgar.","textPreview":"Cada membro recebe um link rastreavel para divulgar.","textChars":52,"textLines":1,"bbox":[158,351,230,62]}
+{"kind":"shape","id":"sh/5kb6xkf6","slide":6,"bbox":[465,285,350,150]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[487,303,54,46]}
+{"kind":"textbox","id":"sh/n29gr2p8","slide":6,"text":"Venda confirmada","textPreview":"Venda confirmada","textChars":16,"textLines":1,"bbox":[551,307,230,34]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":6,"text":"O pagamento acontece na plataforma de trading, como CopyShieldPro.","textPreview":"O pagamento acontece na plataforma de trading, como CopyShieldPro.","textChars":66,"textLines":1,"bbox":[551,351,230,62]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":6,"bbox":[858,285,350,150]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[880,303,54,46]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":6,"text":"Comissao acompanhada","textPreview":"Comissao acompanhada","textChars":20,"textLines":1,"bbox":[944,307,230,34]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":6,"text":"O painel mostra cliques, vendas, carencia, saldo e saque.","textPreview":"O painel mostra cliques, vendas, carencia, saldo e saque.","textChars":57,"textLines":1,"bbox":[944,351,230,62]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":6,"text":"A pessoa nao precisa criar produto. Ela precisa distribuir uma oferta pronta para a audiencia certa.","textPreview":"A pessoa nao precisa criar produto. Ela precisa distribuir uma oferta pronta para a audiencia certa.","textChars":100,"textLines":1,"bbox":[72,520,1000,44]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":6,"text":"Premium Member | 06","textPreview":"Premium Member | 06","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/ntehq3","slide":6,"text":""}
+{"kind":"slide","id":"sl/rdbm5k","slide":7,"title":"Por que esse projeto encaixa no brasileiro comum","textShapes":10}
+{"kind":"textbox","id":"sh/j2t83itg","slide":7,"text":"Por que esse projeto encaixa no brasileiro comum","textPreview":"Por que esse projeto encaixa no brasileiro comum","textChars":48,"textLines":1,"bbox":[72,70,850,118]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":7,"bbox":[92,240,1040,72]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":7,"text":"Baixa barreira","textPreview":"Baixa barreira","textChars":14,"textLines":1,"bbox":[124,258,300,30]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":7,"text":"começa com celular, conversa e link","textPreview":"começa com celular, conversa e link","textChars":35,"textLines":1,"bbox":[430,259,620,28]}
+{"kind":"shape","id":"sh/jqh0fepk","slide":7,"bbox":[92,328,1040,72]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":7,"text":"Oferta pronta","textPreview":"Oferta pronta","textChars":13,"textLines":1,"bbox":[124,346,300,30]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":7,"text":"não precisa estoque, sala, equipe ou site próprio","textPreview":"não precisa estoque, sala, equipe ou site próprio","textChars":49,"textLines":1,"bbox":[430,347,620,28]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":7,"bbox":[92,416,1040,72]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":7,"text":"Painel claro","textPreview":"Painel claro","textChars":12,"textLines":1,"bbox":[124,434,300,30]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":7,"text":"o membro acompanha cliques, vendas e saque","textPreview":"o membro acompanha cliques, vendas e saque","textChars":42,"textLines":1,"bbox":[430,435,620,28]}
+{"kind":"shape","id":"sh/29gr2p8n","slide":7,"bbox":[92,504,1040,72]}
+{"kind":"textbox","id":"sh/d0z61032","slide":7,"text":"Produto desejado","textPreview":"Produto desejado","textChars":16,"textLines":1,"bbox":[124,522,300,30]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":7,"text":"trading automatizado conversa com busca por renda e autonomia","textPreview":"trading automatizado conversa com busca por renda e autonomia","textChars":61,"textLines":1,"bbox":[430,523,620,28]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":7,"text":"Premium Member | 07","textPreview":"Premium Member | 07","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/rdbm5k","slide":7,"text":""}
+{"kind":"slide","id":"sl/qpf63y","slide":8,"title":"A narrativa de venda","textShapes":13}
+{"kind":"textbox","id":"sh/94fu18jq","slide":8,"text":"A narrativa de venda","textPreview":"A narrativa de venda","textChars":20,"textLines":1,"bbox":[72,64,760,62]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":8,"text":"Pare de vender 'ganhe dinheiro facil'. Venda uma decisao adulta: construir uma segunda fonte de oportunidade.","textPreview":"Pare de vender 'ganhe dinheiro facil'. Venda uma decisao adulta: construir uma segunda fonte de oportunidade.","textChars":109,"textLines":1,"bbox":[72,142,920,76]}
+{"kind":"shape","id":"sh/r2p8nqxs","slide":8,"bbox":[72,285,350,150]}
+{"kind":"textbox","id":"sh/gvy90je9","slide":8,"text":"Dor","textPreview":"Dor","textChars":3,"textLines":1,"bbox":[94,303,54,46]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":8,"text":"O mes ficou caro","textPreview":"O mes ficou caro","textChars":16,"textLines":1,"bbox":[158,307,230,34]}
+{"kind":"textbox","id":"sh/2p8nqxs7","slide":8,"text":"O salario sozinho nao protege mais como antes.","textPreview":"O salario sozinho nao protege mais como antes.","textChars":46,"textLines":1,"bbox":[158,351,230,62]}
+{"kind":"shape","id":"sh/ra5gbq1o","slide":8,"bbox":[465,285,350,150]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":8,"text":"Meio","textPreview":"Meio","textChars":4,"textLines":1,"bbox":[487,303,54,46]}
+{"kind":"textbox","id":"sh/9knih4by","slide":8,"text":"O celular ja esta na mao","textPreview":"O celular ja esta na mao","textChars":24,"textLines":1,"bbox":[551,307,230,34]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":8,"text":"A pessoa ja conversa, posta e compartilha todos os dias.","textPreview":"A pessoa ja conversa, posta e compartilha todos os dias.","textChars":56,"textLines":1,"bbox":[551,351,230,62]}
+{"kind":"shape","id":"sh/0nuxc3yl","slide":8,"bbox":[858,285,350,150]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":8,"text":"Oferta","textPreview":"Oferta","textChars":6,"textLines":1,"bbox":[880,303,54,46]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":8,"text":"Entre como membro","textPreview":"Entre como membro","textChars":17,"textLines":1,"bbox":[944,307,230,34]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":8,"text":"Receba link, compartilhe e acompanhe resultado no painel.","textPreview":"Receba link, compartilhe e acompanhe resultado no painel.","textChars":57,"textLines":1,"bbox":[944,351,230,62]}
+{"kind":"textbox","id":"sh/0z61032l","slide":8,"text":"Frase-chave: voce nao esta pedindo favor. Voce esta abrindo uma porta.","textPreview":"Frase-chave: voce nao esta pedindo favor. Voce esta abrindo uma porta.","textChars":70,"textLines":1,"bbox":[72,540,980,40]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":8,"text":"Premium Member | 08","textPreview":"Premium Member | 08","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/qpf63y","slide":8,"text":""}
+{"kind":"slide","id":"sl/otjfpl","slide":9,"title":"Chamada agressiva, mas honesta","textShapes":6}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":9,"text":"Chamada agressiva, mas honesta","textPreview":"Chamada agressiva, mas honesta","textChars":30,"textLines":1,"bbox":[72,78,850,96]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":9,"text":"Se voce espera o cenario ficar perfeito, voce chega tarde. Se voce começa com o que tem, voce entra no jogo antes da maioria.","textPreview":"Se voce espera o cenario ficar perfeito, voce chega tarde. Se voce começa com o que tem, voce entra no jogo antes da maioria.","textChars":125,"textLines":1,"bbox":[72,205,760,100]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":9,"bbox":[72,370,1040,135]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":9,"text":"Entre no Premium Member. Pegue seu link. Compartilhe hoje.","textPreview":"Entre no Premium Member. Pegue seu link. Compartilhe hoje.","textChars":58,"textLines":1,"bbox":[110,405,940,56]}
+{"kind":"textbox","id":"sh/7u54zido","slide":9,"text":"Nao e promessa de dinheiro facil. E um processo para quem quer parar de depender de uma unica fonte.","textPreview":"Nao e promessa de dinheiro facil. E um processo para quem quer parar de depender de uma unica fonte.","textChars":100,"textLines":1,"bbox":[110,468,940,28]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":9,"text":"CTA sugerido: cadastro de membro + grupo de ativacao + primeiro roteiro de compartilhamento.","textPreview":"CTA sugerido: cadastro de membro + grupo de ativacao + primeiro roteiro de compartilhamento.","textChars":92,"textLines":1,"bbox":[72,560,920,34]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":9,"text":"Premium Member | 09","textPreview":"Premium Member | 09","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/otjfpl","slide":9,"text":""}
+{"kind":"slide","id":"sl/6cyylh","slide":10,"title":"Fontes usadas na narrativa","textShapes":10}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":10,"text":"Fontes usadas na narrativa","textPreview":"Fontes usadas na narrativa","textChars":26,"textLines":1,"bbox":[72,64,900,60]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":10,"text":"• CNN Brasil / PoderData AYA, 25.jun.2026: governo Lula desaprovado por 52%; avaliação ruim/péssima em 47%.","textPreview":"• CNN Brasil / PoderData AYA, 25.jun.2026: governo Lula desaprovado por 52%; avaliação ruim/péssima em 47%.","textChars":107,"textLines":1,"bbox":[86,150,1030,42]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":10,"text":"• Folha / Datafolha, 20.jun.2026: avaliação negativa do governo em 38%; positiva em 32%.","textPreview":"• Folha / Datafolha, 20.jun.2026: avaliação negativa do governo em 38%; positiva em 32%.","textChars":88,"textLines":1,"bbox":[86,208,1030,42]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":10,"text":"• Poder360 / Quaest, 10.jun.2026: governo desaprovado por 48% e aprovado por 47%.","textPreview":"• Poder360 / Quaest, 10.jun.2026: governo desaprovado por 48% e aprovado por 47%.","textChars":81,"textLines":1,"bbox":[86,266,1030,42]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":10,"text":"• Folha / Datafolha, 26.abr.2026: 45% buscaram renda alternativa; 59% dizem que renda nao cobre despesas.","textPreview":"• Folha / Datafolha, 26.abr.2026: 45% buscaram renda alternativa; 59% dizem que renda nao cobre despesas.","textChars":105,"textLines":1,"bbox":[86,324,1030,42]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":10,"text":"• Serasa Experian / SalaryFits, 2025: 5 em cada 10 trabalhadores nao chegam ao fim do mes com salario.","textPreview":"• Serasa Experian / SalaryFits, 2025: 5 em cada 10 trabalhadores nao chegam ao fim do mes com salario.","textChars":102,"textLines":1,"bbox":[86,382,1030,42]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":10,"text":"• TIC Domicilios 2025 / Cetic.br: 88% da população acessou internet; 65% usam apenas celular.","textPreview":"• TIC Domicilios 2025 / Cetic.br: 88% da população acessou internet; 65% usam apenas celular.","textChars":93,"textLines":1,"bbox":[86,440,1030,42]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":10,"text":"• DataReportal Digital 2026 Brazil: 150 milhoes de identidades ativas em redes sociais no Brasil.","textPreview":"• DataReportal Digital 2026 Brazil: 150 milhoes de identidades ativas em redes sociais no Brasil.","textChars":97,"textLines":1,"bbox":[86,498,1030,42]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":10,"text":"Observacao: a apresentação usa dados públicos para contextualizar dor econômica; não afirma ganho garantido nem recomendação financeira.","textPreview":"Observacao: a apresentação usa dados públicos para contextualizar dor econômica; não afirma ganho garantido nem recomendação financeira.","textChars":136,"textLines":1,"bbox":[72,610,1080,42]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":10,"text":"Premium Member | 10","textPreview":"Premium Member | 10","textChars":19,"textLines":1,"bbox":[72,660,360,24]}
+{"kind":"notes","id":"nt/6cyylh","slide":10,"text":""}
