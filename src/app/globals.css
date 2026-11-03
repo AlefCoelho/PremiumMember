@@ -1,22 +1,22 @@
 @import "@xyflow/react/dist/style.css";
 
 :root {
-  --bg: #f6f7f9;
-  --panel: #ffffff;
-  --panel-strong: #f0f3f7;
-  --text: #111827;
-  --muted: #657084;
-  --border: #d9dee8;
-  --blue: #2563eb;
-  --blue-soft: #eaf1ff;
-  --green: #14823b;
-  --green-soft: #e8f7ee;
-  --amber: #9a6200;
-  --amber-soft: #fff5dc;
-  --red: #bc2727;
-  --red-soft: #fff0f0;
-  --shadow: 0 16px 42px rgba(17, 24, 39, 0.08);
-  --sidebar-bg: #0f172a;
+  --bg: #0a0a0c;
+  --panel: #141418;
+  --panel-strong: #1d1d23;
+  --text: #f3f4f6;
+  --muted: #9aa3b2;
+  --border: #2b2c35;
+  --blue: #3b82f6;
+  --blue-soft: #16233f;
+  --green: #4ade80;
+  --green-soft: #12301f;
+  --amber: #fbbf24;
+  --amber-soft: #33270a;
+  --red: #f87171;
+  --red-soft: #35171a;
+  --shadow: 0 16px 42px rgba(0, 0, 0, 0.5);
+  --sidebar-bg: #050507;
   --sidebar-text: #e5e7eb;
 }
 
@@ -554,7 +554,7 @@ textarea {
 }
 
 .settings-group strong {
-  color: #111827;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -624,7 +624,7 @@ textarea {
 .flow-inspector label {
   display: grid;
   gap: 6px;
-  color: #334155;
+  color: var(--text);
   font-size: 12px;
   font-weight: 800;
 }
@@ -831,7 +831,7 @@ textarea {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #f6f7f9 100%);
+  background: linear-gradient(135deg, #0a0a0c 0%, #141829 45%, #0a0a0c 100%);
 }
 
 .login-panel {
@@ -966,7 +966,7 @@ textarea {
 
 .success-banner {
   margin-bottom: 18px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--green);
   border-radius: 8px;
   background: var(--green-soft);
   color: var(--green);
@@ -1333,7 +1333,7 @@ textarea {
 
 .community-post-body {
   margin: 0;
-  color: #334155;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -1369,7 +1369,7 @@ textarea {
 
 .community-post-full p {
   margin: 0;
-  color: #334155;
+  color: var(--text);
   font-size: 15px;
   line-height: 1.6;
   white-space: pre-wrap;
@@ -1404,7 +1404,7 @@ textarea {
 
 .community-comment-list p {
   margin: 4px 0 0;
-  color: #334155;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -1555,26 +1555,7 @@ textarea {
   padding-top: 14px;
 }
 
-/* Tema escuro do painel admin. Escopado em .app-shell, que so as telas de
-   admin usam, para o portal do membro e o login seguirem claros. */
 .app-shell {
-  --bg: #0a0a0c;
-  --panel: #141418;
-  --panel-strong: #1d1d23;
-  --text: #f3f4f6;
-  --muted: #9aa3b2;
-  --border: #2b2c35;
-  --blue: #3b82f6;
-  --blue-soft: #16233f;
-  --green: #4ade80;
-  --green-soft: #12301f;
-  --amber: #fbbf24;
-  --amber-soft: #33270a;
-  --red: #f87171;
-  --red-soft: #35171a;
-  --shadow: 0 16px 42px rgba(0, 0, 0, 0.5);
-  --sidebar-bg: #050507;
-  --sidebar-text: #e5e7eb;
   background: var(--bg);
   color: var(--text);
 }
