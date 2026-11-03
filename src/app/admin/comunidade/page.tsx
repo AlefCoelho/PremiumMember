@@ -79,7 +79,7 @@ function MoveButtons({
   );
 }
 
-function SpaceRow({
+function SpaceItem({
   space,
   groups,
   isFirst,
@@ -93,25 +93,25 @@ function SpaceRow({
   const archived = space.status !== "active";
 
   return (
-    <tr>
-      <td>
-        <strong>{space.name}</strong>
-        <span className="mono-value">/socio/comunidade/{space.slug}</span>
-        <span>{space.description || "Sem descricao"}</span>
-      </td>
-      <td>{kindLabel(space.kind)}</td>
-      <td>
-        {space.min_eligible_sales
-          ? `${space.min_eligible_sales} venda(s) liberada(s)`
-          : "Todos os membros"}
-      </td>
-      <td>{space.post_count}</td>
-      <td>
-        <span className={archived ? "badge neutral" : "badge success"}>
-          {archived ? "Arquivado" : "Ativo"}
-        </span>
-      </td>
-      <td>
+    <li className={archived ? "community-admin-space archived" : "community-admin-space"}>
+      <div className="community-admin-space-head">
+        <div>
+          <strong>{space.name}</strong>
+          <div className="community-admin-meta">
+            <span className={archived ? "badge neutral" : "badge success"}>
+              {archived ? "Arquivado" : "Ativo"}
+            </span>
+            <span>{kindLabel(space.kind)}</span>
+            <span>
+              {space.min_eligible_sales
+                ? `A partir de ${space.min_eligible_sales} venda(s) liberada(s)`
+                : "Todos os membros"}
+            </span>
+            <span>{space.post_count} publicacao(oes)</span>
+            <span className="mono-value">/socio/comunidade/{space.slug}</span>
+          </div>
+          {space.description ? <p>{space.description}</p> : null}
+        </div>
         <MoveButtons
           action={moveCommunitySpaceAction}
           idField="space_id"
@@ -119,14 +119,11 @@ function SpaceRow({
           disableUp={isFirst}
           disableDown={isLast}
         />
+      </div>
 
-        <details className="lead-bank-member">
-          <summary>
-            <div>
-              <strong>Editar espaco</strong>
-              <span>Nome, descricao, grupo, tipo e acesso</span>
-            </div>
-          </summary>
+      <details className="community-admin-editor">
+        <summary>Editar espaco</summary>
+        <div className="community-admin-editor-body">
           <form action={updateCommunitySpaceAction} className="stack">
             <input type="hidden" name="space_id" value={space.id} />
             <label>
@@ -187,7 +184,7 @@ function SpaceRow({
             </button>
           </form>
 
-          <form action={deleteCommunitySpaceAction} className="stack">
+          <form action={deleteCommunitySpaceAction} className="stack community-admin-danger">
             <input type="hidden" name="space_id" value={space.id} />
             <p className="muted">
               Excluir apaga o espaco <strong>e as {space.post_count} publicacao(oes)</strong> dele, com os
@@ -202,9 +199,9 @@ function SpaceRow({
               Excluir espaco e publicacoes
             </button>
           </form>
-        </details>
-      </td>
-    </tr>
+        </div>
+      </details>
+    </li>
   );
 }
 
@@ -239,65 +236,44 @@ function GroupPanel({
         />
       </div>
 
-      <div className="table-wrap compact">
-        <table>
-          <thead>
-            <tr>
-              <th>Espaco</th>
-              <th>Tipo</th>
-              <th>Acesso</th>
-              <th>Posts</th>
-              <th>Status</th>
-              <th>Acoes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.spaces.length ? (
-              group.spaces.map((space, index) => (
-                <SpaceRow
-                  space={space}
-                  groups={groups}
-                  isFirst={index === 0}
-                  isLast={index === group.spaces.length - 1}
-                  key={space.id}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="empty-row">
-                  Nenhum espaco neste grupo ainda.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {group.spaces.length ? (
+        <ul className="community-admin-list">
+          {group.spaces.map((space, index) => (
+            <SpaceItem
+              space={space}
+              groups={groups}
+              isFirst={index === 0}
+              isLast={index === group.spaces.length - 1}
+              key={space.id}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p className="muted">Nenhum espaco neste grupo ainda.</p>
+      )}
 
-      <details className="lead-bank-member">
-        <summary>
-          <div>
-            <strong>Editar grupo</strong>
-            <span>Renomear ou arquivar</span>
-          </div>
-        </summary>
-        <form action={renameCommunityGroupAction} className="stack">
-          <input type="hidden" name="group_id" value={group.id} />
-          <label>
-            Nome do grupo
-            <input name="name" defaultValue={group.name} maxLength={80} required />
-          </label>
-          <button className="primary-button" type="submit">
-            Salvar grupo
-          </button>
-        </form>
-        <form action={setCommunityGroupStatusAction} className="stack">
-          <input type="hidden" name="group_id" value={group.id} />
-          <input type="hidden" name="status" value={archived ? "active" : "archived"} />
-          <button className="outline-button" type="submit">
-            {archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-            {archived ? "Reativar grupo" : "Arquivar grupo e esconder os espacos"}
-          </button>
-        </form>
+      <details className="community-admin-editor">
+        <summary>Editar grupo</summary>
+        <div className="community-admin-editor-body">
+          <form action={renameCommunityGroupAction} className="stack">
+            <input type="hidden" name="group_id" value={group.id} />
+            <label>
+              Nome do grupo
+              <input name="name" defaultValue={group.name} maxLength={80} required />
+            </label>
+            <button className="primary-button" type="submit">
+              Salvar grupo
+            </button>
+          </form>
+          <form action={setCommunityGroupStatusAction} className="stack">
+            <input type="hidden" name="group_id" value={group.id} />
+            <input type="hidden" name="status" value={archived ? "active" : "archived"} />
+            <button className="outline-button" type="submit">
+              {archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
+              {archived ? "Reativar grupo" : "Arquivar grupo e esconder os espacos"}
+            </button>
+          </form>
+        </div>
       </details>
     </section>
   );
