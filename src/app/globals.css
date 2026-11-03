@@ -833,9 +833,49 @@ textarea {
   display: grid;
   place-items: center;
   padding: 24px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background: linear-gradient(135deg, #0a0a0c 0%, #141829 45%, #0a0a0c 100%);
   background-size: 220% 220%;
   animation: login-drift 24s ease-in-out infinite alternate;
+}
+
+/* Halo que respira atras do cartao. Fica no centro da tela e so aparece em
+   volta do cartao, que tem fundo solido. */
+.login-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(820px, 150vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  /* O pico fica na faixa que sobra fora do cartao: no centro ele ficaria
+     escondido atras do fundo solido do cartao e nao se veria nada. */
+  background: radial-gradient(
+    circle,
+    rgba(200, 153, 47, 0.1) 0%,
+    rgba(200, 153, 47, 0.3) 44%,
+    rgba(200, 153, 47, 0.12) 62%,
+    rgba(200, 153, 47, 0) 78%
+  );
+  pointer-events: none;
+  animation: login-breathe 7s ease-in-out infinite;
+}
+
+@keyframes login-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
 }
 
 /* Deriva lenta do fundo. Longa e em alternate de proposito: a ideia e nao
@@ -852,6 +892,11 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   .login-page {
     background-position: 50% 50%;
+    animation: none;
+  }
+
+  .login-page::before {
+    opacity: 0.75;
     animation: none;
   }
 }
