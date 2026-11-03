@@ -19,8 +19,7 @@ export default async function AffiliateLoginPage({
           <p className="eyebrow">Portal Premium Member</p>
           <h1>Area de Membros</h1>
           <p className="muted">
-            Recursos premium, aulas exclusivas e comunidade de membros, com suas indicacoes, vendas
-            liberadas e saques no mesmo lugar.
+            Recursos Premium, aulas exclusivas e comunidade de membros, E muito mais Além.
           </p>
         </div>
 
