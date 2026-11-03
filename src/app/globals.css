@@ -841,51 +841,129 @@ textarea {
   animation: login-drift 24s ease-in-out infinite alternate;
 }
 
-/* Halo que respira atras do cartao. Fica no centro da tela e so aparece em
-   volta do cartao, que tem fundo solido. */
-.login-page::before {
+/* Aura atras do cartao: tres camadas de luz desfocadas, cada uma com cor,
+   tamanho, trajeto e duracao propria. As duracoes (13s, 19s, 23s) nao tem
+   divisor comum, entao as camadas quase nunca se repetem em fase e o
+   conjunto nao parece um loop. O giro de matiz vai trocando as cores ao
+   longo do caminho. */
+.login-page::before,
+.login-page::after,
+.login-panel::before {
   content: "";
   position: absolute;
   z-index: -1;
   top: 50%;
   left: 50%;
-  width: min(820px, 150vw);
   aspect-ratio: 1;
-  transform: translate(-50%, -50%);
   border-radius: 50%;
-  /* O pico fica na faixa que sobra fora do cartao: no centro ele ficaria
-     escondido atras do fundo solido do cartao e nao se veria nada. */
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+
+.login-page::before {
+  width: min(680px, 130vw);
   background: radial-gradient(
     circle,
-    rgba(200, 153, 47, 0.1) 0%,
-    rgba(200, 153, 47, 0.3) 44%,
-    rgba(200, 153, 47, 0.12) 62%,
-    rgba(200, 153, 47, 0) 78%
+    rgba(214, 170, 78, 0.34) 0%,
+    rgba(200, 153, 47, 0.14) 46%,
+    rgba(200, 153, 47, 0) 72%
   );
-  pointer-events: none;
-  animation: login-breathe 7s ease-in-out infinite;
+  animation: aura-warm 13s cubic-bezier(0.37, 0, 0.63, 1) infinite;
 }
 
-@keyframes login-breathe {
-  0%,
+.login-page::after {
+  width: min(1040px, 180vw);
+  background: radial-gradient(
+    circle,
+    rgba(109, 140, 255, 0.24) 0%,
+    rgba(84, 94, 214, 0.1) 48%,
+    rgba(84, 94, 214, 0) 74%
+  );
+  animation: aura-cool 19s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+/* Terceira camada pendurada no cartao so para ter mais um ponto de luz sem
+   precisar de outro elemento no HTML. z-index negativo a joga para tras do
+   fundo do cartao. */
+.login-panel::before {
+  width: min(520px, 110vw);
+  background: radial-gradient(
+    circle,
+    rgba(64, 214, 190, 0.22) 0%,
+    rgba(64, 214, 190, 0.08) 50%,
+    rgba(64, 214, 190, 0) 76%
+  );
+  animation: aura-mint 23s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+/* Inspira rapido e solta devagar, como respiracao de verdade, com um pouco
+   de deriva junto: so escalar da um pulso mecanico. */
+@keyframes aura-warm {
+  0% {
+    opacity: 0.5;
+    filter: blur(58px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  34% {
+    opacity: 0.95;
+    filter: blur(52px) hue-rotate(26deg);
+    transform: translate(-52%, -53%) scale(1.09);
+  }
+  68% {
+    opacity: 0.68;
+    filter: blur(62px) hue-rotate(-18deg);
+    transform: translate(-48%, -48%) scale(1.01);
+  }
   100% {
     opacity: 0.5;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.1);
+    filter: blur(58px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(0.92);
   }
 }
 
-/* Deriva lenta do fundo. Longa e em alternate de proposito: a ideia e nao
-   chamar atencao enquanto a pessoa digita a senha. */
-@keyframes login-drift {
-  from {
-    background-position: 0% 0%;
+@keyframes aura-cool {
+  0% {
+    opacity: 0.42;
+    filter: blur(80px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(1.04);
   }
-  to {
-    background-position: 100% 100%;
+  41% {
+    opacity: 0.78;
+    filter: blur(70px) hue-rotate(-34deg);
+    transform: translate(-47%, -52%) scale(0.93);
+  }
+  73% {
+    opacity: 0.56;
+    filter: blur(86px) hue-rotate(22deg);
+    transform: translate(-53%, -47%) scale(1.1);
+  }
+  100% {
+    opacity: 0.42;
+    filter: blur(80px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes aura-mint {
+  0% {
+    opacity: 0.32;
+    filter: blur(66px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  29% {
+    opacity: 0.6;
+    filter: blur(58px) hue-rotate(40deg);
+    transform: translate(-54%, -46%) scale(1.12);
+  }
+  61% {
+    opacity: 0.38;
+    filter: blur(72px) hue-rotate(-30deg);
+    transform: translate(-46%, -54%) scale(0.95);
+  }
+  100% {
+    opacity: 0.32;
+    filter: blur(66px) hue-rotate(0deg);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -895,13 +973,18 @@ textarea {
     animation: none;
   }
 
-  .login-page::before {
-    opacity: 0.75;
+  .login-page::before,
+  .login-page::after,
+  .login-panel::before {
+    opacity: 0.6;
+    filter: blur(70px);
+    transform: translate(-50%, -50%);
     animation: none;
   }
 }
 
 .login-panel {
+  position: relative;
   width: min(440px, 100%);
   padding: 26px;
 }
