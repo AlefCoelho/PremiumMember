@@ -9,7 +9,8 @@ import { requireAffiliate } from "@/lib/auth";
 import { getAffiliateBaseUrl, getAffiliatePortalData } from "@/lib/db";
 import { formatCurrency } from "@/lib/money";
 import { getHoldDeadline, getReferralStatus } from "@/lib/rules";
-import { CalendarClock, HandCoins, Link2, LogOut, Trophy, Users, WalletCards } from "lucide-react";
+import { CalendarClock, HandCoins, Link2, LogOut, MessagesSquare, Trophy, Users, WalletCards } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 function dateLabel(value: string | null) {
@@ -84,12 +85,18 @@ export default async function AffiliatePortalPage({
           <h1>{data.affiliate.name}</h1>
           <p>Acompanhe indicacoes, comissoes e saques em um unico lugar.</p>
         </div>
-        <form action={affiliateLogoutAction}>
-          <button className="outline-button" type="submit">
-            <LogOut size={16} />
-            Sair
-          </button>
-        </form>
+        <div className="hero-actions">
+          <Link className="primary-button" href="/socio/comunidade">
+            <MessagesSquare size={16} />
+            Comunidade
+          </Link>
+          <form action={affiliateLogoutAction}>
+            <button className="outline-button" type="submit">
+              <LogOut size={16} />
+              Sair
+            </button>
+          </form>
+        </div>
       </header>
 
       <section className="affiliate-link-panel panel">
