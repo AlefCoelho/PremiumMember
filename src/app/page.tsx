@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Link2,
   LogOut,
+  MessagesSquare,
   Plug,
   Plus,
   Settings2,
@@ -29,6 +30,7 @@ import {
   saveStrategyFlowAction,
   updateProgramSettingsAction,
 } from "@/app/actions";
+import Link from "next/link";
 import { AffiliateLinkButton } from "@/components/AffiliateLinkButton";
 import { StrategyFlowBuilder } from "@/components/StrategyFlowBuilder";
 import { requireAdmin } from "@/lib/auth";
@@ -404,6 +406,10 @@ export default async function Home() {
               {item.label}
             </a>
           ))}
+          <Link href="/admin/comunidade">
+            <MessagesSquare size={18} />
+            Comunidade
+          </Link>
         </nav>
 
         <form action={logoutAction} className="logout-form">

@@ -374,3 +374,234 @@ export function getCommunityPortalData(affiliateId: number) {
     groups: groupSpaces(spaces),
   };
 }
+
+export const spaceKinds = [
+  { value: "posts", label: "Publicacoes" },
+  { value: "support", label: "Suporte" },
+  { value: "lessons", label: "Aulas" },
+] as const;
+
+export type SpaceKind = (typeof spaceKinds)[number]["value"];
+
+export function isSpaceKind(value: string): value is SpaceKind {
+  return spaceKinds.some((kind) => kind.value === value);
+}
+
+export type AdminCommunitySpace = {
+  id: number;
+  group_id: number;
+  name: string;
+  slug: string;
+  description: string;
+  kind: string;
+  min_eligible_sales: number;
+  position: number;
+  status: string;
+  post_count: number;
+};
+
+export type AdminCommunityGroup = {
+  id: number;
+  name: string;
+  slug: string;
+  position: number;
+  status: string;
+  spaces: AdminCommunitySpace[];
+};
+
+export function slugify(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+function createUniqueSlug(table: "community_groups" | "community_spaces", name: string, fallback: string) {
+  const base = slugify(name) || fallback;
+  const exists = db.prepare(`SELECT id FROM ${table} WHERE slug = ?`);
+  if (!exists.get(base)) return base;
+  for (let attempt = 2; attempt < 200; attempt += 1) {
+    const candidate = `${base.slice(0, 54)}-${attempt}`;
+    if (!exists.get(candidate)) return candidate;
+  }
+  return `${base.slice(0, 48)}-${Date.now().toString(36).slice(-6)}`;
+}
+
+export function getAdminCommunityTree(): AdminCommunityGroup[] {
+  const groups = db
+    .prepare(
+      `SELECT id, name, slug, position, status
+       FROM community_groups
+       ORDER BY position, id`
+    )
+    .all() as Omit<AdminCommunityGroup, "spaces">[];
+
+  const spaces = db
+    .prepare(
+      `SELECT community_spaces.id,
+              community_spaces.group_id,
+              community_spaces.name,
+              community_spaces.slug,
+              community_spaces.description,
+              community_spaces.kind,
+              community_spaces.min_eligible_sales,
+              community_spaces.position,
+              community_spaces.status,
+              (
+                SELECT COUNT(*) FROM community_posts
+                WHERE community_posts.space_id = community_spaces.id
+              ) AS post_count
+       FROM community_spaces
+       ORDER BY community_spaces.position, community_spaces.id`
+    )
+    .all() as AdminCommunitySpace[];
+
+  return groups.map((group) => ({
+    ...group,
+    spaces: spaces.filter((space) => space.group_id === group.id),
+  }));
+}
+
+export function getGroupById(groupId: number) {
+  return db.prepare("SELECT * FROM community_groups WHERE id = ?").get(groupId) as
+    | { id: number; name: string; slug: string; position: number; status: string }
+    | undefined;
+}
+
+export function getSpaceById(spaceId: number) {
+  return db.prepare("SELECT * FROM community_spaces WHERE id = ?").get(spaceId) as
+    | Omit<AdminCommunitySpace, "post_count">
+    | undefined;
+}
+
+function nextPosition(table: "community_groups" | "community_spaces", groupId?: number) {
+  const row = (
+    groupId
+      ? db.prepare(`SELECT MAX(position) AS max FROM ${table} WHERE group_id = ?`).get(groupId)
+      : db.prepare(`SELECT MAX(position) AS max FROM ${table}`).get()
+  ) as { max: number | null };
+  return (row.max ?? 0) + 1;
+}
+
+export function createGroup(input: { name: string }) {
+  const slug = createUniqueSlug("community_groups", input.name, "grupo");
+  const result = db
+    .prepare("INSERT INTO community_groups (name, slug, position) VALUES (?, ?, ?)")
+    .run(input.name, slug, nextPosition("community_groups"));
+  return Number(result.lastInsertRowid);
+}
+
+export function renameGroup(groupId: number, name: string) {
+  db.prepare("UPDATE community_groups SET name = ? WHERE id = ?").run(name, groupId);
+}
+
+export function setGroupStatus(groupId: number, status: "active" | "archived") {
+  db.prepare("UPDATE community_groups SET status = ? WHERE id = ?").run(status, groupId);
+}
+
+export function createSpace(input: {
+  groupId: number;
+  name: string;
+  description: string;
+  kind: SpaceKind;
+  minEligibleSales: number;
+}) {
+  const slug = createUniqueSlug("community_spaces", input.name, "espaco");
+  const result = db
+    .prepare(
+      `INSERT INTO community_spaces (group_id, name, slug, description, kind, min_eligible_sales, position)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+    .run(
+      input.groupId,
+      input.name,
+      slug,
+      input.description,
+      input.kind,
+      input.minEligibleSales,
+      nextPosition("community_spaces", input.groupId)
+    );
+  return { id: Number(result.lastInsertRowid), slug };
+}
+
+// O slug nunca e atualizado aqui: URLs ja publicadas do portal do membro dependem dele.
+export function updateSpace(
+  spaceId: number,
+  input: {
+    groupId: number;
+    name: string;
+    description: string;
+    kind: SpaceKind;
+    minEligibleSales: number;
+  }
+) {
+  const current = getSpaceById(spaceId);
+  if (!current) throw new Error("Espaco nao encontrado.");
+  const position =
+    current.group_id === input.groupId
+      ? current.position
+      : nextPosition("community_spaces", input.groupId);
+
+  db.prepare(
+    `UPDATE community_spaces
+     SET group_id = ?, name = ?, description = ?, kind = ?, min_eligible_sales = ?, position = ?
+     WHERE id = ?`
+  ).run(
+    input.groupId,
+    input.name,
+    input.description,
+    input.kind,
+    input.minEligibleSales,
+    position,
+    spaceId
+  );
+}
+
+export function setSpaceStatus(spaceId: number, status: "active" | "archived") {
+  db.prepare("UPDATE community_spaces SET status = ? WHERE id = ?").run(status, spaceId);
+}
+
+// ON DELETE CASCADE leva posts e comentarios do espaco junto.
+export function deleteSpace(spaceId: number) {
+  db.prepare("DELETE FROM community_spaces WHERE id = ?").run(spaceId);
+}
+
+function swapPositions(
+  table: "community_groups" | "community_spaces",
+  rows: { id: number; position: number }[],
+  id: number,
+  direction: "up" | "down"
+) {
+  const index = rows.findIndex((row) => row.id === id);
+  if (index < 0) return;
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= rows.length) return;
+
+  const update = db.prepare(`UPDATE ${table} SET position = ? WHERE id = ?`);
+  const reorder = db.transaction(() => {
+    // Normaliza as posicoes antes de trocar: a semente inicial pode ter empates.
+    rows.forEach((row, order) => update.run(order + 1, row.id));
+    update.run(targetIndex + 1, rows[index].id);
+    update.run(index + 1, rows[targetIndex].id);
+  });
+  reorder();
+}
+
+export function moveGroup(groupId: number, direction: "up" | "down") {
+  const rows = db
+    .prepare("SELECT id, position FROM community_groups ORDER BY position, id")
+    .all() as { id: number; position: number }[];
+  swapPositions("community_groups", rows, groupId, direction);
+}
+
+export function moveSpace(spaceId: number, direction: "up" | "down") {
+  const space = getSpaceById(spaceId);
+  if (!space) return;
+  const rows = db
+    .prepare("SELECT id, position FROM community_spaces WHERE group_id = ? ORDER BY position, id")
+    .all(space.group_id) as { id: number; position: number }[];
+  swapPositions("community_spaces", rows, spaceId, direction);
+}
