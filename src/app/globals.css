@@ -16,6 +16,8 @@
   --red: #bc2727;
   --red-soft: #fff0f0;
   --shadow: 0 16px 42px rgba(17, 24, 39, 0.08);
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #e5e7eb;
 }
 
 * {
@@ -64,8 +66,8 @@ a {
   gap: 28px;
   padding: 24px 18px;
   border-right: 1px solid var(--border);
-  background: #0f172a;
-  color: #e5e7eb;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
 }
 
 .brand {
@@ -171,7 +173,7 @@ td span {
   border: 1px solid var(--border);
   border-radius: 7px;
   background: var(--panel);
-  color: #334155;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -206,7 +208,7 @@ td span {
   place-items: center;
   border-radius: 8px;
   background: var(--panel-strong);
-  color: #475569;
+  color: var(--muted);
 }
 
 .kpi-card.blue .kpi-icon {
@@ -306,8 +308,8 @@ td {
 }
 
 th {
-  background: #f8fafc;
-  color: #475569;
+  background: var(--panel-strong);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -349,8 +351,8 @@ tr:last-child td {
 }
 
 .badge.neutral {
-  background: #eef2f7;
-  color: #475569;
+  background: var(--panel-strong);
+  color: var(--muted);
 }
 
 .row-actions {
@@ -412,7 +414,7 @@ tr:last-child td {
 .lead-bank-member {
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #ffffff;
+  background: var(--panel);
   overflow: hidden;
 }
 
@@ -447,7 +449,7 @@ tr:last-child td {
 
 .lead-bank-member[open] summary {
   border-bottom: 1px solid var(--border);
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .primary-button {
@@ -468,8 +470,8 @@ tr:last-child td {
   gap: 8px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #ffffff;
-  color: #334155;
+  background: var(--panel);
+  color: var(--text);
   padding: 0 12px;
   font-size: 13px;
   font-weight: 800;
@@ -488,7 +490,7 @@ tr:last-child td {
 .stack label {
   display: grid;
   gap: 6px;
-  color: #334155;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -499,7 +501,7 @@ textarea {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   padding: 10px 11px;
   font-size: 14px;
@@ -543,7 +545,7 @@ textarea {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .settings-group strong,
@@ -566,7 +568,7 @@ textarea {
 .mono-value {
   max-width: 260px;
   overflow: hidden;
-  color: #334155;
+  color: var(--muted);
   font-family: "Courier New", monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -607,7 +609,7 @@ textarea {
   align-content: start;
   gap: 12px;
   padding: 14px;
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .flow-palette {
@@ -640,8 +642,8 @@ textarea {
   gap: 8px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #ffffff;
-  color: #334155;
+  background: var(--panel);
+  color: var(--text);
   padding: 0 10px;
   font-size: 13px;
   font-weight: 800;
@@ -650,7 +652,7 @@ textarea {
 .flow-canvas {
   min-width: 0;
   height: 560px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .flow-node {
@@ -661,7 +663,7 @@ textarea {
   border: 1px solid var(--border);
   border-left-width: 5px;
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--panel);
   padding: 12px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
 }
@@ -685,7 +687,7 @@ textarea {
 
 .flow-node p {
   margin: 0;
-  color: #475569;
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
 }
@@ -747,11 +749,11 @@ textarea {
 }
 
 .react-flow__edge-textbg {
-  fill: #ffffff;
+  fill: var(--panel);
 }
 
 .react-flow__edge-text {
-  fill: #334155;
+  fill: var(--text);
   font-size: 11px;
   font-weight: 800;
 }
@@ -873,7 +875,7 @@ textarea {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .payment-summary span {
@@ -1147,8 +1149,8 @@ textarea {
   gap: 24px;
   padding: 24px 16px;
   border-right: 1px solid var(--border);
-  background: #0f172a;
-  color: #e5e7eb;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   overflow-y: auto;
 }
 
@@ -1477,14 +1479,14 @@ textarea {
 .community-admin-space {
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: #ffffff;
+  background: var(--panel);
   padding: 14px;
   display: grid;
   gap: 12px;
 }
 
 .community-admin-space.archived {
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .community-admin-space-head {
@@ -1531,7 +1533,7 @@ textarea {
   list-style: none;
   font-size: 13px;
   font-weight: 600;
-  background: #f8fafc;
+  background: var(--panel-strong);
 }
 
 .community-admin-editor > summary::-webkit-details-marker {
@@ -1551,4 +1553,51 @@ textarea {
 .community-admin-danger {
   border-top: 1px dashed var(--border);
   padding-top: 14px;
+}
+
+/* Tema escuro do painel admin. Escopado em .app-shell, que so as telas de
+   admin usam, para o portal do membro e o login seguirem claros. */
+.app-shell {
+  --bg: #0a0a0c;
+  --panel: #141418;
+  --panel-strong: #1d1d23;
+  --text: #f3f4f6;
+  --muted: #9aa3b2;
+  --border: #2b2c35;
+  --blue: #3b82f6;
+  --blue-soft: #16233f;
+  --green: #4ade80;
+  --green-soft: #12301f;
+  --amber: #fbbf24;
+  --amber-soft: #33270a;
+  --red: #f87171;
+  --red-soft: #35171a;
+  --shadow: 0 16px 42px rgba(0, 0, 0, 0.5);
+  --sidebar-bg: #050507;
+  --sidebar-text: #e5e7eb;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-shell .react-flow__controls-button {
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-strong);
+  fill: var(--text);
+}
+
+.app-shell .react-flow__controls-button:hover {
+  background: var(--panel);
+}
+
+.app-shell .react-flow__minimap-svg {
+  background: var(--panel-strong);
+}
+
+.app-shell .react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.55);
+}
+
+.app-shell .react-flow__attribution {
+  background: transparent;
+  color: var(--muted);
 }
