@@ -18,7 +18,10 @@ export default async function AffiliateLoginPage({
         <div>
           <p className="eyebrow">Portal Premium Member</p>
           <h1>Area de Membros</h1>
-          <p className="muted">Acompanhe suas indicacoes, vendas liberadas e solicite saque pelo Premium Member.</p>
+          <p className="muted">
+            Recursos premium, aulas exclusivas e comunidade de membros, com suas indicacoes, vendas
+            liberadas e saques no mesmo lugar.
+          </p>
         </div>
 
         <form action={affiliateLoginAction} className="stack">
