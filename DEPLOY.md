@@ -3,6 +3,30 @@
 Runbook para publicar uma versao nova do Premium Member sem perder dados de membros,
 indicacoes e saques. O banco e um arquivo SQLite, entao backup vem antes de tudo.
 
+## Ambiente real (verificado em 2026-11-03)
+
+| Item | Valor |
+|---|---|
+| Host | `root@2.24.65.26` (srv1638461, Ubuntu, kernel 6.8) |
+| Atalho SSH local | `premium-vps` |
+| Projeto | `/home/user/htdocs/socios-premiums` |
+| Servico | `socios-premiums.service` (systemd, **Caminho C**) |
+| Porta | 3020, atras do nginx (`/etc/nginx/sites-available/socios-premiums.conf`) |
+| Banco | `/home/user/htdocs/socios-premiums/data/socios-premiums.sqlite` |
+| `SOCIOS_DB_PATH` | definido no unit, caminho absoluto — a armadilha do passo 1 **nao** se aplica |
+| Node | v22.23.1 · `sqlite3` disponivel em `/usr/bin/sqlite3` |
+| Env | `/home/user/htdocs/socios-premiums/.env.local` |
+
+Dois pontos descobertos na vistoria:
+
+1. **A pasta do projeto nao e um repositorio git.** O deploy foi feito copiando arquivos,
+   entao o passo 3 (`git pull`) nao funciona como esta escrito. Ou se inicializa o git na
+   VPS, ou se copia `src/` por `scp`/`rsync` e se builda la.
+2. **Existe um banco orfao** em `.next/standalone/data/socios-premiums.sqlite`, de 30/06,
+   com 1 afiliado e 3 indicacoes. E residuo de quando `SOCIOS_DB_PATH` ainda nao estava
+   definido — a armadilha aconteceu uma vez. O proximo `npm run build` apaga esse arquivo.
+   Ha copia em `/root/backups/orfao-standalone-2026-11-03.sqlite`.
+
 ## Antes de comecar: descobrir como o app roda hoje
 
 Rode na VPS e guarde a saida. Sem isso nao da para escolher o comando de restart.
