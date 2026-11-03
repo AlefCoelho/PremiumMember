@@ -17,7 +17,7 @@ export default async function AffiliateLoginPage({
       <section className="login-panel">
         <div>
           <p className="eyebrow">Portal Premium Member</p>
-          <h1>Comissoes e saques</h1>
+          <h1>Area de Membros</h1>
           <p className="muted">Acompanhe suas indicacoes, vendas liberadas e solicite saque pelo Premium Member.</p>
         </div>
 
