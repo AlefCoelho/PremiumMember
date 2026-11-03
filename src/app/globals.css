@@ -18,6 +18,8 @@
   --shadow: 0 16px 42px rgba(0, 0, 0, 0.5);
   --sidebar-bg: #050507;
   --sidebar-text: #e5e7eb;
+  --gold: #c8992f;
+  --gold-bright: #ffeaa0;
 }
 
 * {
@@ -832,6 +834,26 @@ textarea {
   place-items: center;
   padding: 24px;
   background: linear-gradient(135deg, #0a0a0c 0%, #141829 45%, #0a0a0c 100%);
+  background-size: 220% 220%;
+  animation: login-drift 24s ease-in-out infinite alternate;
+}
+
+/* Deriva lenta do fundo. Longa e em alternate de proposito: a ideia e nao
+   chamar atencao enquanto a pessoa digita a senha. */
+@keyframes login-drift {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page {
+    background-position: 50% 50%;
+    animation: none;
+  }
 }
 
 .login-panel {
@@ -850,10 +872,57 @@ textarea {
 
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--blue);
+  color: var(--gold);
   font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+/* Brilho dourado percorrendo o texto. So entra onde o recorte do fundo no
+   texto existe, senao a palavra ficaria invisivel. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .eyebrow {
+    background-image: linear-gradient(
+      100deg,
+      var(--gold) 0%,
+      var(--gold) 38%,
+      var(--gold-bright) 50%,
+      var(--gold) 62%,
+      var(--gold) 100%
+    );
+    background-size: 300% 100%;
+    /* Repetido de proposito: com no-repeat, o trecho da palavra fora do
+       gradiente fica transparente e some. As pontas tem a mesma cor, entao a
+       emenda nao aparece. */
+    background-repeat: repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: eyebrow-shine 3.8s linear infinite;
+  }
+}
+
+@keyframes eyebrow-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eyebrow {
+    background-position: 50% 0;
+    animation: none;
+  }
+}
+
+/* So a chamada das telas de login/cadastro fica branca; .muted segue
+   cinza no resto do sistema, onde e texto secundario. */
+.login-panel .muted {
+  color: #ffffff;
 }
 
 .login-panel h1 {
