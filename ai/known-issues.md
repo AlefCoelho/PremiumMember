@@ -29,6 +29,9 @@ sumiria no deploy seguinte. As imagens ficam em `data/uploads/`, ao lado do banc
 `/uploads/[...file]`, que exige sessao e so aceita o padrao de nome que nos geramos
 (barra path traversal). **Nunca mova upload para `public/`.**
 
+Backup do `.sqlite` sozinho **nao** protege as imagens. O `DEPLOY.md` passou a cobrir isso
+em 2026-11-04 (tar no passo 2, restauracao no rollback, segunda linha de crontab).
+
 ## 3. Nao use `path.join` dinamico no escopo de modulo
 
 O rastreio de arquivos do Turbopack conclui que o projeto inteiro e dependencia e incha a

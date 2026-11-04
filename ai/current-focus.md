@@ -67,16 +67,19 @@ divulgar.
 
 ## Deploy, resumido
 
-Runbook completo em `DEPLOY.md`. O que funciona hoje:
+Runbook completo em `DEPLOY.md`, atualizado em 2026-11-04 para bater com a realidade
+(uploads, procedimento real por `scp`, nome certo do servico). O que funciona hoje:
 
-1. backup WAL-safe (`sqlite3 ... ".backup ..."`, nunca `cp`)
-2. copiar o backup para fora da VPS
+1. backup WAL-safe do banco (`sqlite3 ... ".backup ..."`, nunca `cp`) **e tar dos uploads**
+2. copiar as duas copias para fora da VPS
 3. `tar czf` do `src/` atual, como rollback
-4. `scp -r src/. premium-vps:/home/user/htdocs/socios-premiums/src/`
-5. `npm run build` na VPS (sem `npm ci`, enquanto nao houver dependencia nova)
+4. `scp -r src/. premium-vps:/home/user/htdocs/socios-premiums/src/` (`rsync --delete` se o
+   commit apagou arquivo)
+5. `npm run build` na VPS — `npm ci` **so** se mexeu em `package.json`
 6. `cp -r .next/static .next/standalone/.next/` e `cp -r public .next/standalone/`
-7. `systemctl restart socios-premiums`
+7. `systemctl restart socios-premiums` (nao `premium-member`)
 8. conferir `affiliates: 17` e `admins: 2` **depois** do restart; mudou, rollback na hora
+9. conferir que `data/uploads/` nao esvaziou
 
 A pasta de producao nao e repositorio git. Atualizar o GitHub e passo **separado**: depois
 do deploy, `main`, `feat/comunidade` e `feat/admin-comunidade` sao avancadas por
