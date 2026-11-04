@@ -11,6 +11,7 @@ import {
   buildInfinitePayCheckoutUrl,
   buildOrderNsu,
   getInfinitePayHandle,
+  isInfinitePayEnabled,
   INFINITEPAY_PROVIDER,
 } from "@/lib/infinitepay";
 
@@ -27,6 +28,10 @@ type CheckoutPayload = {
 };
 
 export async function POST(request: NextRequest) {
+  if (!isInfinitePayEnabled()) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (!validateInternalApiSecret(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }

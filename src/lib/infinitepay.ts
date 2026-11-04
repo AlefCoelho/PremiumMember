@@ -10,6 +10,17 @@ export function getInfinitePayWebhookSecret() {
   return (process.env.INFINITEPAY_WEBHOOK_SECRET ?? "").trim();
 }
 
+// A integracao so existe quando o handle e os dois segredos estao no ambiente.
+// Enquanto um pagamento externo e usado no lugar, as rotas respondem 404 em vez
+// de ficarem expostas devolvendo 401 e 500 para quem passar por elas.
+export function isInfinitePayEnabled() {
+  return Boolean(
+    getInfinitePayHandle() &&
+      getInfinitePayWebhookSecret() &&
+      (process.env.PREMIUM_MEMBER_API_SECRET ?? "").trim()
+  );
+}
+
 export function buildOrderNsu(prefix = "pm") {
   return `${prefix}_${randomUUID().replace(/-/g, "")}`;
 }

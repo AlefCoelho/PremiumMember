@@ -5,6 +5,7 @@ import {
   markPaymentOrderPaid,
 } from "@/lib/db";
 import {
+  isInfinitePayEnabled,
   isInfinitePayPaidStatus,
   readInfinitePayCaptureMethod,
   readInfinitePayOrderNsu,
@@ -13,6 +14,10 @@ import {
 } from "@/lib/infinitepay";
 
 export async function POST(request: NextRequest) {
+  if (!isInfinitePayEnabled()) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (!validateWebhookSecret(request)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
