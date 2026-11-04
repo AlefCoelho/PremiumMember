@@ -411,6 +411,10 @@ export default async function Home() {
             <MessagesSquare size={18} />
             Comunidade
           </Link>
+          <Link href="/admin/eventos">
+            <CalendarClock size={18} />
+            Eventos
+          </Link>
           <Link href="/admin/senhas">
             <KeyRound size={18} />
             Senhas

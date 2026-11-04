@@ -1897,3 +1897,160 @@ textarea {
   font-size: 12px;
   font-weight: 700;
 }
+
+/* Duas colunas so no Feed: a lista de publicacoes e a coluna de eventos e
+   destaques. Abaixo de 1100px a coluna desce para baixo do feed. */
+.community-feed-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.community-aside {
+  display: grid;
+  gap: 14px;
+  position: sticky;
+  top: 18px;
+}
+
+.community-aside-panel .panel-header h2 {
+  font-size: 15px;
+}
+
+.community-aside-events,
+.community-aside-trending {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.community-aside-events li {
+  display: grid;
+  gap: 8px;
+}
+
+.community-aside-event {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.community-aside-event-text {
+  display: grid;
+  min-width: 0;
+}
+
+.community-aside-event-text strong {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.community-aside-event-text span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.community-event-date {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-strong);
+  line-height: 1.1;
+}
+
+.community-event-date strong {
+  font-size: 16px;
+}
+
+.community-event-date span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.community-aside-trending li a {
+  display: grid;
+  gap: 2px;
+}
+
+.community-aside-trending strong {
+  font-size: 13px;
+}
+
+.community-aside-trending span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.community-aside-link {
+  margin-top: 12px;
+  display: inline-block;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.community-event-list {
+  display: grid;
+  gap: 14px;
+}
+
+.community-event-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-strong);
+  padding: 14px;
+}
+
+.community-event-card .community-event-date {
+  min-width: 54px;
+}
+
+.community-event-body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.community-event-body h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.community-event-body p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.community-event-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.community-event-actions .primary-button,
+.community-event-actions .outline-button {
+  width: auto;
+}
+
+@media (max-width: 1100px) {
+  .community-feed-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .community-aside {
+    position: static;
+  }
+}

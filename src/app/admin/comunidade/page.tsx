@@ -3,6 +3,7 @@ import {
   ArrowUp,
   Archive,
   ArchiveRestore,
+  CalendarClock,
   LayoutDashboard,
   KeyRound,
   LogOut,
@@ -312,6 +313,10 @@ export default async function AdminCommunityPage({
             <MessagesSquare size={18} />
             Grupos e espacos
           </a>
+          <Link href="/admin/eventos">
+            <CalendarClock size={18} />
+            Eventos
+          </Link>
           <Link href="/admin/senhas">
             <KeyRound size={18} />
             Senhas

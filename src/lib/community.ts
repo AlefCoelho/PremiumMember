@@ -63,6 +63,11 @@ CREATE TABLE IF NOT EXISTS community_favorites (
   UNIQUE (post_id, affiliate_id)
 );
 
+CREATE TABLE IF NOT EXISTS community_featured_posts (
+  post_id INTEGER PRIMARY KEY REFERENCES community_posts(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_community_reactions_post ON community_reactions(post_id);
 CREATE INDEX IF NOT EXISTS idx_community_favorites_member ON community_favorites(affiliate_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_spaces_group ON community_spaces(group_id, position);
@@ -759,4 +764,75 @@ const linkPattern = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|br|io|me|co|a
 
 export function containsExternalLink(text: string) {
   return linkPattern.test(text);
+}
+
+export function toggleFeatured(postId: number) {
+  const existing = db
+    .prepare("SELECT post_id FROM community_featured_posts WHERE post_id = ?")
+    .get(postId) as { post_id: number } | undefined;
+
+  if (existing) {
+    db.prepare("DELETE FROM community_featured_posts WHERE post_id = ?").run(postId);
+    return false;
+  }
+
+  db.prepare("INSERT INTO community_featured_posts (post_id) VALUES (?)").run(postId);
+  return true;
+}
+
+export function isFeatured(postId: number) {
+  return Boolean(
+    db.prepare("SELECT post_id FROM community_featured_posts WHERE post_id = ?").get(postId)
+  );
+}
+
+export type TrendingPost = CommunityPost & { reaction_total: number; featured: boolean };
+
+// Publicacoes em alta: primeiro o que o admin marcou como destaque, depois as
+// mais reagidas. Respeita o acesso do membro, como o resto do feed.
+export function getTrendingPosts(eligibleSales: number, limit = 5): TrendingPost[] {
+  return db
+    .prepare(
+      `${postSelect}
+       LEFT JOIN community_featured_posts
+         ON community_featured_posts.post_id = community_posts.id
+       WHERE community_posts.status = 'published'
+         AND community_spaces.status = 'active'
+         AND community_spaces.min_eligible_sales <= ?
+       ORDER BY (community_featured_posts.post_id IS NOT NULL) DESC,
+                (
+                  SELECT COUNT(*) FROM community_reactions
+                  WHERE community_reactions.post_id = community_posts.id
+                ) DESC,
+                community_posts.created_at DESC
+       LIMIT ?`
+    )
+    .all(eligibleSales, limit)
+    .map((row) => {
+      const post = row as CommunityPost;
+      return {
+        ...post,
+        reaction_total: (
+          db
+            .prepare("SELECT COUNT(*) AS total FROM community_reactions WHERE post_id = ?")
+            .get(post.id) as { total: number }
+        ).total,
+        featured: isFeatured(post.id),
+      };
+    });
+}
+
+export function getRecentPostsForAdmin(limit = 40): (CommunityPost & { featured: boolean })[] {
+  return db
+    .prepare(
+      `${postSelect}
+       WHERE community_posts.status = 'published'
+       ORDER BY community_posts.created_at DESC
+       LIMIT ?`
+    )
+    .all(limit)
+    .map((row) => {
+      const post = row as CommunityPost;
+      return { ...post, featured: isFeatured(post.id) };
+    });
 }

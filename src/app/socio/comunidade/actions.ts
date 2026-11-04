@@ -14,6 +14,7 @@ import {
   setReaction,
   toggleFavorite,
 } from "@/lib/community";
+import { getEventById, toggleRsvp } from "@/lib/events";
 
 function asText(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -122,4 +123,18 @@ export async function toggleFavoriteAction(formData: FormData) {
   revalidatePath(`/socio/comunidade/${post.space_slug}`);
   revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
   revalidatePath("/socio/comunidade/favoritos");
+}
+
+export async function toggleEventRsvpAction(formData: FormData) {
+  const session = await requireAffiliate();
+  const eventId = Number(requireText(formData, "event_id", 20));
+  const event = getEventById(eventId);
+  if (!event) throw new Error("Evento nao encontrado.");
+  if (event.status !== "scheduled") throw new Error("Este evento nao esta aberto para confirmacao.");
+
+  toggleRsvp(eventId, session.affiliateId);
+
+  revalidatePath("/socio/comunidade");
+  revalidatePath("/socio/comunidade/eventos");
+  revalidatePath("/admin/eventos");
 }
