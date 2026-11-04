@@ -1,12 +1,21 @@
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { requireAffiliate } from "@/lib/auth";
-import { attachPostMeta, getFavoritePosts, getMemberEligibleSales } from "@/lib/community";
+import { getAvatarUrls } from "@/lib/profiles";
+import { publicUrl } from "@/lib/storage";
+import {
+  attachPostMeta,
+  getFavoritePosts,
+  getMemberEligibleSales,
+  getPostImagePaths,
+} from "@/lib/community";
 import Link from "next/link";
 
 export default async function CommunityFavoritesPage() {
   const session = await requireAffiliate();
   const eligibleSales = getMemberEligibleSales(session.affiliateId);
   const posts = attachPostMeta(getFavoritePosts(session.affiliateId, eligibleSales), session.affiliateId);
+  const avatars = getAvatarUrls(posts.map((post) => post.author_id));
+  const images = getPostImagePaths(posts.map((post) => post.id));
 
   return (
     <>
@@ -20,7 +29,15 @@ export default async function CommunityFavoritesPage() {
 
       <section className="community-feed">
         {posts.length ? (
-          posts.map((post) => <CommunityPostCard key={post.id} post={post} showSpace />)
+          posts.map((post) => (
+            <CommunityPostCard
+              key={post.id}
+              post={post}
+              showSpace
+              avatarUrl={post.author_type === "member" ? avatars.get(post.author_id) : null}
+              imageUrl={publicUrl(images.get(post.id))}
+            />
+          ))
         ) : (
           <div className="panel community-empty">
             <strong>Nenhum favorito ainda.</strong>

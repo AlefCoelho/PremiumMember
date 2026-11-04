@@ -29,7 +29,11 @@ export function timeAgo(value: string) {
   return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(created);
 }
 
-export function CommunityAvatar({ name }: { name: string }) {
+export function CommunityAvatar({ name, url }: { name: string; url?: string | null }) {
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img className="community-avatar community-avatar-photo" src={url} alt={name} />;
+  }
   return <span className="community-avatar">{initials(name)}</span>;
 }
 
@@ -78,16 +82,20 @@ export function CommunityReactionBar({ post }: { post: CommunityPostWithMeta }) 
 export function CommunityPostCard({
   post,
   showSpace = false,
+  avatarUrl,
+  imageUrl,
 }: {
   post: CommunityPost | CommunityPostWithMeta;
   showSpace?: boolean;
+  avatarUrl?: string | null;
+  imageUrl?: string | null;
 }) {
   const href = `/socio/comunidade/${post.space_slug}/${post.id}`;
 
   return (
     <article className="community-post">
       <header>
-        <CommunityAvatar name={post.author_name} />
+        <CommunityAvatar name={post.author_name} url={avatarUrl} />
         <div>
           <strong>{shortName(post.author_name)}</strong>
           <span>
@@ -103,6 +111,13 @@ export function CommunityPostCard({
         {post.title}
       </Link>
       <p className="community-post-body">{post.body}</p>
+
+      {imageUrl ? (
+        <Link href={href} className="community-post-image">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt={post.title} loading="lazy" />
+        </Link>
+      ) : null}
 
       {hasMeta(post) ? <CommunityReactionBar post={post} /> : null}
 

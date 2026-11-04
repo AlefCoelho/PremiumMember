@@ -1,7 +1,16 @@
 import { createCommunityPostAction } from "@/app/socio/comunidade/actions";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import { ImageUploadField } from "@/components/ImageUploadField";
 import { requireAffiliate } from "@/lib/auth";
-import { attachPostMeta, getMemberEligibleSales, getSpaceBySlug, getSpacePosts } from "@/lib/community";
+import { getAvatarUrls } from "@/lib/profiles";
+import { publicUrl } from "@/lib/storage";
+import {
+  attachPostMeta,
+  getMemberEligibleSales,
+  getPostImagePaths,
+  getSpaceBySlug,
+  getSpacePosts,
+} from "@/lib/community";
 import { notFound } from "next/navigation";
 
 const kindLabel: Record<string, string> = {
@@ -36,6 +45,8 @@ export default async function CommunitySpacePage({
   }
 
   const posts = attachPostMeta(getSpacePosts(space.id), session.affiliateId);
+  const avatars = getAvatarUrls(posts.map((post) => post.author_id));
+  const images = getPostImagePaths(posts.map((post) => post.id));
 
   return (
     <>
@@ -58,6 +69,7 @@ export default async function CommunitySpacePage({
             Mensagem
             <textarea name="body" rows={4} placeholder="Escreva aqui..." maxLength={8000} required />
           </label>
+          <ImageUploadField name="image" label="Adicionar imagem" />
           {erro === "link" ? (
             <p className="form-error">
               Link externo nao e permitido na comunidade. Tire o endereco e publique de novo.
@@ -71,7 +83,14 @@ export default async function CommunitySpacePage({
 
       <section className="community-feed">
         {posts.length ? (
-          posts.map((post) => <CommunityPostCard key={post.id} post={post} />)
+          posts.map((post) => (
+            <CommunityPostCard
+              key={post.id}
+              post={post}
+              avatarUrl={post.author_type === "member" ? avatars.get(post.author_id) : null}
+              imageUrl={publicUrl(images.get(post.id))}
+            />
+          ))
         ) : (
           <div className="panel community-empty">
             <strong>Nenhuma publicacao neste espaco.</strong>

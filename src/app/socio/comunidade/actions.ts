@@ -11,10 +11,13 @@ import {
   getPostById,
   getSpaceBySlug,
   isReactionKind,
+  setPostImage,
   setReaction,
   toggleFavorite,
 } from "@/lib/community";
 import { getEventById, toggleRsvp } from "@/lib/events";
+import { removeAvatar, setAvatar } from "@/lib/profiles";
+import { saveImage } from "@/lib/storage";
 
 function asText(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -50,6 +53,12 @@ export async function createCommunityPostAction(formData: FormData) {
     title,
     body,
   });
+
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    const saved = await saveImage(image, "posts");
+    if (saved.ok) setPostImage(postId, saved.storedPath);
+  }
 
   revalidatePath("/socio/comunidade");
   revalidatePath(`/socio/comunidade/${space.slug}`);
@@ -137,4 +146,29 @@ export async function toggleEventRsvpAction(formData: FormData) {
   revalidatePath("/socio/comunidade");
   revalidatePath("/socio/comunidade/eventos");
   revalidatePath("/admin/eventos");
+}
+
+export async function updateAvatarAction(formData: FormData) {
+  const session = await requireAffiliate();
+  const image = formData.get("avatar");
+
+  if (!(image instanceof File) || image.size === 0) {
+    redirect("/socio/comunidade/perfil?erro=vazio");
+  }
+
+  const saved = await saveImage(image, "avatars");
+  if (!saved.ok) {
+    redirect(`/socio/comunidade/perfil?erro=${saved.reason}`);
+  }
+
+  setAvatar(session.affiliateId, saved.storedPath);
+  revalidatePath("/socio/comunidade", "layout");
+  redirect("/socio/comunidade/perfil?ok=1");
+}
+
+export async function removeAvatarAction() {
+  const session = await requireAffiliate();
+  removeAvatar(session.affiliateId);
+  revalidatePath("/socio/comunidade", "layout");
+  redirect("/socio/comunidade/perfil?removido=1");
 }

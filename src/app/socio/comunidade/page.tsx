@@ -1,10 +1,13 @@
 import { toggleEventRsvpAction } from "@/app/socio/comunidade/actions";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { requireAffiliate } from "@/lib/auth";
+import { getAvatarUrls } from "@/lib/profiles";
+import { publicUrl } from "@/lib/storage";
 import {
   attachPostMeta,
   getCommunityPortalData,
   getFeedPosts,
+  getPostImagePaths,
   getTrendingPosts,
 } from "@/lib/community";
 import { attachRsvp, eventDayParts, getUpcomingEvents } from "@/lib/events";
@@ -17,6 +20,9 @@ export default async function CommunityFeedPage() {
   const posts = attachPostMeta(getFeedPosts(eligibleSales), session.affiliateId);
 
   // As duas colunas da direita existem so aqui, no Feed.
+  const avatars = getAvatarUrls(posts.map((post) => post.author_id));
+  const images = getPostImagePaths(posts.map((post) => post.id));
+
   const events = attachRsvp(getUpcomingEvents(5), session.affiliateId);
   const trending = getTrendingPosts(eligibleSales, 5);
 
@@ -33,7 +39,15 @@ export default async function CommunityFeedPage() {
       <div className="community-feed-layout">
         <section className="community-feed">
           {posts.length ? (
-            posts.map((post) => <CommunityPostCard key={post.id} post={post} showSpace />)
+            posts.map((post) => (
+              <CommunityPostCard
+                key={post.id}
+                post={post}
+                showSpace
+                avatarUrl={post.author_type === "member" ? avatars.get(post.author_id) : null}
+                imageUrl={publicUrl(images.get(post.id))}
+              />
+            ))
           ) : (
             <div className="panel community-empty">
               <strong>Nenhuma publicacao ainda.</strong>

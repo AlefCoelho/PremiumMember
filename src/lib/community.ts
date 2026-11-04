@@ -63,6 +63,12 @@ CREATE TABLE IF NOT EXISTS community_favorites (
   UNIQUE (post_id, affiliate_id)
 );
 
+CREATE TABLE IF NOT EXISTS community_post_images (
+  post_id INTEGER PRIMARY KEY REFERENCES community_posts(id) ON DELETE CASCADE,
+  image_path TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS community_featured_posts (
   post_id INTEGER PRIMARY KEY REFERENCES community_posts(id) ON DELETE CASCADE,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -835,4 +841,24 @@ export function getRecentPostsForAdmin(limit = 40): (CommunityPost & { featured:
       const post = row as CommunityPost;
       return { ...post, featured: isFeatured(post.id) };
     });
+}
+
+export function setPostImage(postId: number, storedPath: string) {
+  db.prepare(
+    `INSERT INTO community_post_images (post_id, image_path)
+     VALUES (?, ?)
+     ON CONFLICT (post_id) DO UPDATE SET image_path = excluded.image_path`
+  ).run(postId, storedPath);
+}
+
+export function getPostImagePaths(postIds: number[]) {
+  const unique = [...new Set(postIds)];
+  if (!unique.length) return new Map<number, string>();
+  const rows = db
+    .prepare(
+      `SELECT post_id, image_path FROM community_post_images
+       WHERE post_id IN (${unique.map(() => "?").join(",")})`
+    )
+    .all(...unique) as { post_id: number; image_path: string }[];
+  return new Map(rows.map((row) => [row.post_id, row.image_path]));
 }

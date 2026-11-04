@@ -2054,3 +2054,79 @@ textarea {
     position: static;
   }
 }
+
+.community-avatar-photo {
+  object-fit: cover;
+  padding: 0;
+}
+
+.community-post-image {
+  display: block;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.community-post-image img {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.image-upload {
+  display: grid;
+  gap: 8px;
+}
+
+.image-upload-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.image-upload-trigger:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.image-upload-trigger input {
+  display: none;
+}
+
+.image-upload-preview {
+  position: relative;
+  justify-self: start;
+  max-width: 260px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-upload-preview img {
+  display: block;
+  width: 100%;
+}
+
+.image-upload-preview button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
