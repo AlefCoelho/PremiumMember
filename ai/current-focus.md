@@ -32,7 +32,16 @@ https://premiummember.online — VPS `root@2.24.65.26` (atalho SSH `premium-vps`
 nginx, Node v22.23.1. Banco em `data/socios-premiums.sqlite`, com `SOCIOS_DB_PATH` absoluto
 no unit do systemd.
 
-Producao: 17 afiliados, 2 admins. Conferir esses dois numeros **depois** de todo restart.
+Producao: **18 afiliados, 1 admin** (em 2026-11-04). Conferir esses dois numeros **depois**
+de todo restart — nao para proteger os registros, e sim para detectar se o app subiu
+apontando para outro banco. Contagem muito menor que a esperada significa que o
+`SOCIOS_DB_PATH` se perdeu.
+
+O numero de afiliados **cresce sozinho** conforme gente se cadastra por
+`/cadastro-membro`; confira o valor atual antes de usar como referencia. O segundo admin,
+`admin@sociospremiums.local` (id 1), de um dominio antigo, foi apagado em 2026-11-04 a
+pedido do Alef — nao tinha publicacao nem comentario. Hoje so existe
+`admin@premiummember.local` (id 11).
 
 Dev local: `SOCIOS_DB_PATH` para um arquivo descartavel, `npx next dev -p 3021`.
 Admin de dev: `admin@premiummember.local` / `admin123` (do `.env.example`; producao e outra).
