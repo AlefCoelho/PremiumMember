@@ -321,7 +321,10 @@ systemctl start socios-premiums
 
 Backup so antes de deploy nao protege contra perda no dia a dia. Agende um diario.
 
-Ha um script pronto no repositorio, `scripts/setup-backups.sh`. Ele le o caminho do banco do
+Se voce nao se sente a vontade no terminal, use **`scripts/BACKUP-PASSO-A-PASSO.md`**: o
+mesmo resultado, um comando por vez, com o que deve aparecer depois de cada um.
+
+Para quem prefere automatizar, ha um script pronto, `scripts/setup-backups.sh`. Ele le o caminho do banco do
 proprio unit do systemd, instala as duas linhas de crontab sem duplicar se ja existirem,
 guarda o crontab anterior e no fim tira uma copia de teste para provar que o comando
 funciona — em vez de descobrir as 3h da manha que estava errado:
