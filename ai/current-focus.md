@@ -63,6 +63,19 @@ diario. O comando esta no `DEPLOY.md`. Falta tambem copia **fora** da VPS.
 `teste.comunidade@premiummember.local` (id 23), ativo e contando. Decidir se apaga antes de
 divulgar.
 
+### Sobre os 17 membros de producao
+
+O Alef definiu em 2026-11-04 que sao de um projeto antigo, sem valor real, e podem ser
+recadastrados. Nao trate como dado sagrado.
+
+**Mas continue conferindo a contagem depois de todo restart.** Ela nao protege os registros:
+detecta se o app subiu apontando para outro banco (`known-issues.md` item 1). Contagem
+inesperada significa cadastros **futuros** indo para pasta que o proximo build apaga.
+
+Ponto nao resolvido: o `CONTINUACAO.md` fala em "saques envolvidos". Antes de qualquer
+limpeza, conferir `SELECT status, COUNT(*) FROM withdrawals GROUP BY status;` — saque
+pendente e dinheiro devido.
+
 ## Antes de divulgar para alunos novos
 
 - Cadastro publico **funciona**: `/cadastro-membro` cria conta, loga e abre a dashboard.
