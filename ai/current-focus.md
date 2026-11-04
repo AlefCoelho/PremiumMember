@@ -1,13 +1,15 @@
 # Estado atual
 
-Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`.** O `main` esta em
-`46b58be` (um commit a frente, so o `CONTINUACAO.md`), e a branch `memoria-operacional` em
-`72d2500`, com o PR #3 aberto em draft.
+Atualizado em 2026-11-04. **Producao, `main`, `feat/comunidade`, `feat/admin-comunidade` e
+`memoria-operacional` estao todas no commit `53c1399`.**
 
-**As notificacoes da comunidade ainda NAO estao em producao.** O deploy foi tentado em
-2026-11-04 pela sessao local e **barrado pelo classificador de modo automatico**, que
-bloqueia escrita em producao sem autorizacao explicita do Alef. O codigo esta pronto e
-testado na branch; falta so o Alef liberar o passo.
+**As notificacoes da comunidade estao em producao** desde 2026-11-04. Conferido depois do
+restart: 17 afiliados, 2 admins, `community_notifications` criada, `data/uploads/` intacto
+com `avatars/` e `posts/`, e as classes `notification-row` e `notification-avatar`
+presentes na folha de estilo servida. Nenhum erro no journal.
+
+O PR #3 continua **aberto e em draft**. Como as branches foram avancadas por fast-forward,
+ele nao tem mais nada para mesclar — da para fechar quando o Alef quiser.
 
 ## O que e
 
