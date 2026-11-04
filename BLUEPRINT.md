@@ -7,16 +7,25 @@ Destinado a sessao local do Claude Code e ao Alef.
 
 ## 1. Onde cada coisa esta
 
+> **Atualizado em 2026-11-04.** Entre a primeira versao deste documento e agora, o PR #3 foi
+> mesclado, o backup diario entrou na VPS, o disco foi limpo e **o deploy aconteceu**. As
+> secoes abaixo refletem o estado novo; o que mudou esta marcado.
+
 | | Commit | O que e |
 |---|---|---|
-| **Producao (VPS)** | `254cb6a` | o que esta no ar em https://premiummember.online |
-| **`main` no GitHub** | `46b58be` | 1 commit a frente da producao — **so o `CONTINUACAO.md`**, nenhum codigo |
-| **Branch `memoria-operacional`** | `c8c8d7b` | 11 commits a frente do `main`, com o PR #3 aberto |
+| **Producao (VPS)** | `53c1399` | no ar em https://premiummember.online, **com as notificacoes** |
+| **`main` no GitHub** | `b83d84f` | 2 commits a frente — **so documentacao**, nenhum codigo |
 
-**Producao e `main` estao iguais em codigo.** A diferenca e um arquivo `.md`.
+**As notificacoes estao em producao** desde 2026-11-04. Conferido depois do restart: 17
+afiliados, 2 admins, `community_notifications` criada, `data/uploads/` intacto com `avatars/`
+e `posts/`, e as classes `notification-row` e `notification-avatar` na folha de estilo
+servida. Nenhum erro no journal.
 
-**PR #3**: aberto, `mergeable_state: clean`, sem conflito, 25 arquivos, +2276/-56.
-**Esta como DRAFT**, e draft nao pode ser mesclado. Ver passo 2 da secao 5.
+**O PR #3 foi fechado como merged pelo proprio GitHub**, nao por alguem clicando no botao: ao avancar o `main` por fast-forward ate os commits da branch, o GitHub reconheceu que tudo ja estava na base. Draft nao impede esse fechamento automatico.
+
+**Daqui em diante `main` e producao podem divergir.** Nao basta olhar o GitHub para saber o
+que esta no ar; hoje a diferenca e so documentacao, mas isso nao e garantido. Para saber se
+um deploy aconteceu, pergunte ao banco de producao, nao ao repositorio.
 
 ---
 
@@ -131,14 +140,18 @@ Nenhum passo do deploy acontece fora da VPS. Esta sessao nao a alcanca:
 Remote Control foi tentado: o computador **ALEF** aparece conectado, mas nenhuma das pastas
 e oferecida a sessoes de nuvem. Esse recurso pode ainda nao estar liberado para a conta.
 
+**Resolvido em 2026-11-04:** a sessao local fez o deploy, com autorizacao do Alef. A primeira
+tentativa dela tambem foi barrada, pelo classificador de modo automatico, que exige
+autorizacao explicita para escrever em producao.
+
 ### 4.2 Backup diario e limpeza de disco
 
-Mesmo motivo. Ficaram prontos em `scripts/`, faltando rodar na VPS.
+Mesmo motivo — **ambos resolvidos pela sessao local em 2026-11-04**. Ver passo 4 da secao 5.
 
 ### 4.3 Marcar o PR como pronto
 
-Tentado e **bloqueado pela politica desta sessao**. O PR segue em draft e **nao pode ser
-mesclado nesse estado**.
+Tentado e bloqueado pela politica desta sessao. Acabou nao sendo um problema: o Alef mesclou
+o PR #3 sozinho, ao detectar os commits na base.
 
 ### 4.4 Niveis e badges do membro
 
@@ -177,24 +190,24 @@ definiu que os 17 membros nao tem valor real. Ela detecta se o app subiu apontan
 dentro de `.next/standalone/data`, pasta que o proximo build apaga. O prejuizo nao seria o
 passado — seriam os cadastros **futuros**.
 
-### Passo 3 — Tirar o PR #3 do draft e mesclar
+### Passo 3 — ~~Mesclar o PR #3~~ FEITO
 
-Draft nao mescla. Tire do draft, depois mescle, para `main` e producao ficarem iguais.
+Fechado como merged pelo proprio GitHub quando o `main` avancou por fast-forward. Nada a fazer; o `gh pr ready 3` previsto aqui nunca foi necessario.
 
-```bash
-gh pr ready 3
-gh pr merge 3 --squash   # ou --merge, conforme a preferencia do Alef
-```
+### Passo 4 — ~~Backup diario~~ FEITO
 
-Se `gh` usar GraphQL e for recusado, use a rota REST:
-`POST /repos/AlefCoelho/PremiumMember/pulls/3/ccr/ready_for_review`
+Instalado na VPS em 2026-11-04 pela sessao local: banco as 03h00, `data/uploads/` as 03h30,
+retencao de 14 dias. O proprio `setup-backups.sh` provou a copia na hora, e ela abriu com 17
+afiliados.
 
-### Passo 4 — Backup diario, se ainda nao instalado
+A copia **fora** da VPS tambem foi resolvida: `scripts/puxar-backups.sh` roda na maquina
+local, traz os arquivos e confere que o `.sqlite` abre, em vez de so copiar bytes. Ja rodou
+uma vez. Vale repetir toda semana.
 
-`scripts/setup-backups.sh` na VPS. Cobre o banco **e** as imagens. Rodar sem argumento mostra
-o que faria; com `--aplicar`, aplica.
+### Passo 5 — ~~Disco da VPS~~ FEITO
 
-Lembre: backup que mora so no servidor nao e backup. Tirar copia para fora.
+`npm cache clean --force` liberou 2,1 GB: o disco saiu de 91% para 89%, com 11 GB livres, e
+`/root/.npm` ficou em 5,2 MB. O que ainda ocupa espaco e de outros projetos na VPS.
 
 ### Passo 5 — Disco da VPS
 
@@ -211,17 +224,14 @@ isso a proxima sessao recomeca do zero, como esta recomecou.
 
 ## 6. Pontos em aberto
 
-### 6.1 Saques — merece conferencia antes de qualquer limpeza
+### 6.1 Saques — RESPONDIDO em 2026-11-04: nao ha nenhum
 
-O Alef definiu que os 17 membros sao de um projeto antigo e podem ser recadastrados. Mas o
-`CONTINUACAO.md` fala em *"16 membros reais e saques envolvidos"*. Saque pendente e dinheiro
-devido a alguem.
+A sessao local conferiu direto no banco de producao:
+`SELECT status, COUNT(*) FROM withdrawals GROUP BY status` devolve **zero linhas**.
 
-```bash
-sqlite3 /home/user/htdocs/socios-premiums/data/socios-premiums.sqlite "SELECT status, COUNT(*) FROM withdrawals GROUP BY status;"
-```
-
-Nenhuma linha = o documento esta velho nesse trecho, e a memoria pode ser corrigida.
+Nao ha dinheiro devido a ninguem. O trecho do `CONTINUACAO.md` que fala em *"16 membros
+reais e saques envolvidos"* estava velho. Com isso, a decisao do Alef sobre os 17 membros
+nao esbarra em nenhuma obrigacao financeira.
 
 ### 6.2 Limites conhecidos das notificacoes
 
@@ -247,14 +257,19 @@ e um `<textarea>` sem autocomplete. Decidido isso, a notificacao e so chamar `in
 
 ---
 
-## 7. Ordem recomendada
+## 7. O que ainda falta
 
-1. **Backup de pe** — se ainda nao estiver
-2. **Deploy** — rota curta ou completa
-3. **Verificar** — contagem de afiliados, site respondendo, pagina de notificacoes no navegador
-4. **Mesclar o PR #3** — depois de tirar do draft
-5. **Disco e cron** — se faltarem
-6. **Atualizar `ai/`** — com o commit que foi para producao
+Tudo que este documento listava como proximo passo foi feito em 2026-11-04: backup diario,
+deploy, verificacao, mesclagem do PR #3 e limpeza de disco. **Nao ha tarefa pendente de
+engenharia.**
 
-Deployar antes de ter backup e a troca errada, mesmo com dados descartaveis: o que protege
-nesse caso nao e o banco, e o `tar` do `src`, que esta no passo 2 das duas rotas.
+O que resta depende de decisao do Alef, nao de codigo:
+
+1. **Niveis e badges do membro** — quantos niveis, nomes e peso de cada criterio. O
+   `CONTINUACAO.md` manda perguntar antes, e continua valendo.
+2. **Mencao com `@`** — falta decidir como identificar a pessoa (nome nao e unico em
+   `affiliates`, e o formulario e um `<textarea>` sem autocomplete).
+3. **Membro de teste em producao** — apagar ou nao antes de divulgar.
+
+E uma rotina que vale manter: rodar `scripts/puxar-backups.sh` toda semana. Backup que mora
+so no servidor nao e backup, e um que ninguem verifica so se descobre quebrado no pior dia.

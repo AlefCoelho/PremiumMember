@@ -1,17 +1,24 @@
 # Estado atual
 
-Atualizado em 2026-11-04. **Producao, `main`, `feat/comunidade`, `feat/admin-comunidade` e
-`memoria-operacional` estao todas no commit `53c1399`.**
+Atualizado em 2026-11-04. **As notificacoes da comunidade estao em producao** desde
+2026-11-04. Conferido depois do restart: 17 afiliados, 2 admins, `community_notifications`
+criada, `data/uploads/` intacto com `avatars/` e `posts/`, e as classes `notification-row` e
+`notification-avatar` presentes na folha de estilo servida. Nenhum erro no journal.
 
-**As notificacoes da comunidade estao em producao** desde 2026-11-04. Conferido depois do
-restart: 17 afiliados, 2 admins, `community_notifications` criada, `data/uploads/` intacto
-com `avatars/` e `posts/`, e as classes `notification-row` e `notification-avatar`
-presentes na folha de estilo servida. Nenhum erro no journal.
+**O codigo em producao e o de `53c1399`.** O `main` seguiu adiante, e os commits a frente
+sao **so documentacao** (`ai/` e `BLUEPRINT.md`), nenhum codigo. Entao producao esta em dia
+no que importa. Confira o commit atual do `main` com `git rev-parse --short origin/main`,
+em vez de confiar no numero escrito aqui, que envelhece a cada commit.
 
-O **PR #3 foi fechado como merged** pelo proprio GitHub: ao avancar o `main` por
-fast-forward ate os commits da `memoria-operacional`, o GitHub reconheceu que tudo ja
-estava na base e fechou sozinho. Nao foi preciso tirar do draft — draft impede mesclar pelo
-botao, nao impede o fechamento automatico quando os commits chegam na base por fora.
+O **PR #3 foi fechado como merged pelo proprio GitHub**, nao por alguem clicando no botao:
+ao avancar o `main` por fast-forward ate os commits da `memoria-operacional`, o GitHub
+reconheceu que tudo ja estava na base e fechou sozinho. Draft impede mesclar pelo botao,
+nao impede esse fechamento automatico. Por isso o `gh pr ready 3` que o blueprint previa
+nunca foi necessario.
+
+> Daqui em diante `main` e producao podem divergir. Olhar o GitHub nao responde mais o que
+> esta no ar. Para saber se um deploy aconteceu, pergunte ao banco de producao, nao ao
+> repositorio — por exemplo, se a tabela de um recurso novo ja existe la.
 
 ## O que e
 
@@ -102,9 +109,7 @@ recadastrados. Nao trate como dado sagrado.
 detecta se o app subiu apontando para outro banco (`known-issues.md` item 1). Contagem
 inesperada significa cadastros **futuros** indo para pasta que o proximo build apaga.
 
-Ponto nao resolvido: o `CONTINUACAO.md` fala em "saques envolvidos". Antes de qualquer
-limpeza, conferir `SELECT status, COUNT(*) FROM withdrawals GROUP BY status;` — saque
-pendente e dinheiro devido.
+Sobre os saques, ver o item 6 acima: conferido, nao ha nenhum.
 
 ## Antes de divulgar para alunos novos
 
