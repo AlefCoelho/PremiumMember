@@ -2442,6 +2442,10 @@ textarea {
   isolation: isolate;
   overflow-x: hidden;
   background: var(--bg);
+  /* Nesta pagina o texto de apoio e branco, nao cinza: ela e a vitrine do
+     produto e precisa de leitura firme. Redefinir --muted aqui cobre todas as
+     descricoes de uma vez, sem mexer no resto do sistema. */
+  --muted: #ffffff;
   /* Cada secao encaixa ao rolar, sem prender: o leitor ainda passa direto se
      quiser. scroll-snap obrigatorio em pagina longa irrita mais do que ajuda. */
   scroll-snap-type: y proximity;
@@ -2735,6 +2739,26 @@ textarea {
   min-height: 54px;
   padding: 0 26px;
   font-size: 15px;
+  /* Respira em escala e brilho, mais lento que um piscar, para chamar sem
+     apressar. So transform e box-shadow: nao recalcula layout. */
+  animation: lp-cta-pulso 2.8s ease-in-out infinite;
+}
+
+.lp-cta:hover {
+  animation-play-state: paused;
+  transform: translateY(-1px);
+}
+
+@keyframes lp-cta-pulso {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(200, 153, 47, 0.45), 0 10px 26px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 10px rgba(200, 153, 47, 0), 0 14px 32px rgba(0, 0, 0, 0.45);
+  }
 }
 
 .lp-nota {
@@ -2786,6 +2810,10 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   .lp {
     scroll-snap-type: none;
+  }
+
+  .lp-cta {
+    animation: none;
   }
 
   .lp-aura {

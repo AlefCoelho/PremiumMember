@@ -299,10 +299,17 @@ export default function ApresentacaoPage() {
             </li>
           </ul>
 
-          <Link className="primary-button lp-cta" href="/cadastro-membro">
+          {/* Pagamento fica fora do sistema por enquanto: a InfinitePay do app
+              esta desligada, entao o botao leva direto para a fatura. */}
+          <a
+            className="primary-button lp-cta"
+            href="https://invoice.infinitepay.io/plans/gabriela-42644709-4v3/AAZSyC2MYW"
+            target="_blank"
+            rel="noreferrer"
+          >
             <Crown size={18} />
             Adquirir acesso por R$ 97,00 mensal
-          </Link>
+          </a>
 
           <p className="muted lp-nota">
             Ja e membro? <Link href="/socio/login">Entre no portal</Link>.
