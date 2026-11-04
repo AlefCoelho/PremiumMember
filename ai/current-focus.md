@@ -8,8 +8,10 @@ restart: 17 afiliados, 2 admins, `community_notifications` criada, `data/uploads
 com `avatars/` e `posts/`, e as classes `notification-row` e `notification-avatar`
 presentes na folha de estilo servida. Nenhum erro no journal.
 
-O PR #3 continua **aberto e em draft**. Como as branches foram avancadas por fast-forward,
-ele nao tem mais nada para mesclar — da para fechar quando o Alef quiser.
+O **PR #3 foi fechado como merged** pelo proprio GitHub: ao avancar o `main` por
+fast-forward ate os commits da `memoria-operacional`, o GitHub reconheceu que tudo ja
+estava na base e fechou sozinho. Nao foi preciso tirar do draft — draft impede mesclar pelo
+botao, nao impede o fechamento automatico quando os commits chegam na base por fora.
 
 ## O que e
 
