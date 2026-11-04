@@ -72,9 +72,13 @@ local, traz os arquivos para `find-skills/backups-producao/` e **confere que o .
 abre**. Ja rodou uma vez com sucesso. Falta agendar no Agendador de Tarefas do Windows,
 depois das 3h30 — enquanto isso, rodar a mao de vez em quando.
 
-### 4. Disco da VPS em 91%
+### 4. Disco da VPS em 89%
 
-8,7 GB livres. Ver `known-issues.md` item 9.
+11 GB livres. Em 2026-11-04 foram liberados 2,1 GB com `npm cache clean --force`, que
+deixou `/root/.npm` em 5,2 MB. O servico continuou ativo e o site respondendo 200.
+
+O que resta e de outros projetos na VPS, nao do Premium Member: ~58 GB em `/home/user`.
+O proprio projeto ocupa ~700 MB. Ver `known-issues.md` item 9.
 
 ### 5. Membro de teste em producao
 
