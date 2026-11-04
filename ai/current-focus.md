@@ -32,7 +32,7 @@ https://premiummember.online — VPS `root@2.24.65.26` (atalho SSH `premium-vps`
 nginx, Node v22.23.1. Banco em `data/socios-premiums.sqlite`, com `SOCIOS_DB_PATH` absoluto
 no unit do systemd.
 
-Producao: **18 afiliados, 1 admin** (em 2026-11-04). Conferir esses dois numeros **depois**
+Producao: **17 afiliados, 1 admin** (em 2026-11-04). Conferir esses dois numeros **depois**
 de todo restart — nao para proteger os registros, e sim para detectar se o app subiu
 apontando para outro banco. Contagem muito menor que a esperada significa que o
 `SOCIOS_DB_PATH` se perdeu.
@@ -98,10 +98,11 @@ deixou `/root/.npm` em 5,2 MB. O servico continuou ativo e o site respondendo 20
 O que resta e de outros projetos na VPS, nao do Premium Member: ~58 GB em `/home/user`.
 O proprio projeto ocupa ~700 MB. Ver `known-issues.md` item 9.
 
-### 5. Membro de teste em producao
+### 5. Membro de teste em producao — RESOLVIDO
 
-`teste.comunidade@premiummember.local` (id 23), ativo e contando. Decidir se apaga antes de
-divulgar.
+`teste.comunidade@premiummember.local` (id 23) foi apagado em 2026-11-04 a pedido do Alef.
+Nao tinha publicacao, comentario, reacao, favorito, indicacao nem saque, e nao era
+patrocinador de ninguem — conferido um a um antes, com backup na frente.
 
 ### 6. Saques — conferido, nao ha nenhum
 
