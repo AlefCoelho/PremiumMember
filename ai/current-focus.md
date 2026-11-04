@@ -1,13 +1,17 @@
 # Estado atual
 
 Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`.** O `main` esta em
-`46b58be` (um commit a frente, so o `CONTINUACAO.md`), e a branch `memoria-operacional` em
-`72d2500`, com o PR #3 aberto em draft.
+`53c1399`: o PR #3 foi **mesclado** em 2026-11-04 18:03 UTC, entao o codigo das notificacoes,
+a memoria `ai/`, o `DEPLOY.md` corrigido e os scripts ja estao no `main`.
 
-**As notificacoes da comunidade ainda NAO estao em producao.** O deploy foi tentado em
-2026-11-04 pela sessao local e **barrado pelo classificador de modo automatico**, que
-bloqueia escrita em producao sem autorizacao explicita do Alef. O codigo esta pronto e
-testado na branch; falta so o Alef liberar o passo.
+**As notificacoes ainda NAO estao em producao.** O `main` esta a frente da VPS. O deploy foi
+tentado pela sessao local e **barrado pelo classificador de modo automatico**, que bloqueia
+escrita em producao sem autorizacao explicita do Alef. O codigo esta pronto e testado; falta
+so o Alef liberar o passo.
+
+> Como `main` e producao divergiram, nao basta olhar o GitHub para saber o que esta no ar.
+> A pergunta que decide: a tabela `community_notifications` existe no banco de producao?
+> Existe -> o deploy aconteceu. Nao existe -> nao aconteceu.
 
 ## O que e
 
@@ -94,9 +98,7 @@ recadastrados. Nao trate como dado sagrado.
 detecta se o app subiu apontando para outro banco (`known-issues.md` item 1). Contagem
 inesperada significa cadastros **futuros** indo para pasta que o proximo build apaga.
 
-Ponto nao resolvido: o `CONTINUACAO.md` fala em "saques envolvidos". Antes de qualquer
-limpeza, conferir `SELECT status, COUNT(*) FROM withdrawals GROUP BY status;` — saque
-pendente e dinheiro devido.
+Sobre os saques, ver o item 6 acima: conferido, nao ha nenhum.
 
 ## Antes de divulgar para alunos novos
 

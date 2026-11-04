@@ -7,16 +7,21 @@ Destinado a sessao local do Claude Code e ao Alef.
 
 ## 1. Onde cada coisa esta
 
+> **Atualizado em 2026-11-04 18:10 UTC.** O PR #3 foi mesclado e o backup diario foi
+> instalado depois da primeira versao deste documento. As secoes abaixo refletem o estado
+> novo; onde algo mudou, esta marcado.
+
 | | Commit | O que e |
 |---|---|---|
 | **Producao (VPS)** | `254cb6a` | o que esta no ar em https://premiummember.online |
-| **`main` no GitHub** | `46b58be` | 1 commit a frente da producao — **so o `CONTINUACAO.md`**, nenhum codigo |
-| **Branch `memoria-operacional`** | `c8c8d7b` | 11 commits a frente do `main`, com o PR #3 aberto |
+| **`main` no GitHub** | `53c1399` | tudo que esta neste blueprint, **mais** o backup diario |
 
-**Producao e `main` estao iguais em codigo.** A diferenca e um arquivo `.md`.
+**O PR #3 foi mesclado** pelo Alef em 2026-11-04 18:03 UTC. A branch `memoria-operacional`
+cumpriu o papel dela.
 
-**PR #3**: aberto, `mergeable_state: clean`, sem conflito, 25 arquivos, +2276/-56.
-**Esta como DRAFT**, e draft nao pode ser mesclado. Ver passo 2 da secao 5.
+**`main` e producao agora divergem em codigo.** Nao basta olhar o GitHub para saber o que
+esta no ar. A pergunta que decide: a tabela `community_notifications` existe no banco de
+producao? Existe -> o deploy aconteceu. Nao existe -> nao aconteceu.
 
 ---
 
@@ -177,24 +182,19 @@ definiu que os 17 membros nao tem valor real. Ela detecta se o app subiu apontan
 dentro de `.next/standalone/data`, pasta que o proximo build apaga. O prejuizo nao seria o
 passado — seriam os cadastros **futuros**.
 
-### Passo 3 — Tirar o PR #3 do draft e mesclar
+### Passo 3 — ~~Mesclar o PR #3~~ FEITO
 
-Draft nao mescla. Tire do draft, depois mescle, para `main` e producao ficarem iguais.
+Mesclado pelo Alef em 2026-11-04 18:03 UTC. Nada a fazer.
 
-```bash
-gh pr ready 3
-gh pr merge 3 --squash   # ou --merge, conforme a preferencia do Alef
-```
+### Passo 4 — ~~Backup diario~~ FEITO
 
-Se `gh` usar GraphQL e for recusado, use a rota REST:
-`POST /repos/AlefCoelho/PremiumMember/pulls/3/ccr/ready_for_review`
+Instalado na VPS em 2026-11-04 pela sessao local: banco as 03h00, `data/uploads/` as 03h30,
+retencao de 14 dias. O proprio `setup-backups.sh` provou a copia na hora, e ela abriu com 17
+afiliados.
 
-### Passo 4 — Backup diario, se ainda nao instalado
-
-`scripts/setup-backups.sh` na VPS. Cobre o banco **e** as imagens. Rodar sem argumento mostra
-o que faria; com `--aplicar`, aplica.
-
-Lembre: backup que mora so no servidor nao e backup. Tirar copia para fora.
+A copia **fora** da VPS tambem foi resolvida: `scripts/puxar-backups.sh` roda na maquina
+local, traz os arquivos e confere que o `.sqlite` abre, em vez de so copiar bytes. Ja rodou
+uma vez. Vale repetir toda semana.
 
 ### Passo 5 — Disco da VPS
 
@@ -211,17 +211,14 @@ isso a proxima sessao recomeca do zero, como esta recomecou.
 
 ## 6. Pontos em aberto
 
-### 6.1 Saques — merece conferencia antes de qualquer limpeza
+### 6.1 Saques — RESPONDIDO em 2026-11-04: nao ha nenhum
 
-O Alef definiu que os 17 membros sao de um projeto antigo e podem ser recadastrados. Mas o
-`CONTINUACAO.md` fala em *"16 membros reais e saques envolvidos"*. Saque pendente e dinheiro
-devido a alguem.
+A sessao local conferiu direto no banco de producao:
+`SELECT status, COUNT(*) FROM withdrawals GROUP BY status` devolve **zero linhas**.
 
-```bash
-sqlite3 /home/user/htdocs/socios-premiums/data/socios-premiums.sqlite "SELECT status, COUNT(*) FROM withdrawals GROUP BY status;"
-```
-
-Nenhuma linha = o documento esta velho nesse trecho, e a memoria pode ser corrigida.
+Nao ha dinheiro devido a ninguem. O trecho do `CONTINUACAO.md` que fala em *"16 membros
+reais e saques envolvidos"* estava velho. Com isso, a decisao do Alef sobre os 17 membros
+nao esbarra em nenhuma obrigacao financeira.
 
 ### 6.2 Limites conhecidos das notificacoes
 
