@@ -841,11 +841,15 @@ textarea {
   animation: login-drift 24s ease-in-out infinite alternate;
 }
 
-/* Aura atras do cartao: tres camadas de luz desfocadas, cada uma com cor,
-   tamanho, trajeto e duracao propria. As duracoes (13s, 19s, 23s) nao tem
-   divisor comum, entao as camadas quase nunca se repetem em fase e o
-   conjunto nao parece um loop. O giro de matiz vai trocando as cores ao
-   longo do caminho. */
+/* Aura atras do cartao. Tres camadas de luz sobrepostas; as duas de cima sao
+   conic-gradient girando em sentidos opostos, o que troca a cor de forma
+   continua, sem keyframe de cor e sem salto de matiz. Giro e respiracao sao
+   animacoes separadas, uma em `rotate` e outra em `scale`/`opacity`: sao
+   propriedades independentes, entao nao disputam o mesmo `transform` e os
+   periodos podem ser diferentes.
+
+   Custo: nada de `filter` animado. O desfoque e aplicado uma vez e so o
+   compositor trabalha depois, o que mantem o efeito viavel em celular fraco. */
 .login-page::before,
 .login-page::after,
 .login-panel::before {
@@ -855,115 +859,90 @@ textarea {
   top: 50%;
   left: 50%;
   aspect-ratio: 1;
+  translate: -50% -50%;
   border-radius: 50%;
   pointer-events: none;
-  will-change: transform, opacity, filter;
+  will-change: rotate, scale, opacity;
+  /* A mascara apaga a borda do circulo, senao o conic-gradient terminaria num
+     disco de contorno duro, com cara de neon. */
+  -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.55) 42%, transparent 72%);
+  mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.55) 42%, transparent 72%);
 }
 
 .login-page::before {
-  width: min(680px, 130vw);
-  background: radial-gradient(
-    circle,
-    rgba(214, 170, 78, 0.34) 0%,
-    rgba(200, 153, 47, 0.14) 46%,
-    rgba(200, 153, 47, 0) 72%
+  width: min(880px, 165vw);
+  background: conic-gradient(
+    from 0deg,
+    rgba(168, 85, 247, 0.5),
+    rgba(59, 130, 246, 0.45),
+    rgba(34, 211, 238, 0.4),
+    rgba(52, 211, 153, 0.38),
+    rgba(214, 170, 78, 0.5),
+    rgba(244, 114, 182, 0.42),
+    rgba(168, 85, 247, 0.5)
   );
-  animation: aura-warm 13s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  filter: blur(74px);
+  animation: aura-spin 46s linear infinite, aura-breathe 14s ease-in-out infinite;
 }
 
 .login-page::after {
-  width: min(1040px, 180vw);
-  background: radial-gradient(
-    circle,
-    rgba(109, 140, 255, 0.24) 0%,
-    rgba(84, 94, 214, 0.1) 48%,
-    rgba(84, 94, 214, 0) 74%
+  width: min(620px, 120vw);
+  background: conic-gradient(
+    from 210deg,
+    rgba(34, 211, 238, 0.42),
+    rgba(214, 170, 78, 0.46),
+    rgba(244, 114, 182, 0.36),
+    rgba(99, 102, 241, 0.44),
+    rgba(34, 211, 238, 0.42)
   );
-  animation: aura-cool 19s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  filter: blur(58px);
+  opacity: 0.8;
+  animation: aura-spin-reverse 31s linear infinite, aura-breathe 19s ease-in-out infinite;
 }
 
-/* Terceira camada pendurada no cartao so para ter mais um ponto de luz sem
-   precisar de outro elemento no HTML. z-index negativo a joga para tras do
-   fundo do cartao. */
+/* Camada quente fixa, pendurada no cartao, para a marca nao se perder no meio
+   das outras cores. z-index negativo a joga para tras do fundo do cartao. */
 .login-panel::before {
   width: min(520px, 110vw);
   background: radial-gradient(
     circle,
-    rgba(64, 214, 190, 0.22) 0%,
-    rgba(64, 214, 190, 0.08) 50%,
-    rgba(64, 214, 190, 0) 76%
+    rgba(214, 170, 78, 0.26) 0%,
+    rgba(200, 153, 47, 0.1) 48%,
+    rgba(200, 153, 47, 0) 74%
   );
-  animation: aura-mint 23s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  filter: blur(46px);
+  animation: aura-breathe 23s ease-in-out infinite;
 }
 
-/* Inspira rapido e solta devagar, como respiracao de verdade, com um pouco
-   de deriva junto: so escalar da um pulso mecanico. */
-@keyframes aura-warm {
+@keyframes aura-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes aura-spin-reverse {
+  to {
+    rotate: -360deg;
+  }
+}
+
+/* Inspira mais rapido do que solta, como respiracao de verdade. */
+@keyframes aura-breathe {
   0% {
     opacity: 0.5;
-    filter: blur(58px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(0.92);
+    scale: 0.93;
   }
-  34% {
+  38% {
     opacity: 0.95;
-    filter: blur(52px) hue-rotate(26deg);
-    transform: translate(-52%, -53%) scale(1.09);
+    scale: 1.08;
   }
-  68% {
-    opacity: 0.68;
-    filter: blur(62px) hue-rotate(-18deg);
-    transform: translate(-48%, -48%) scale(1.01);
+  72% {
+    opacity: 0.7;
+    scale: 1;
   }
   100% {
     opacity: 0.5;
-    filter: blur(58px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(0.92);
-  }
-}
-
-@keyframes aura-cool {
-  0% {
-    opacity: 0.42;
-    filter: blur(80px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(1.04);
-  }
-  41% {
-    opacity: 0.78;
-    filter: blur(70px) hue-rotate(-34deg);
-    transform: translate(-47%, -52%) scale(0.93);
-  }
-  73% {
-    opacity: 0.56;
-    filter: blur(86px) hue-rotate(22deg);
-    transform: translate(-53%, -47%) scale(1.1);
-  }
-  100% {
-    opacity: 0.42;
-    filter: blur(80px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(1.04);
-  }
-}
-
-@keyframes aura-mint {
-  0% {
-    opacity: 0.32;
-    filter: blur(66px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(1);
-  }
-  29% {
-    opacity: 0.6;
-    filter: blur(58px) hue-rotate(40deg);
-    transform: translate(-54%, -46%) scale(1.12);
-  }
-  61% {
-    opacity: 0.38;
-    filter: blur(72px) hue-rotate(-30deg);
-    transform: translate(-46%, -54%) scale(0.95);
-  }
-  100% {
-    opacity: 0.32;
-    filter: blur(66px) hue-rotate(0deg);
-    transform: translate(-50%, -50%) scale(1);
+    scale: 0.93;
   }
 }
 
@@ -977,8 +956,7 @@ textarea {
   .login-page::after,
   .login-panel::before {
     opacity: 0.6;
-    filter: blur(70px);
-    transform: translate(-50%, -50%);
+    scale: 1;
     animation: none;
   }
 }
