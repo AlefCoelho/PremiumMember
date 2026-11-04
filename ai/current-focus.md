@@ -1,6 +1,13 @@
 # Estado atual
 
-Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`**, igual ao `main`.
+Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`.** O `main` esta em
+`46b58be` (um commit a frente, so o `CONTINUACAO.md`), e a branch `memoria-operacional` em
+`72d2500`, com o PR #3 aberto em draft.
+
+**As notificacoes da comunidade ainda NAO estao em producao.** O deploy foi tentado em
+2026-11-04 pela sessao local e **barrado pelo classificador de modo automatico**, que
+bloqueia escrita em producao sem autorizacao explicita do Alef. O codigo esta pronto e
+testado na branch; falta so o Alef liberar o passo.
 
 ## O que e
 
@@ -48,11 +55,20 @@ formulario e um `<textarea>` simples, sem autocomplete. Decidir isso antes de im
 Uma vez escolhido, a notificacao e so chamar `insert` com `kind: "mention"` em
 `src/lib/notifications.ts`.
 
-### 3. Backup automatico — recomendado, nao feito
+### 3. Backup automatico — INSTALADO em 2026-11-04
 
-So existem os backups manuais que precedem cada deploy, em `/root/backups/` e em
-`find-skills/backups-producao/`. Com 16 membros reais e saques envolvidos, vale um cron
-diario. O comando esta no `DEPLOY.md`. Falta tambem copia **fora** da VPS.
+Rodando na VPS, instalado por `scripts/setup-backups.sh --aplicar`:
+
+- **03h00** — banco, com `sqlite3 ".backup"`, retencao de 14 dias
+- **03h30** — `data/uploads/` em tar.gz, mesma retencao
+
+O proprio script provou o backup na hora de instalar: a copia abriu com 17 afiliados.
+O crontab anterior ficou guardado em `/root/backups/crontab-antes-*.txt`.
+
+Para tirar copia **fora** da VPS existe `scripts/puxar-backups.sh`, que roda na maquina
+local, traz os arquivos para `find-skills/backups-producao/` e **confere que o .sqlite
+abre**. Ja rodou uma vez com sucesso. Falta agendar no Agendador de Tarefas do Windows,
+depois das 3h30 — enquanto isso, rodar a mao de vez em quando.
 
 ### 4. Disco da VPS em 91%
 
@@ -62,6 +78,12 @@ diario. O comando esta no `DEPLOY.md`. Falta tambem copia **fora** da VPS.
 
 `teste.comunidade@premiummember.local` (id 23), ativo e contando. Decidir se apaga antes de
 divulgar.
+
+### 6. Saques — conferido, nao ha nenhum
+
+O `CONTINUACAO.md` falava em "saques envolvidos". Conferido em 2026-11-04 direto no banco
+de producao: `SELECT status, COUNT(*) FROM withdrawals GROUP BY status` devolve **zero
+linhas**. Nao ha dinheiro devido a ninguem. O trecho do `CONTINUACAO.md` estava velho.
 
 ### Sobre os 17 membros de producao
 

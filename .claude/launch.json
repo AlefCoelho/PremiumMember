@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "premium-member",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3100"],
-      "port": 3100
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-p", "3021"],
+      "port": 3021
     }
   ]
 }
