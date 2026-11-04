@@ -1,17 +1,19 @@
 # Estado atual
 
-Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`.** O `main` esta em
-`53c1399`: o PR #3 foi **mesclado** em 2026-11-04 18:03 UTC, entao o codigo das notificacoes,
-a memoria `ai/`, o `DEPLOY.md` corrigido e os scripts ja estao no `main`.
+Atualizado em 2026-11-04. **As notificacoes da comunidade estao em producao** desde
+2026-11-04. Conferido depois do restart: 17 afiliados, 2 admins, `community_notifications`
+criada, `data/uploads/` intacto com `avatars/` e `posts/`, e as classes `notification-row` e
+`notification-avatar` presentes na folha de estilo servida. Nenhum erro no journal.
 
-**As notificacoes ainda NAO estao em producao.** O `main` esta a frente da VPS. O deploy foi
-tentado pela sessao local e **barrado pelo classificador de modo automatico**, que bloqueia
-escrita em producao sem autorizacao explicita do Alef. O codigo esta pronto e testado; falta
-so o Alef liberar o passo.
+**Producao esta em `53c1399`.** O `main` seguiu adiante e hoje esta em `b83d84f` — os dois
+commits a frente sao **so documentacao** (`ai/current-focus.md`), nenhum codigo. Entao
+producao esta em dia no que importa.
 
-> Como `main` e producao divergiram, nao basta olhar o GitHub para saber o que esta no ar.
-> A pergunta que decide: a tabela `community_notifications` existe no banco de producao?
-> Existe -> o deploy aconteceu. Nao existe -> nao aconteceu.
+O **PR #3 foi mesclado** pelo Alef em 2026-11-04 18:03 UTC. Nao esta mais aberto.
+
+> Daqui em diante `main` e producao podem divergir. Olhar o GitHub nao responde mais o que
+> esta no ar. Para saber se um deploy aconteceu, pergunte ao banco de producao, nao ao
+> repositorio — por exemplo, se a tabela de um recurso novo ja existe la.
 
 ## O que e
 
@@ -74,9 +76,13 @@ local, traz os arquivos para `find-skills/backups-producao/` e **confere que o .
 abre**. Ja rodou uma vez com sucesso. Falta agendar no Agendador de Tarefas do Windows,
 depois das 3h30 — enquanto isso, rodar a mao de vez em quando.
 
-### 4. Disco da VPS em 91%
+### 4. Disco da VPS em 89%
 
-8,7 GB livres. Ver `known-issues.md` item 9.
+11 GB livres. Em 2026-11-04 foram liberados 2,1 GB com `npm cache clean --force`, que
+deixou `/root/.npm` em 5,2 MB. O servico continuou ativo e o site respondendo 200.
+
+O que resta e de outros projetos na VPS, nao do Premium Member: ~58 GB em `/home/user`.
+O proprio projeto ocupa ~700 MB. Ver `known-issues.md` item 9.
 
 ### 5. Membro de teste em producao
 

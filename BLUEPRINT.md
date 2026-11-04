@@ -7,21 +7,25 @@ Destinado a sessao local do Claude Code e ao Alef.
 
 ## 1. Onde cada coisa esta
 
-> **Atualizado em 2026-11-04 18:10 UTC.** O PR #3 foi mesclado e o backup diario foi
-> instalado depois da primeira versao deste documento. As secoes abaixo refletem o estado
-> novo; onde algo mudou, esta marcado.
+> **Atualizado em 2026-11-04.** Entre a primeira versao deste documento e agora, o PR #3 foi
+> mesclado, o backup diario entrou na VPS, o disco foi limpo e **o deploy aconteceu**. As
+> secoes abaixo refletem o estado novo; o que mudou esta marcado.
 
 | | Commit | O que e |
 |---|---|---|
-| **Producao (VPS)** | `254cb6a` | o que esta no ar em https://premiummember.online |
-| **`main` no GitHub** | `53c1399` | tudo que esta neste blueprint, **mais** o backup diario |
+| **Producao (VPS)** | `53c1399` | no ar em https://premiummember.online, **com as notificacoes** |
+| **`main` no GitHub** | `b83d84f` | 2 commits a frente — **so documentacao**, nenhum codigo |
 
-**O PR #3 foi mesclado** pelo Alef em 2026-11-04 18:03 UTC. A branch `memoria-operacional`
-cumpriu o papel dela.
+**As notificacoes estao em producao** desde 2026-11-04. Conferido depois do restart: 17
+afiliados, 2 admins, `community_notifications` criada, `data/uploads/` intacto com `avatars/`
+e `posts/`, e as classes `notification-row` e `notification-avatar` na folha de estilo
+servida. Nenhum erro no journal.
 
-**`main` e producao agora divergem em codigo.** Nao basta olhar o GitHub para saber o que
-esta no ar. A pergunta que decide: a tabela `community_notifications` existe no banco de
-producao? Existe -> o deploy aconteceu. Nao existe -> nao aconteceu.
+**O PR #3 foi mesclado** pelo Alef em 2026-11-04 18:03 UTC.
+
+**Daqui em diante `main` e producao podem divergir.** Nao basta olhar o GitHub para saber o
+que esta no ar; hoje a diferenca e so documentacao, mas isso nao e garantido. Para saber se
+um deploy aconteceu, pergunte ao banco de producao, nao ao repositorio.
 
 ---
 
@@ -136,14 +140,18 @@ Nenhum passo do deploy acontece fora da VPS. Esta sessao nao a alcanca:
 Remote Control foi tentado: o computador **ALEF** aparece conectado, mas nenhuma das pastas
 e oferecida a sessoes de nuvem. Esse recurso pode ainda nao estar liberado para a conta.
 
+**Resolvido em 2026-11-04:** a sessao local fez o deploy, com autorizacao do Alef. A primeira
+tentativa dela tambem foi barrada, pelo classificador de modo automatico, que exige
+autorizacao explicita para escrever em producao.
+
 ### 4.2 Backup diario e limpeza de disco
 
-Mesmo motivo. Ficaram prontos em `scripts/`, faltando rodar na VPS.
+Mesmo motivo — **ambos resolvidos pela sessao local em 2026-11-04**. Ver passo 4 da secao 5.
 
 ### 4.3 Marcar o PR como pronto
 
-Tentado e **bloqueado pela politica desta sessao**. O PR segue em draft e **nao pode ser
-mesclado nesse estado**.
+Tentado e bloqueado pela politica desta sessao. Acabou nao sendo um problema: o Alef mesclou
+o PR #3 por conta propria em 18:03 UTC.
 
 ### 4.4 Niveis e badges do membro
 
@@ -196,6 +204,11 @@ A copia **fora** da VPS tambem foi resolvida: `scripts/puxar-backups.sh` roda na
 local, traz os arquivos e confere que o `.sqlite` abre, em vez de so copiar bytes. Ja rodou
 uma vez. Vale repetir toda semana.
 
+### Passo 5 — ~~Disco da VPS~~ FEITO
+
+`npm cache clean --force` liberou 2,1 GB: o disco saiu de 91% para 89%, com 11 GB livres, e
+`/root/.npm` ficou em 5,2 MB. O que ainda ocupa espaco e de outros projetos na VPS.
+
 ### Passo 5 — Disco da VPS
 
 Estava em 91%, com 8,7 GB livres. Ha ~2,1 GB em `/root/.npm` recuperaveis com
@@ -244,14 +257,19 @@ e um `<textarea>` sem autocomplete. Decidido isso, a notificacao e so chamar `in
 
 ---
 
-## 7. Ordem recomendada
+## 7. O que ainda falta
 
-1. **Backup de pe** — se ainda nao estiver
-2. **Deploy** — rota curta ou completa
-3. **Verificar** — contagem de afiliados, site respondendo, pagina de notificacoes no navegador
-4. **Mesclar o PR #3** — depois de tirar do draft
-5. **Disco e cron** — se faltarem
-6. **Atualizar `ai/`** — com o commit que foi para producao
+Tudo que este documento listava como proximo passo foi feito em 2026-11-04: backup diario,
+deploy, verificacao, mesclagem do PR #3 e limpeza de disco. **Nao ha tarefa pendente de
+engenharia.**
 
-Deployar antes de ter backup e a troca errada, mesmo com dados descartaveis: o que protege
-nesse caso nao e o banco, e o `tar` do `src`, que esta no passo 2 das duas rotas.
+O que resta depende de decisao do Alef, nao de codigo:
+
+1. **Niveis e badges do membro** — quantos niveis, nomes e peso de cada criterio. O
+   `CONTINUACAO.md` manda perguntar antes, e continua valendo.
+2. **Mencao com `@`** — falta decidir como identificar a pessoa (nome nao e unico em
+   `affiliates`, e o formulario e um `<textarea>` sem autocomplete).
+3. **Membro de teste em producao** — apagar ou nao antes de divulgar.
+
+E uma rotina que vale manter: rodar `scripts/puxar-backups.sh` toda semana. Backup que mora
+so no servidor nao e backup, e um que ninguem verifica so se descobre quebrado no pior dia.
