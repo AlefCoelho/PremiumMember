@@ -26,8 +26,13 @@ nunca foi necessario.
   fixa no rodape e a lista de espacos vira um seletor que abre. Usa
   `env(safe-area-inset-bottom)` e `viewportFit: "cover"`. Campos de formulario com 16px,
   senao o iPhone da zoom ao focar.
-- **Pagina publica `/apresentacao`**, com rolagem por secoes, a aura do login, dourado nas
-  palavras de destaque e a oferta de R$ 97,00 mensal levando a `/cadastro-membro`.
+- **Pagina publica `/apresentacao`**, com rolagem por secoes, a aura do login e dourado nas
+  palavras de destaque. A primeira secao depois do topo e o **arsenal de agentes de IA**,
+  que e o argumento principal do produto: agentes prontos para baixar, workflows, automacoes
+  para Claude Code e Codex, e a conta de quanto tempo se economiza. O texto de apoio e
+  branco nesta pagina (`--muted` redefinido dentro de `.lp`), nao cinza como no painel.
+  O botao de adquirir pulsa e leva para a fatura da InfinitePay em aba nova — o checkout
+  interno segue desligado, entao o pagamento acontece fora e o cadastro vem depois.
 - **`contatoalefcoelho@gmail.com` e administrador** em producao. A senha foi gerada e
   gravada num arquivo fora do repositorio, e conferida contra o hash. Atencao ao gravar
   hash bcrypt por SSH: o `$` e comido pelo shell — mande por arquivo .sql, nunca inline.
