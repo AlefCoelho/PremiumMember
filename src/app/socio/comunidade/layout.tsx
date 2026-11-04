@@ -1,7 +1,7 @@
 import { CommunitySidebar } from "@/components/CommunitySidebar";
 import { requireAffiliate } from "@/lib/auth";
 import { getCommunityPortalData } from "@/lib/community";
-import { LayoutDashboard } from "lucide-react";
+import { HandCoins } from "lucide-react";
 import Link from "next/link";
 
 export default async function CommunityLayout({ children }: { children: React.ReactNode }) {
@@ -21,9 +21,9 @@ export default async function CommunityLayout({ children }: { children: React.Re
 
         <CommunitySidebar groups={data.groups} />
 
-        <Link className="community-back" href="/socio">
-          <LayoutDashboard size={16} />
-          Voltar ao painel
+        <Link className="community-back" href="/socio/ganhos">
+          <HandCoins size={16} />
+          Indicacoes e saques
         </Link>
       </aside>
 

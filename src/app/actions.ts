@@ -92,8 +92,8 @@ export async function affiliateUpdatePixKeyAction(formData: FormData) {
 
   db.prepare("UPDATE affiliates SET pix_key = ? WHERE id = ?").run(pixKey, session.affiliateId);
 
-  revalidatePath("/socio");
-  redirect("/socio?pix=salvo");
+  revalidatePath("/socio/ganhos");
+  redirect("/socio/ganhos?pix=salvo");
 }
 
 const memberWalletOptions = [
@@ -162,9 +162,9 @@ export async function affiliateUpdateWalletsAction(formData: FormData) {
   });
 
   transaction();
-  revalidatePath("/socio");
+  revalidatePath("/socio/ganhos");
   revalidatePath("/");
-  redirect("/socio?wallets=salvo");
+  redirect("/socio/ganhos?wallets=salvo");
 }
 
 export async function logoutAction() {
@@ -344,8 +344,8 @@ export async function affiliateRequestWithdrawalAction(formData: FormData) {
      VALUES (?, ?, ?, ?, ?)`
   ).run(session.affiliateId, amount, pixKey, isoDate(), "Solicitado pelo portal do membro.");
 
-  revalidatePath("/socio");
-  redirect("/socio?saque=solicitado");
+  revalidatePath("/socio/ganhos");
+  redirect("/socio/ganhos?saque=solicitado");
 }
 
 export async function payWithdrawalAction(formData: FormData) {
