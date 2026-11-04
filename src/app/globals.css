@@ -920,6 +920,56 @@ textarea {
   }
 }
 
+/* Para o botao o disco nao pode girar como elemento: ele e um retangulo, e os
+   cantos apareceriam. Aqui gira o angulo do proprio gradiente, via @property.
+   Onde @property nao existe, o gradiente fica parado em vez de sumir. */
+@property --aura-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* A borda e o proprio gradiente: duas camadas de fundo, o azul recortado no
+   padding-box e o conic no border-box. Sem pseudo-elemento, porque um
+   ::before com z-index negativo cai atras do fundo do cartao e nao aparece.
+   O brilho em volta vem do box-shadow, que respira junto. */
+.login-panel .primary-button {
+  position: relative;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--blue), var(--blue)) padding-box,
+    conic-gradient(
+        from var(--aura-angle),
+        rgb(168, 85, 247),
+        rgb(59, 130, 246),
+        rgb(34, 211, 238),
+        rgb(52, 211, 153),
+        rgb(214, 170, 78),
+        rgb(244, 114, 182),
+        rgb(168, 85, 247)
+      )
+      border-box;
+  animation: aura-angle-spin 12s linear infinite, aura-button-glow 14s ease-in-out infinite;
+}
+
+@keyframes aura-angle-spin {
+  to {
+    --aura-angle: 360deg;
+  }
+}
+
+/* No botao a respiracao e so de brilho: mexer na escala faria a borda pular
+   sob o cursor. */
+@keyframes aura-button-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(99, 102, 241, 0.55);
+  }
+}
+
 @keyframes aura-spin-reverse {
   to {
     rotate: -360deg;
@@ -957,6 +1007,10 @@ textarea {
   .login-panel::before {
     opacity: 0.6;
     scale: 1;
+    animation: none;
+  }
+
+  .login-panel .primary-button {
     animation: none;
   }
 }
