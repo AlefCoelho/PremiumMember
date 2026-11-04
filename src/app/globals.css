@@ -1845,3 +1845,55 @@ textarea {
   background: transparent;
   color: var(--muted);
 }
+
+.community-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.community-reactions form {
+  display: inline-flex;
+}
+
+.community-favorite-form {
+  margin-left: auto;
+}
+
+.community-reaction {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.community-reaction:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.community-reaction.active {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--text);
+}
+
+.community-reaction.favorited {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.community-reaction em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+}

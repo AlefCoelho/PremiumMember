@@ -1,12 +1,12 @@
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { requireAffiliate } from "@/lib/auth";
-import { getCommunityPortalData, getFeedPosts } from "@/lib/community";
+import { attachPostMeta, getCommunityPortalData, getFeedPosts } from "@/lib/community";
 import Link from "next/link";
 
 export default async function CommunityFeedPage() {
   const session = await requireAffiliate();
   const { eligibleSales, spaces } = getCommunityPortalData(session.affiliateId);
-  const posts = getFeedPosts(eligibleSales);
+  const posts = attachPostMeta(getFeedPosts(eligibleSales), session.affiliateId);
 
   return (
     <>

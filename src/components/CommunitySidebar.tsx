@@ -1,7 +1,7 @@
 "use client";
 
 import type { CommunityGroupWithSpaces } from "@/lib/community";
-import { GraduationCap, LifeBuoy, MessagesSquare, Sparkles } from "lucide-react";
+import { Bookmark, GraduationCap, LifeBuoy, MessagesSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -19,6 +19,14 @@ export function CommunitySidebar({ groups }: { groups: CommunityGroupWithSpaces[
       <Link className={pathname === "/socio/comunidade" ? "community-nav-feed active" : "community-nav-feed"} href="/socio/comunidade">
         <Sparkles size={16} />
         Feed
+      </Link>
+
+      <Link
+        className={pathname === "/socio/comunidade/favoritos" ? "community-nav-feed active" : "community-nav-feed"}
+        href="/socio/comunidade/favoritos"
+      >
+        <Bookmark size={16} />
+        Favoritos
       </Link>
 
       {groups.map((group) => (

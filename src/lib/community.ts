@@ -46,6 +46,25 @@ CREATE TABLE IF NOT EXISTS community_comments (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS community_reactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+  affiliate_id INTEGER NOT NULL REFERENCES affiliates(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (post_id, affiliate_id)
+);
+
+CREATE TABLE IF NOT EXISTS community_favorites (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+  affiliate_id INTEGER NOT NULL REFERENCES affiliates(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (post_id, affiliate_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_community_reactions_post ON community_reactions(post_id);
+CREATE INDEX IF NOT EXISTS idx_community_favorites_member ON community_favorites(affiliate_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_spaces_group ON community_spaces(group_id, position);
 CREATE INDEX IF NOT EXISTS idx_community_posts_space ON community_posts(space_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_comments_post ON community_comments(post_id, created_at);
@@ -604,4 +623,140 @@ export function moveSpace(spaceId: number, direction: "up" | "down") {
     .prepare("SELECT id, position FROM community_spaces WHERE group_id = ? ORDER BY position, id")
     .all(space.group_id) as { id: number; position: number }[];
   swapPositions("community_spaces", rows, spaceId, direction);
+}
+
+export const reactionKinds = [
+  { value: "like", label: "Curtir", emoji: "\u{1F44D}" },
+  { value: "dislike", label: "Nao curtir", emoji: "\u{1F44E}" },
+  { value: "heart", label: "Amei", emoji: "\u2764\uFE0F" },
+  { value: "money", label: "Lucrativo", emoji: "\u{1F911}" },
+  { value: "sad", label: "Triste", emoji: "\u{1F622}" },
+] as const;
+
+export type ReactionKind = (typeof reactionKinds)[number]["value"];
+
+export function isReactionKind(value: string): value is ReactionKind {
+  return reactionKinds.some((kind) => kind.value === value);
+}
+
+export type PostMeta = {
+  reactions: Record<string, number>;
+  reaction_total: number;
+  my_reaction: string | null;
+  favorited: boolean;
+};
+
+export type CommunityPostWithMeta = CommunityPost & PostMeta;
+
+// Uma reacao por membro por publicacao: clicar em outra troca, clicar na mesma
+// remove. E o comportamento que as pessoas ja esperam de um feed.
+export function setReaction(postId: number, affiliateId: number, kind: ReactionKind) {
+  const current = db
+    .prepare("SELECT kind FROM community_reactions WHERE post_id = ? AND affiliate_id = ?")
+    .get(postId, affiliateId) as { kind: string } | undefined;
+
+  if (current?.kind === kind) {
+    db.prepare("DELETE FROM community_reactions WHERE post_id = ? AND affiliate_id = ?").run(
+      postId,
+      affiliateId
+    );
+    return null;
+  }
+
+  db.prepare(
+    `INSERT INTO community_reactions (post_id, affiliate_id, kind)
+     VALUES (?, ?, ?)
+     ON CONFLICT (post_id, affiliate_id) DO UPDATE SET kind = excluded.kind`
+  ).run(postId, affiliateId, kind);
+  return kind;
+}
+
+export function toggleFavorite(postId: number, affiliateId: number) {
+  const existing = db
+    .prepare("SELECT id FROM community_favorites WHERE post_id = ? AND affiliate_id = ?")
+    .get(postId, affiliateId) as { id: number } | undefined;
+
+  if (existing) {
+    db.prepare("DELETE FROM community_favorites WHERE id = ?").run(existing.id);
+    return false;
+  }
+
+  db.prepare("INSERT INTO community_favorites (post_id, affiliate_id) VALUES (?, ?)").run(
+    postId,
+    affiliateId
+  );
+  return true;
+}
+
+// Duas consultas agregadas para a lista inteira, em vez de duas por publicacao.
+export function attachPostMeta(posts: CommunityPost[], affiliateId: number): CommunityPostWithMeta[] {
+  if (!posts.length) return [];
+  const ids = posts.map((post) => post.id);
+  const placeholders = ids.map(() => "?").join(",");
+
+  const counts = db
+    .prepare(
+      `SELECT post_id, kind, COUNT(*) AS total
+       FROM community_reactions
+       WHERE post_id IN (${placeholders})
+       GROUP BY post_id, kind`
+    )
+    .all(...ids) as { post_id: number; kind: string; total: number }[];
+
+  const mine = db
+    .prepare(
+      `SELECT post_id, kind FROM community_reactions
+       WHERE affiliate_id = ? AND post_id IN (${placeholders})`
+    )
+    .all(affiliateId, ...ids) as { post_id: number; kind: string }[];
+
+  const favorites = db
+    .prepare(
+      `SELECT post_id FROM community_favorites
+       WHERE affiliate_id = ? AND post_id IN (${placeholders})`
+    )
+    .all(affiliateId, ...ids) as { post_id: number }[];
+
+  const myMap = new Map(mine.map((row) => [row.post_id, row.kind]));
+  const favSet = new Set(favorites.map((row) => row.post_id));
+
+  return posts.map((post) => {
+    const reactions: Record<string, number> = {};
+    let total = 0;
+    for (const row of counts) {
+      if (row.post_id !== post.id) continue;
+      reactions[row.kind] = row.total;
+      total += row.total;
+    }
+    return {
+      ...post,
+      reactions,
+      reaction_total: total,
+      my_reaction: myMap.get(post.id) ?? null,
+      favorited: favSet.has(post.id),
+    };
+  });
+}
+
+export function getFavoritePosts(affiliateId: number, eligibleSales: number): CommunityPost[] {
+  return db
+    .prepare(
+      `${postSelect}
+       JOIN community_favorites
+         ON community_favorites.post_id = community_posts.id
+        AND community_favorites.affiliate_id = ?
+       WHERE community_posts.status = 'published'
+         AND community_spaces.status = 'active'
+         AND community_spaces.min_eligible_sales <= ?
+       ORDER BY community_favorites.created_at DESC`
+    )
+    .all(affiliateId, eligibleSales) as CommunityPost[];
+}
+
+// Link externo de membro e bloqueado. O admin posta link, o membro nao: e a
+// regra combinada para a comunidade nao virar vitrine de divulgacao.
+const linkPattern = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|br|io|me|co|app|link|gg|tv|ly)\b)/i;
+
+export function containsExternalLink(text: string) {
+  return linkPattern.test(text);
 }

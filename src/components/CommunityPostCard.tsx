@@ -1,5 +1,7 @@
-import type { CommunityPost } from "@/lib/community";
-import { MessageCircle, Pin } from "lucide-react";
+import { reactToPostAction, toggleFavoriteAction } from "@/app/socio/comunidade/actions";
+import type { CommunityPost, CommunityPostWithMeta } from "@/lib/community";
+import { reactionKinds } from "@/lib/community";
+import { Bookmark, MessageCircle, Pin } from "lucide-react";
 import Link from "next/link";
 
 function initials(name: string) {
@@ -8,6 +10,11 @@ function initials(name: string) {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
+}
+
+// Os dois primeiros nomes, como o membro se cadastrou.
+export function shortName(name: string) {
+  return name.split(/\s+/).slice(0, 2).join(" ");
 }
 
 export function timeAgo(value: string) {
@@ -26,7 +33,55 @@ export function CommunityAvatar({ name }: { name: string }) {
   return <span className="community-avatar">{initials(name)}</span>;
 }
 
-export function CommunityPostCard({ post, showSpace = false }: { post: CommunityPost; showSpace?: boolean }) {
+function hasMeta(post: CommunityPost | CommunityPostWithMeta): post is CommunityPostWithMeta {
+  return "reactions" in post;
+}
+
+export function CommunityReactionBar({ post }: { post: CommunityPostWithMeta }) {
+  return (
+    <div className="community-reactions">
+      {reactionKinds.map((kind) => {
+        const total = post.reactions[kind.value] ?? 0;
+        const active = post.my_reaction === kind.value;
+        return (
+          <form action={reactToPostAction} key={kind.value}>
+            <input type="hidden" name="post_id" value={post.id} />
+            <input type="hidden" name="kind" value={kind.value} />
+            <button
+              className={active ? "community-reaction active" : "community-reaction"}
+              type="submit"
+              title={kind.label}
+              aria-label={kind.label}
+            >
+              <span aria-hidden>{kind.emoji}</span>
+              {total ? <em>{total}</em> : null}
+            </button>
+          </form>
+        );
+      })}
+
+      <form action={toggleFavoriteAction} className="community-favorite-form">
+        <input type="hidden" name="post_id" value={post.id} />
+        <button
+          className={post.favorited ? "community-reaction favorited" : "community-reaction"}
+          type="submit"
+          title={post.favorited ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          aria-label={post.favorited ? "Remover dos favoritos" : "Salvar nos favoritos"}
+        >
+          <Bookmark size={15} fill={post.favorited ? "currentColor" : "none"} />
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export function CommunityPostCard({
+  post,
+  showSpace = false,
+}: {
+  post: CommunityPost | CommunityPostWithMeta;
+  showSpace?: boolean;
+}) {
   const href = `/socio/comunidade/${post.space_slug}/${post.id}`;
 
   return (
@@ -34,7 +89,7 @@ export function CommunityPostCard({ post, showSpace = false }: { post: Community
       <header>
         <CommunityAvatar name={post.author_name} />
         <div>
-          <strong>{post.author_name}</strong>
+          <strong>{shortName(post.author_name)}</strong>
           <span>
             {timeAgo(post.created_at)}
             {showSpace ? ` - ${post.space_name}` : ""}
@@ -48,6 +103,8 @@ export function CommunityPostCard({ post, showSpace = false }: { post: Community
         {post.title}
       </Link>
       <p className="community-post-body">{post.body}</p>
+
+      {hasMeta(post) ? <CommunityReactionBar post={post} /> : null}
 
       <footer>
         <Link href={href}>

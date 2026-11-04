@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAffiliate } from "@/lib/auth";
 import {
+  containsExternalLink,
   createComment,
   createPost,
   getMemberEligibleSales,
   getPostById,
   getSpaceBySlug,
+  isReactionKind,
+  setReaction,
+  toggleFavorite,
 } from "@/lib/community";
 
 function asText(formData: FormData, key: string) {
@@ -26,6 +30,11 @@ export async function createCommunityPostAction(formData: FormData) {
   const spaceSlug = requireText(formData, "space_slug", 80);
   const title = requireText(formData, "title", 160);
   const body = requireText(formData, "body", 8000);
+
+  // Volta para a propria pagina com um aviso, em vez de estourar tela de erro.
+  if (containsExternalLink(`${title} ${body}`)) {
+    redirect(`/socio/comunidade/${spaceSlug}?erro=link`);
+  }
 
   const space = getSpaceBySlug(spaceSlug);
   if (!space) throw new Error("Espaco nao encontrado.");
@@ -54,6 +63,10 @@ export async function createCommunityCommentAction(formData: FormData) {
   const post = getPostById(postId);
   if (!post) throw new Error("Publicacao nao encontrada.");
 
+  if (containsExternalLink(body)) {
+    redirect(`/socio/comunidade/${post.space_slug}/${postId}?erro=link`);
+  }
+
   const space = getSpaceBySlug(post.space_slug);
   if (!space) throw new Error("Espaco nao encontrado.");
   if (space.min_eligible_sales > getMemberEligibleSales(session.affiliateId)) {
@@ -70,4 +83,43 @@ export async function createCommunityCommentAction(formData: FormData) {
   revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
   revalidatePath(`/socio/comunidade/${post.space_slug}`);
   revalidatePath("/socio/comunidade");
+}
+
+async function requireAccessiblePost(postId: number, affiliateId: number) {
+  const post = getPostById(postId);
+  if (!post) throw new Error("Publicacao nao encontrada.");
+  const space = getSpaceBySlug(post.space_slug);
+  if (!space) throw new Error("Espaco nao encontrado.");
+  if (space.min_eligible_sales > getMemberEligibleSales(affiliateId)) {
+    throw new Error("Voce ainda nao tem acesso a este espaco.");
+  }
+  return post;
+}
+
+export async function reactToPostAction(formData: FormData) {
+  const session = await requireAffiliate();
+  const postId = Number(requireText(formData, "post_id", 20));
+  const kind = asText(formData, "kind");
+  if (!isReactionKind(kind)) throw new Error("Reacao invalida.");
+
+  const post = await requireAccessiblePost(postId, session.affiliateId);
+  setReaction(postId, session.affiliateId, kind);
+
+  revalidatePath("/socio/comunidade");
+  revalidatePath(`/socio/comunidade/${post.space_slug}`);
+  revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
+  revalidatePath("/socio/comunidade/favoritos");
+}
+
+export async function toggleFavoriteAction(formData: FormData) {
+  const session = await requireAffiliate();
+  const postId = Number(requireText(formData, "post_id", 20));
+
+  const post = await requireAccessiblePost(postId, session.affiliateId);
+  toggleFavorite(postId, session.affiliateId);
+
+  revalidatePath("/socio/comunidade");
+  revalidatePath(`/socio/comunidade/${post.space_slug}`);
+  revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
+  revalidatePath("/socio/comunidade/favoritos");
 }

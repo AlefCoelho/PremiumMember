@@ -1,7 +1,7 @@
 import { createCommunityPostAction } from "@/app/socio/comunidade/actions";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { requireAffiliate } from "@/lib/auth";
-import { getMemberEligibleSales, getSpaceBySlug, getSpacePosts } from "@/lib/community";
+import { attachPostMeta, getMemberEligibleSales, getSpaceBySlug, getSpacePosts } from "@/lib/community";
 import { notFound } from "next/navigation";
 
 const kindLabel: Record<string, string> = {
@@ -10,9 +10,16 @@ const kindLabel: Record<string, string> = {
   lessons: "Aulas",
 };
 
-export default async function CommunitySpacePage({ params }: { params: Promise<{ space: string }> }) {
+export default async function CommunitySpacePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ space: string }>;
+  searchParams: Promise<{ erro?: string }>;
+}) {
   const session = await requireAffiliate();
   const { space: spaceSlug } = await params;
+  const { erro } = await searchParams;
   const space = getSpaceBySlug(spaceSlug);
   if (!space) notFound();
 
@@ -28,7 +35,7 @@ export default async function CommunitySpacePage({ params }: { params: Promise<{
     );
   }
 
-  const posts = getSpacePosts(space.id);
+  const posts = attachPostMeta(getSpacePosts(space.id), session.affiliateId);
 
   return (
     <>
@@ -51,6 +58,11 @@ export default async function CommunitySpacePage({ params }: { params: Promise<{
             Mensagem
             <textarea name="body" rows={4} placeholder="Escreva aqui..." maxLength={8000} required />
           </label>
+          {erro === "link" ? (
+            <p className="form-error">
+              Link externo nao e permitido na comunidade. Tire o endereco e publique de novo.
+            </p>
+          ) : null}
           <button className="primary-button" type="submit">
             Publicar
           </button>

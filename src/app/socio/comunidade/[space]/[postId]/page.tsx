@@ -8,11 +8,14 @@ import { notFound } from "next/navigation";
 
 export default async function CommunityPostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ space: string; postId: string }>;
+  searchParams: Promise<{ erro?: string }>;
 }) {
   const session = await requireAffiliate();
   const { space: spaceSlug, postId } = await params;
+  const { erro } = await searchParams;
   const space = getSpaceBySlug(spaceSlug);
   if (!space) notFound();
 
@@ -85,6 +88,11 @@ export default async function CommunityPostPage({
             Seu comentario
             <textarea name="body" rows={3} placeholder="Escreva um comentario..." maxLength={4000} required />
           </label>
+          {erro === "link" ? (
+            <p className="form-error">
+              Link externo nao e permitido na comunidade. Tire o endereco e comente de novo.
+            </p>
+          ) : null}
           <button className="primary-button" type="submit">
             Comentar
           </button>
