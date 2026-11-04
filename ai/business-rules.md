@@ -60,5 +60,11 @@ por publicacao: clicar em outra **troca**, clicar na mesma **remove**.
 **Eventos**: o botao de entrar aparece de 10 minutos antes do inicio ate o fim da live, com
 15 minutos de folga. Presenca e toggle idempotente (`UNIQUE (event_id, affiliate_id)`).
 
+**Notificacoes**: o autor de uma publicacao e avisado quando alguem **comenta** ou **reage**
+nela. Nunca se notifica a si mesmo. Admin nao recebe (nao tem linha em `affiliates`).
+Trocar de reacao atualiza a mesma notificacao; **retirar a reacao apaga a notificacao**, para
+o sino nao apontar para algo que nao existe mais. Marcar como lidas e explicito, por botao —
+nao acontece so por abrir a pagina.
+
 **Redefinicao de senha**: token de 32 bytes guardado como hash SHA-256, valido 60 minutos,
 uso unico, e um pedido novo invalida o anterior.

@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAffiliate } from "@/lib/auth";
 import {
+  clearReactionNotification,
+  markAllRead,
+  notifyComment,
+  notifyReaction,
+} from "@/lib/notifications";
+import {
   containsExternalLink,
   createComment,
   createPost,
@@ -83,13 +89,21 @@ export async function createCommunityCommentAction(formData: FormData) {
     throw new Error("Voce ainda nao tem acesso a este espaco.");
   }
 
-  createComment({
+  const commentId = createComment({
     postId,
     authorType: "member",
     authorId: session.affiliateId,
     body,
   });
 
+  notifyComment({
+    postId,
+    commentId,
+    actorType: "member",
+    actorId: session.affiliateId,
+  });
+
+  revalidatePath("/socio/comunidade/notificacoes");
   revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
   revalidatePath(`/socio/comunidade/${post.space_slug}`);
   revalidatePath("/socio/comunidade");
@@ -113,8 +127,26 @@ export async function reactToPostAction(formData: FormData) {
   if (!isReactionKind(kind)) throw new Error("Reacao invalida.");
 
   const post = await requireAccessiblePost(postId, session.affiliateId);
-  setReaction(postId, session.affiliateId, kind);
+  const applied = setReaction(postId, session.affiliateId, kind);
 
+  // setReaction devolve null quando o clique retirou a reacao. Nesse caso a
+  // notificacao sai, em vez de apontar para algo que nao existe mais.
+  if (applied) {
+    notifyReaction({
+      postId,
+      actorType: "member",
+      actorId: session.affiliateId,
+      kind: applied,
+    });
+  } else {
+    clearReactionNotification({
+      postId,
+      actorType: "member",
+      actorId: session.affiliateId,
+    });
+  }
+
+  revalidatePath("/socio/comunidade/notificacoes");
   revalidatePath("/socio/comunidade");
   revalidatePath(`/socio/comunidade/${post.space_slug}`);
   revalidatePath(`/socio/comunidade/${post.space_slug}/${postId}`);
@@ -171,4 +203,11 @@ export async function removeAvatarAction() {
   removeAvatar(session.affiliateId);
   revalidatePath("/socio/comunidade", "layout");
   redirect("/socio/comunidade/perfil?removido=1");
+}
+
+export async function markNotificationsReadAction() {
+  const session = await requireAffiliate();
+  markAllRead(session.affiliateId);
+  revalidatePath("/socio/comunidade/notificacoes");
+  revalidatePath("/socio/comunidade");
 }

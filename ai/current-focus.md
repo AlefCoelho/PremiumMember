@@ -38,10 +38,15 @@ nomes e peso de cada criterio **nao foram decididos**. **Pergunte antes de imple
 
 Os dados ja existem: `community_reactions`, `community_favorites` e `affiliates.created_at`.
 
-### 2. Marcar membros com `@` — nao implementado
+### 2. Marcar membros com `@` — a base ja existe
 
-Vale pouco sozinho: sem notificacao, ninguem sabe que foi marcado. Considere fazer junto com
-notificacoes.
+As **notificacoes** foram feitas (comentario e reacao na sua publicacao), que era a parte
+que faltava para a mencao valer alguma coisa. Falta a mencao em si.
+
+O ponto em aberto e **como identificar a pessoa**: nome nao e unico em `affiliates`, e o
+formulario e um `<textarea>` simples, sem autocomplete. Decidir isso antes de implementar.
+Uma vez escolhido, a notificacao e so chamar `insert` com `kind: "mention"` em
+`src/lib/notifications.ts`.
 
 ### 3. Backup automatico — recomendado, nao feito
 

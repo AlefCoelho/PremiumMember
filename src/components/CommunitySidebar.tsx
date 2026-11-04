@@ -2,6 +2,7 @@
 
 import type { CommunityGroupWithSpaces } from "@/lib/community";
 import {
+  Bell,
   Bookmark,
   CalendarClock,
   GraduationCap,
@@ -19,7 +20,13 @@ const kindIcon = {
   lessons: GraduationCap,
 } as const;
 
-export function CommunitySidebar({ groups }: { groups: CommunityGroupWithSpaces[] }) {
+export function CommunitySidebar({
+  groups,
+  unread = 0,
+}: {
+  groups: CommunityGroupWithSpaces[];
+  unread?: number;
+}) {
   const pathname = usePathname();
 
   return (
@@ -27,6 +34,15 @@ export function CommunitySidebar({ groups }: { groups: CommunityGroupWithSpaces[
       <Link className={pathname === "/socio/comunidade" ? "community-nav-feed active" : "community-nav-feed"} href="/socio/comunidade">
         <Sparkles size={16} />
         Feed
+      </Link>
+
+      <Link
+        className={pathname === "/socio/comunidade/notificacoes" ? "community-nav-feed active" : "community-nav-feed"}
+        href="/socio/comunidade/notificacoes"
+      >
+        <Bell size={16} />
+        Notificacoes
+        {unread > 0 ? <span className="community-nav-badge">{unread > 99 ? "99+" : unread}</span> : null}
       </Link>
 
       <Link

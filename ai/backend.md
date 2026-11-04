@@ -27,6 +27,11 @@ Perfil (`src/lib/profiles.ts`): `affiliate_profiles`, chave primaria = `affiliat
 Senha (`src/lib/password-reset.ts`): `affiliate_password_resets` com `token_hash` unico,
 `expires_at` e `used_at`.
 
+Notificacoes (`src/lib/notifications.ts`): `community_notifications`, com
+`UNIQUE (affiliate_id, kind, post_id, comment_id, actor_type, actor_id)`. `comment_id` usa
+**0 em vez de NULL** quando nao se aplica: no SQLite dois NULLs nao colidem numa UNIQUE,
+entao com NULL cada clique de reacao criaria linha nova.
+
 ## Padroes obrigatorios
 
 - **Schema**: `CREATE TABLE IF NOT EXISTS` no import do modulo. Coluna nova em tabela

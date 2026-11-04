@@ -1,12 +1,14 @@
 import { CommunitySidebar } from "@/components/CommunitySidebar";
 import { requireAffiliate } from "@/lib/auth";
 import { getCommunityPortalData } from "@/lib/community";
+import { countUnread } from "@/lib/notifications";
 import { HandCoins } from "lucide-react";
 import Link from "next/link";
 
 export default async function CommunityLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAffiliate();
   const data = getCommunityPortalData(session.affiliateId);
+  const unread = countUnread(session.affiliateId);
 
   return (
     <div className="community-shell">
@@ -19,7 +21,7 @@ export default async function CommunityLayout({ children }: { children: React.Re
           </div>
         </div>
 
-        <CommunitySidebar groups={data.groups} />
+        <CommunitySidebar groups={data.groups} unread={unread} />
 
         <Link className="community-back" href="/socio/ganhos">
           <HandCoins size={16} />

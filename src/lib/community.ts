@@ -389,10 +389,13 @@ export function createComment(input: {
   authorId: number;
   body: string;
 }) {
-  db.prepare(
-    `INSERT INTO community_comments (post_id, author_type, author_id, body)
-     VALUES (?, ?, ?, ?)`
-  ).run(input.postId, input.authorType, input.authorId, input.body);
+  const result = db
+    .prepare(
+      `INSERT INTO community_comments (post_id, author_type, author_id, body)
+       VALUES (?, ?, ?, ?)`
+    )
+    .run(input.postId, input.authorType, input.authorId, input.body);
+  return Number(result.lastInsertRowid);
 }
 
 export function getCommunityPortalData(affiliateId: number) {
