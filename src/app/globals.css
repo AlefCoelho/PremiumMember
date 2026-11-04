@@ -2801,3 +2801,79 @@ textarea {
     transform: none;
   }
 }
+
+/* A secao do arsenal e o argumento principal da pagina: ganha respiro maior e
+   um contorno dourado discreto nos cartoes, para destacar sem gritar. */
+.lp-arsenal {
+  padding-top: 88px;
+  padding-bottom: 88px;
+}
+
+.lp-secao-texto {
+  margin: 0 0 14px;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.65;
+}
+
+.lp-arsenal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.lp-card-destaque {
+  border-color: rgba(200, 153, 47, 0.3);
+  background: linear-gradient(180deg, rgba(200, 153, 47, 0.05), transparent 60%), var(--panel);
+}
+
+.lp-conta {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 12px;
+  background: var(--panel-strong);
+}
+
+.lp-conta-icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--panel);
+  color: var(--gold);
+}
+
+.lp-conta strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.lp-conta p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+@media (max-width: 720px) {
+  .lp-arsenal {
+    padding-top: 54px;
+    padding-bottom: 54px;
+  }
+
+  .lp-conta {
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+  }
+}

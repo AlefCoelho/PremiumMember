@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   BadgeCheck,
+  Bot,
   CalendarClock,
+  Clock,
   Crown,
+  Download,
   GraduationCap,
   HandCoins,
   Heart,
@@ -11,8 +14,10 @@ import {
   MessagesSquare,
   ShieldCheck,
   Sparkles,
+  Terminal,
   TrendingUp,
   Users,
+  Workflow,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -60,6 +65,33 @@ const pilares = [
   },
 ] as const;
 
+const arsenal = [
+  {
+    Icon: Download,
+    titulo: "Agentes prontos para baixar",
+    texto:
+      "Nada de montar do zero. Voce acessa, baixa e usa — ja configurado, ja testado, pronto para trabalhar no primeiro minuto.",
+  },
+  {
+    Icon: Workflow,
+    titulo: "Workflows que ja rodam",
+    texto:
+      "Fluxos completos para negocio pequeno e para operacao grande. O que muda e a escala, nao o trabalho de montar.",
+  },
+  {
+    Icon: Terminal,
+    titulo: "Automacoes para Claude Code e Codex",
+    texto:
+      "Feitas sob medida para as ferramentas que voce ja usa. Chega pronto, encaixa, roda.",
+  },
+  {
+    Icon: Bot,
+    titulo: "Um agente para cada necessidade",
+    texto:
+      "Vendas, suporte, conteudo, financeiro, operacao, pesquisa. Precisa de algo especifico? Tem um agente para isso.",
+  },
+] as const;
+
 const experiencia = [
   {
     Icon: Sparkles,
@@ -94,8 +126,9 @@ export default function ApresentacaoPage() {
           Um ecossistema <span className="gold-shine">inteiro</span> para quem leva a serio.
         </h1>
         <p className="lp-hero-texto">
-          Comunidade, aulas exclusivas, encontros ao vivo e a sua central de indicacoes — no
-          mesmo lugar, com <span className="gold-shine">acesso de membro</span>.
+          Um arsenal de <span className="gold-shine">agentes de IA prontos para usar</span>,
+          mais comunidade, aulas, encontros ao vivo e a sua central de indicacoes — tudo no
+          mesmo lugar.
         </p>
         <a className="primary-button lp-cta-topo" href="#acesso">
           <Crown size={16} />
@@ -106,8 +139,53 @@ export default function ApresentacaoPage() {
         </p>
       </header>
 
+      <section className="lp-secao lp-arsenal" id="arsenal">
+        <p className="eyebrow">O diferencial</p>
+        <h2>
+          Um time inteiro de agentes, <span className="gold-shine">pronto para baixar</span>.
+        </h2>
+        <p className="lp-secao-texto">
+          Pare um segundo e faca a conta. Quanto tempo leva para montar um time que cobre
+          vendas, suporte, conteudo, financeiro e operacao? Quanto custa manter esse time?
+        </p>
+        <p className="lp-secao-texto">
+          Aqui dentro ele ja existe, montado e configurado. Sao{" "}
+          <span className="gold-shine">funcionarios que trabalham 24 horas por dia</span>, sete
+          dias por semana, sem ferias, sem atraso e sem curva de aprendizado. Voce baixa e
+          comeca a usar.
+        </p>
+
+        <div className="lp-arsenal-grid">
+          {arsenal.map(({ Icon, titulo, texto }) => (
+            <article className="lp-card lp-card-destaque" key={titulo}>
+              <span className="lp-card-icone">
+                <Icon size={20} />
+              </span>
+              <h3>{titulo}</h3>
+              <p>{texto}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="lp-conta">
+          <span className="lp-conta-icone">
+            <Clock size={20} />
+          </span>
+          <div>
+            <strong>A conta que ninguem faz</strong>
+            <p>
+              Montar, testar e ajustar um unico agente bom leva dias. Um time inteiro leva
+              meses — e isso se voce souber exatamente o que esta fazendo. O que esta aqui
+              dentro ja passou por esse caminho.{" "}
+              <span className="gold-shine">Voce pula a parte dificil</span> e fica com o
+              resultado.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="lp-secao">
-        <p className="eyebrow">O que tem dentro</p>
+        <p className="eyebrow">O que mais tem dentro</p>
         <h2>
           Seis frentes, <span className="gold-shine">uma plataforma</span>.
         </h2>
@@ -198,6 +276,12 @@ export default function ApresentacaoPage() {
           </div>
 
           <ul className="lp-inclui">
+            <li>
+              <BadgeCheck size={16} /> Arsenal de agentes de IA prontos para baixar e usar
+            </li>
+            <li>
+              <BadgeCheck size={16} /> Workflows e automacoes para Claude Code e Codex
+            </li>
             <li>
               <BadgeCheck size={16} /> Comunidade completa, com todos os espacos abertos
             </li>
