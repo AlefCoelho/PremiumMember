@@ -40,3 +40,25 @@ de acesso premium. A janela e deslizante, recontada a cada leitura.
 Acesso a um espaco exige `eligible_sales >= space.min_eligible_sales`
 (`getMemberEligibleSales()` / `getSpacesForMember()`). Espaco `archived` nao aparece para
 o membro. O gate e aplicado **no servidor**, na consulta, nao na renderizacao.
+
+## Comunidade — comportamentos
+
+**Acesso ao espaco**: `eligible_sales >= space.min_eligible_sales`
+(`getMemberEligibleSales()` / `getSpacesForMember()`). Espaco `archived` nao aparece.
+O gate e aplicado **no servidor, na consulta**, nao na renderizacao.
+
+**Reacoes**: cinco tipos — `like`, `dislike`, `heart` (Amei), `money`, `sad`. Uma por membro
+por publicacao: clicar em outra **troca**, clicar na mesma **remove**.
+
+**Favoritos**: toggle por membro, listados em `/socio/comunidade/favoritos`.
+
+**Link externo**: membro **nao** publica link, nem em publicacao nem em comentario
+(`containsExternalLink`). Admin publica.
+
+**Publicacoes em alta**: `community_featured_posts`, marcadas por `toggleFeatured()`.
+
+**Eventos**: o botao de entrar aparece de 10 minutos antes do inicio ate o fim da live, com
+15 minutos de folga. Presenca e toggle idempotente (`UNIQUE (event_id, affiliate_id)`).
+
+**Redefinicao de senha**: token de 32 bytes guardado como hash SHA-256, valido 60 minutos,
+uso unico, e um pedido novo invalida o anterior.

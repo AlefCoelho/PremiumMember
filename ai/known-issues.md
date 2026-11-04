@@ -1,44 +1,84 @@
 # Problemas conhecidos e areas sensiveis
 
+## 0. REGRA QUE NAO SE QUEBRA: o motor de comissao
+
+Nenhuma alteracao toca `affiliates`, `referrals`, `withdrawals` ou `payment_orders`. E o
+diferencial do produto. Toda tabela nova nasce separada, com `CREATE TABLE IF NOT EXISTS`,
+justamente para o deploy nunca precisar de `ALTER TABLE`.
+
+(O doc de continuacao cita tambem `commissions`; essa tabela **nao existe** no codigo hoje.
+Se for criada algum dia, entra na mesma protecao.)
+
+Depois de todo deploy, conferir `affiliates: 17` e `admins: 2` **apos** o restart. Mudou?
+Rollback na hora.
+
 ## 1. `SOCIOS_DB_PATH` + saida standalone (critico)
 
 `next.config.ts` usa `output: "standalone"`. Sem `SOCIOS_DB_PATH` absoluto, `db.ts` cai em
 `process.cwd()/data`, que nesse modo aponta para `.next/standalone/data` — pasta que o
-proximo `next build` **apaga**. Isso ja aconteceu uma vez: havia um banco orfao de 30/06
-com 1 afiliado e 3 indicacoes (copia em `/root/backups/orfao-standalone-2026-11-03.sqlite`).
+proximo `next build` **apaga**. Ja aconteceu: havia um banco orfao de 30/06 com 1 afiliado
+e 3 indicacoes (copia em `/root/backups/orfao-standalone-2026-11-03.sqlite`).
 
-Hoje na VPS o unit do systemd define `SOCIOS_DB_PATH` absoluto, entao a armadilha esta
-fechada. Nunca remova essa variavel.
+Hoje o unit do systemd define a variavel. Nunca a remova.
 
-## 2. Backup de SQLite em WAL
+## 2. Uploads tem a mesma armadilha — e por isso nao vao para `public/`
 
-Copiar so o `.sqlite` perde transacoes que estao no `-wal`. Use sempre
-`sqlite3 <db> ".backup '<destino>'"`, que funciona com o app no ar. Alternativa: parar o
-app e copiar os tres arquivos (`.sqlite`, `-wal`, `-shm`).
+Na saida standalone o `public/` e recriado a cada build: imagem que o membro enviasse
+sumiria no deploy seguinte. As imagens ficam em `data/uploads/`, ao lado do banco
+(`SOCIOS_UPLOADS_DIR`, ou derivado de `SOCIOS_DB_PATH`), e sao servidas pela rota
+`/uploads/[...file]`, que exige sessao e so aceita o padrao de nome que nos geramos
+(barra path traversal). **Nunca mova upload para `public/`.**
 
-## 3. A pasta do projeto na VPS nao e um repositorio git
+## 3. Nao use `path.join` dinamico no escopo de modulo
 
-Deploy foi feito copiando arquivos. `git pull` na VPS nao funciona como o `DEPLOY.md`
-sugere no passo 3 — e preciso `rsync`/`scp` de `src/` e buildar la, ou inicializar git.
+O rastreio de arquivos do Turbopack conclui que o projeto inteiro e dependencia e incha a
+saida standalone. Em `storage.ts` a resolucao do diretorio ficou dentro de uma funcao com
+cache por causa disso.
 
-## 4. Tabela larga em viewport estreita (resolvido, nao repetir)
+## 4. Backup de SQLite em WAL
 
-O admin da comunidade nasceu como tabela de 1334px num viewport de 723px — as acoes
-ficavam fora da tela. Foi trocado por lista de cartoes com `<details>`. Nao volte a
-colocar muitas colunas de acao numa tabela.
+Copiar so o `.sqlite` perde transacoes do `-wal` — que costuma estar **maior** que o
+arquivo principal. Use sempre `sqlite3 <db> ".backup '<destino>'"`, que funciona com o app
+no ar. Nunca `cp` do `.sqlite`.
 
-## 5. Slug nao acompanha rename (intencional)
+## 5. A pasta do projeto na VPS nao e um repositorio git
 
-Renomear grupo ou espaco **nao** muda o slug, para nao quebrar URL ja divulgada. O slug
-sai do nome na criacao e recebe sufixo numerico se colidir. Se alguem pedir "corrigir o
-slug", confirme antes: e uma quebra de link.
+Deploy copia arquivos por `scp`. `git pull` na VPS nao funciona como o passo 3 do
+`DEPLOY.md` sugere. Manter o GitHub atualizado e um passo **separado** do deploy.
 
-## 6. `better-sqlite3` e modulo nativo
+## 6. Validacao de formulario nao pode lancar excecao
 
-Precisa casar com a versao de Node da VPS (hoje v22.23.1). Se a versao de Node mudar,
-apague `node_modules` antes de `npm ci`.
+`containsExternalLink` devolve a pessoa para a propria pagina com aviso. Lancar excecao
+dava tela de erro de servidor. Vale para toda validacao de entrada do membro.
 
-## 7. `src/app/page.tsx` tem 40KB
+## 7. Slug nao acompanha rename (intencional)
 
-Painel admin inteiro num arquivo. Alterar exige cuidado; nao ha teste automatizado em
-nenhuma parte do projeto.
+Renomear grupo ou espaco nao muda o slug, para nao quebrar URL divulgada. Se pedirem
+"corrigir o slug", confirme antes: e uma quebra de link.
+
+## 8. Tabela larga em viewport estreita (resolvido, nao repetir)
+
+O admin da comunidade nasceu como tabela de 1334px num viewport de 723px — as acoes ficavam
+fora da tela. Virou lista de cartoes com `<details>`. Nao volte a por muitas colunas de
+acao numa tabela.
+
+## 9. Disco da VPS em 91%
+
+8,7 GB livres. O Premium Member ocupa ~700 MB; o grosso sao 58 GB em `/home/user` de outros
+sites. Ha 2,1 GB de cache npm em `/root/.npm` que sai com `npm cache clean --force`.
+
+## 10. `better-sqlite3` e modulo nativo
+
+Precisa casar com o Node da VPS (v22.23.1). Se a versao mudar, apague `node_modules` antes
+de `npm ci`. Enquanto nao houver dependencia nova, o deploy roda `npm run build` **sem**
+`npm ci`.
+
+## 11. Membro de teste vivo em producao
+
+`teste.comunidade@premiummember.local` (id 23) esta ativo e **entra nas contagens**.
+Decidir se apaga antes de divulgar.
+
+## 12. `src/app/page.tsx` tem 40KB
+
+Painel admin inteiro num arquivo. Zero teste automatizado em todo o projeto; verificacao e
+manual, pelo passo 7 do `DEPLOY.md`.

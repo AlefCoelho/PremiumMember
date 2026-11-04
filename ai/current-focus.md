@@ -1,36 +1,83 @@
 # Estado atual
 
-Atualizado em 2026-11-04. HEAD `91b2749`, branch `main`, arvore limpa.
+Atualizado em 2026-11-04. **Producao esta no commit `254cb6a`**, igual ao `main`.
+
+## O que e
+
+Plataforma unica do Alef Coelho: comunidade, aulas, suporte e central de afiliados no mesmo
+lugar. Comecou como painel de afiliados.
 
 ## No ar
 
-https://premiummember.online — VPS `root@2.24.65.26`, systemd `socios-premiums.service`,
-porta 3020 atras do nginx. Detalhes e runbook em `DEPLOY.md` (raiz do projeto).
+https://premiummember.online — VPS `root@2.24.65.26` (atalho SSH `premium-vps`), projeto em
+`/home/user/htdocs/socios-premiums`, servico `socios-premiums.service`, porta 3020 atras do
+nginx, Node v22.23.1. Banco em `data/socios-premiums.sqlite`, com `SOCIOS_DB_PATH` absoluto
+no unit do systemd.
 
-Producao verificada apos o ultimo deploy: 17 afiliados, 2 admins, nenhuma alteracao de
-schema, motor de comissao intacto. Backup WAL-safe em
-`/root/backups/socios-2026-11-04-1004.sqlite`.
+Producao: 17 afiliados, 2 admins. Conferir esses dois numeros **depois** de todo restart.
 
-## Ultimo trabalho entregue
+Dev local: `SOCIOS_DB_PATH` para um arquivo descartavel, `npx next dev -p 3021`.
+Admin de dev: `admin@premiummember.local` / `admin123` (do `.env.example`; producao e outra).
 
-Admin da comunidade (`/admin/comunidade`) — Alef cria e organiza grupos e espacos sem
-editar codigo nem rodar SQL:
-- grupos: criar, renomear, reordenar, arquivar
-- espacos: criar, renomear, descricao, mover de grupo, reordenar, arquivar, `kind`
-  (`posts`/`support`/`lessons`), `min_eligible_sales`, excluir com confirmacao
+## Duas mudancas de rumo recentes
 
-Junto disso: tema escuro unico em todo o sistema, e os efeitos dourado/halo no login do
-membro (ver `ui-system.md`).
+**A comunidade virou a casa do membro.** `/socio` so redireciona para `/socio/comunidade`.
+Indicacoes, comissoes e saques foram para `/socio/ganhos`.
 
-## Areas sensiveis
+**A InfinitePay esta desligada**, por decisao do Alef, que usa um sistema externo
+provisorio. Checkout e webhook respondem 404 sem as chaves. Nenhuma comissao entra
+automaticamente; `paid_at` e lancado pelo admin.
 
-- `SOCIOS_DB_PATH` — ver `known-issues.md` item 1. Risco de perda de banco.
-- `src/app/page.tsx` (40KB) — painel admin inteiro num arquivo.
-- Webhook InfinitePay — idempotencia por `order_nsu`; mexer ali afeta dinheiro.
-- Zero teste automatizado no projeto. Verificacao e manual, pelo roteiro do passo 7 do
-  `DEPLOY.md`.
+## O que falta
 
-## Pendencias conhecidas
+### 1. Niveis e badges do membro — pedido, nao comecado
 
-- Deploy na VPS e manual por copia de arquivos (a pasta la nao e repositorio git).
-- Backup diario por cron: receitado no `DEPLOY.md`, nao confirmado como instalado.
+Simbolo de nivel abaixo do nome, por tempo de comunidade + likes e favoritos recebidos, com
+aviso de parabens ao subir. O Alef disse "podemos pensar melhor com calma": quantos niveis,
+nomes e peso de cada criterio **nao foram decididos**. **Pergunte antes de implementar.**
+
+Os dados ja existem: `community_reactions`, `community_favorites` e `affiliates.created_at`.
+
+### 2. Marcar membros com `@` — nao implementado
+
+Vale pouco sozinho: sem notificacao, ninguem sabe que foi marcado. Considere fazer junto com
+notificacoes.
+
+### 3. Backup automatico — recomendado, nao feito
+
+So existem os backups manuais que precedem cada deploy, em `/root/backups/` e em
+`find-skills/backups-producao/`. Com 16 membros reais e saques envolvidos, vale um cron
+diario. O comando esta no `DEPLOY.md`. Falta tambem copia **fora** da VPS.
+
+### 4. Disco da VPS em 91%
+
+8,7 GB livres. Ver `known-issues.md` item 9.
+
+### 5. Membro de teste em producao
+
+`teste.comunidade@premiummember.local` (id 23), ativo e contando. Decidir se apaga antes de
+divulgar.
+
+## Antes de divulgar para alunos novos
+
+- Cadastro publico **funciona**: `/cadastro-membro` cria conta, loga e abre a dashboard.
+- Recuperacao de senha **funciona, sem e-mail automatico** enquanto `RESEND_API_KEY` nao for
+  configurada. O admin gera o link em `/admin/senhas` e entrega.
+- Pagamento **nao funciona**: InfinitePay desligada, sistema externo provisorio no lugar.
+
+## Deploy, resumido
+
+Runbook completo em `DEPLOY.md`. O que funciona hoje:
+
+1. backup WAL-safe (`sqlite3 ... ".backup ..."`, nunca `cp`)
+2. copiar o backup para fora da VPS
+3. `tar czf` do `src/` atual, como rollback
+4. `scp -r src/. premium-vps:/home/user/htdocs/socios-premiums/src/`
+5. `npm run build` na VPS (sem `npm ci`, enquanto nao houver dependencia nova)
+6. `cp -r .next/static .next/standalone/.next/` e `cp -r public .next/standalone/`
+7. `systemctl restart socios-premiums`
+8. conferir `affiliates: 17` e `admins: 2` **depois** do restart; mudou, rollback na hora
+
+A pasta de producao nao e repositorio git. Atualizar o GitHub e passo **separado**: depois
+do deploy, `main`, `feat/comunidade` e `feat/admin-comunidade` sao avancadas por
+fast-forward para o mesmo commit.

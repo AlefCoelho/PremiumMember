@@ -73,3 +73,40 @@ Exclusao real existe so para espaco (`deleteSpace`) e pede confirmacao na UI.
 ## Formatar dinheiro
 
 Sempre por `src/lib/money.ts`. Nunca `toFixed(2)` espalhado.
+
+## Contagem agregada para uma lista
+
+`attachPostMeta(posts, affiliateId)` resolve reacoes e favoritos da lista toda em **duas
+consultas agregadas**, nao duas por publicacao. Ao adicionar um contador novo por item,
+siga esse formato em vez de consultar dentro do laco.
+
+## Recurso externo que pode estar desligado
+
+```ts
+export function isXEnabled() {
+  return Boolean(process.env.X_KEY?.trim() && process.env.X_SECRET?.trim());
+}
+```
+
+Rota protegida responde **404** quando desligada (nao 401/500, que expoem a existencia).
+Funcao de envio devolve `false` em vez de fingir sucesso. Religar = so por o ambiente,
+sem mexer no codigo. Referencia: `isInfinitePayEnabled()`, `isMailConfigured()`.
+
+## Caminho de arquivo resolvido em runtime
+
+```ts
+let cachedDir: string | null = null;
+function resolveDir() {
+  if (cachedDir) return cachedDir;
+  cachedDir = process.env.SOCIOS_UPLOADS_DIR ?? derivarDoBanco();
+  return cachedDir;
+}
+```
+
+Nunca no escopo do modulo: o rastreio do Turbopack incha a saida standalone
+(`known-issues.md` item 3).
+
+## Campo de imagem
+
+Reuse `ImageUploadField` — ele reduz e converte para WebP no navegador antes de enviar.
+No servidor, `saveImage(file, "avatars" | "posts")`; para exibir, `publicUrl(storedPath)`.

@@ -12,9 +12,20 @@ Tabelas do nucleo (`src/lib/db.ts`):
 `affiliate_clicks`.
 
 Tabelas da comunidade (`src/lib/community.ts`):
-`community_groups`, `community_spaces`, `community_posts`, `community_comments`.
+`community_groups`, `community_spaces`, `community_posts`, `community_comments`,
+`community_reactions` (`post_id` + `affiliate_id` + `kind`), `community_favorites`,
+`community_post_images` (1:1 com post), `community_featured_posts` ("em alta").
 Grupos e espacos tem `position` (ordem) e `status` (`active`/`archived`).
 Espaco tem `kind` (`posts`/`support`/`lessons`) e `min_eligible_sales` (gate de acesso).
+
+Eventos (`src/lib/events.ts`): `community_events` (`starts_at`, `duration_minutes`,
+`meet_url`, `recording_url`, `status` `scheduled`/`cancelled`) e `community_event_rsvps`
+(`UNIQUE (event_id, affiliate_id)` — a confirmacao e um toggle idempotente).
+
+Perfil (`src/lib/profiles.ts`): `affiliate_profiles`, chave primaria = `affiliate_id`.
+
+Senha (`src/lib/password-reset.ts`): `affiliate_password_resets` com `token_hash` unico,
+`expires_at` e `used_at`.
 
 ## Padroes obrigatorios
 
@@ -30,6 +41,10 @@ Espaco tem `kind` (`posts`/`support`/`lessons`) e `min_eligible_sales` (gate de 
 - **Erro** = `throw new Error("mensagem em portugues")`.
 - **Dinheiro** sempre em centavos (`*_cents`), formatado por `src/lib/money.ts`.
 - **Datas** em texto ISO (`YYYY-MM-DD` por `isoDate()`), nunca `Date` no banco.
+- **Arquivo em disco so por `src/lib/storage.ts`.** Nenhum outro modulo escreve arquivo.
+  Trocar de destino (R2, Supabase) e mexer so nele.
+- **Recurso externo opcional checa o ambiente e desliga limpo**, em vez de falhar: ver
+  `isInfinitePayEnabled()` (404) e `isMailConfigured()` (nao finge que mandou e-mail).
 
 ## Autenticacao
 
@@ -42,3 +57,17 @@ Duas sessoes independentes, ambas JWT assinado com `JWT_SECRET` em cookie httpOn
 
 Senhas com `bcryptjs` (10 rounds). Membro sem `password_hash` ou com `status != 'active'`
 nao loga. Trocar `JWT_SECRET` desloga todo mundo.
+
+## Redefinicao de senha do membro
+
+Token aleatorio, guardado so como `token_hash`, valido 60 minutos e de uso unico. Pedido
+novo invalida os anteriores. Envio por e-mail e **opcional** (`RESEND_API_KEY` + `MAIL_FROM`);
+sem essas variaveis o admin gera o link em `/admin/senhas` e entrega pelo canal que ja usa.
+`cleanupExpiredTokens()` limpa o que passou de 7 dias.
+
+## Upload de imagem
+
+`saveImage(file, "avatars" | "posts")` — teto de 2MB, so `webp`/`jpeg`/`png`, nome de
+arquivo aleatorio e nunca reaproveitado. Servido por `/uploads/[...file]`, que exige sessao
+de membro ou admin: sao fotos de pessoas e conteudo de area fechada, nao abrem para a
+internet. Cache `private, immutable` por um ano, seguro porque o nome nao se repete.
