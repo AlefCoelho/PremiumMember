@@ -16,7 +16,12 @@ codigo, e atualize apos qualquer mudanca relevante.
 | `decisions.md` | antes de propor mudanca estrutural |
 | `patterns.md` | antes de escrever codigo novo |
 
-Runbook de deploy fica em `DEPLOY.md`, na raiz — nao duplicar aqui.
+## Os outros dois documentos da raiz
+
+- `DEPLOY.md` — runbook de deploy, passo a passo. Nao duplicar aqui.
+- `CONTINUACAO.md` — handoff escrito para humanos. Esta pasta reorganiza o conteudo dele
+  por assunto; se os dois divergirem, o `CONTINUACAO.md` e a versao que o Alef leu e
+  aprovou. Mudou algo? Atualize os dois.
 
 Por tarefa: UI -> `ui-system` + `frontend`. Backend -> `backend` + `architecture`.
 Regra de negocio -> `business-rules`. Bug -> `known-issues`. Fluxo -> `architecture` +
