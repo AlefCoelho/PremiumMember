@@ -4,6 +4,7 @@ import {
   Archive,
   ArchiveRestore,
   LayoutDashboard,
+  KeyRound,
   LogOut,
   MessagesSquare,
   Plus,
@@ -311,6 +312,10 @@ export default async function AdminCommunityPage({
             <MessagesSquare size={18} />
             Grupos e espacos
           </a>
+          <Link href="/admin/senhas">
+            <KeyRound size={18} />
+            Senhas
+          </Link>
         </nav>
 
         <form action={logoutAction} className="logout-form">

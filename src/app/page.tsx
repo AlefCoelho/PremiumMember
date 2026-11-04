@@ -8,6 +8,7 @@ import {
   HandCoins,
   LayoutDashboard,
   Link2,
+  KeyRound,
   LogOut,
   MessagesSquare,
   Plug,
@@ -409,6 +410,10 @@ export default async function Home() {
           <Link href="/admin/comunidade">
             <MessagesSquare size={18} />
             Comunidade
+          </Link>
+          <Link href="/admin/senhas">
+            <KeyRound size={18} />
+            Senhas
           </Link>
         </nav>
 
