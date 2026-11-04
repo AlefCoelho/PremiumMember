@@ -20,6 +20,23 @@ nunca foi necessario.
 > esta no ar. Para saber se um deploy aconteceu, pergunte ao banco de producao, nao ao
 > repositorio — por exemplo, se a tabela de um recurso novo ja existe la.
 
+## Novidades de 2026-11-04 (tarde)
+
+- **Comunidade com cara de app no celular.** Abaixo de 820px os cinco destinos viram barra
+  fixa no rodape e a lista de espacos vira um seletor que abre. Usa
+  `env(safe-area-inset-bottom)` e `viewportFit: "cover"`. Campos de formulario com 16px,
+  senao o iPhone da zoom ao focar.
+- **Pagina publica `/apresentacao`**, com rolagem por secoes, a aura do login, dourado nas
+  palavras de destaque e a oferta de R$ 97,00 mensal levando a `/cadastro-membro`.
+- **`contatoalefcoelho@gmail.com` e administrador** em producao. A senha foi gerada e
+  gravada num arquivo fora do repositorio, e conferida contra o hash. Atencao ao gravar
+  hash bcrypt por SSH: o `$` e comido pelo shell — mande por arquivo .sql, nunca inline.
+- **Subdominio `admin.premiummember.online`**: o bloco HTTP ja esta no nginx e ligado, com
+  os outros sites da VPS conferidos antes e depois do reload. **Falta o registro A na
+  Hostinger**, que so o Alef cria. Depois disso, `scripts/ativar-subdominio-admin.sh
+  --aplicar` emite o certificado. O subdominio e organizacao: quem separa admin de membro
+  continua sendo o cookie.
+
 ## O que e
 
 Plataforma unica do Alef Coelho: comunidade, aulas, suporte e central de afiliados no mesmo
