@@ -65,23 +65,29 @@ O admin da comunidade nasceu como tabela de 1334px num viewport de 723px — as 
 fora da tela. Virou lista de cartoes com `<details>`. Nao volte a por muitas colunas de
 acao numa tabela.
 
-## 9. Disco da VPS em 91%
+## 9. Uma sessao de nuvem nao alcanca a VPS
+
+Nao ha cliente ssh no container e a porta 22 de `2.24.65.26` nao responde: a saida vai por
+um proxy HTTPS, que nao roteia ssh. Nenhuma credencial resolve isso de dentro daqui. Tarefa
+que precisa da VPS vira script no repositorio, para alguem rodar de uma maquina com acesso.
+
+## 10. Disco da VPS em 91%
 
 8,7 GB livres. O Premium Member ocupa ~700 MB; o grosso sao 58 GB em `/home/user` de outros
 sites. Ha 2,1 GB de cache npm em `/root/.npm` que sai com `npm cache clean --force`.
 
-## 10. `better-sqlite3` e modulo nativo
+## 11. `better-sqlite3` e modulo nativo
 
 Precisa casar com o Node da VPS (v22.23.1). Se a versao mudar, apague `node_modules` antes
 de `npm ci`. Enquanto nao houver dependencia nova, o deploy roda `npm run build` **sem**
 `npm ci`.
 
-## 11. Membro de teste vivo em producao
+## 12. Membro de teste vivo em producao
 
 `teste.comunidade@premiummember.local` (id 23) esta ativo e **entra nas contagens**.
 Decidir se apaga antes de divulgar.
 
-## 12. `src/app/page.tsx` tem 40KB
+## 13. `src/app/page.tsx` tem 40KB
 
 Painel admin inteiro num arquivo. Zero teste automatizado em todo o projeto; verificacao e
 manual, pelo passo 7 do `DEPLOY.md`.

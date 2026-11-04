@@ -319,7 +319,20 @@ systemctl start socios-premiums
 
 ## Backup recorrente
 
-Backup so antes de deploy nao protege contra perda no dia a dia. Agende um diario:
+Backup so antes de deploy nao protege contra perda no dia a dia. Agende um diario.
+
+Ha um script pronto no repositorio, `scripts/setup-backups.sh`. Ele le o caminho do banco do
+proprio unit do systemd, instala as duas linhas de crontab sem duplicar se ja existirem,
+guarda o crontab anterior e no fim tira uma copia de teste para provar que o comando
+funciona — em vez de descobrir as 3h da manha que estava errado:
+
+```bash
+# na VPS, como root
+bash setup-backups.sh            # mostra o que faria, sem mudar nada
+bash setup-backups.sh --aplicar  # aplica
+```
+
+Para fazer na mao, o equivalente e:
 
 ```bash
 crontab -e
