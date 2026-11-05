@@ -9,7 +9,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   createLessonCommentAction,
   toggleLessonDoneAction,
@@ -20,6 +20,7 @@ import { requireAffiliate } from "@/lib/auth";
 import { getMemberEligibleSales } from "@/lib/community";
 import {
   canOpenLesson,
+  memberCanOpenLesson,
   getLessonBySlug,
   getLessonMaterials,
   getLessonPresentationMap,
@@ -53,6 +54,14 @@ export default async function LessonPage({
 
   const eligibleSales = getMemberEligibleSales(session.affiliateId);
   const voltar = `/socio/comunidade/${entry.spaceSlug}`;
+
+  // Travamento premium e liberacao programada sao do espaco, nao da aula: quem
+  // chega pelo endereco direto volta para a pagina do espaco, que e onde o
+  // motivo certo e o botao de pagamento estao. Repetir aquela tela aqui seria
+  // manter duas versoes do mesmo texto.
+  if (!memberCanOpenLesson(entry, session.affiliateId, eligibleSales) && canOpenLesson(entry, eligibleSales)) {
+    redirect(voltar);
+  }
 
   if (!canOpenLesson(entry, eligibleSales)) {
     const exigido = requiredSalesFor(entry);

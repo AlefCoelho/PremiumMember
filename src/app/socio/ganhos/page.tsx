@@ -8,6 +8,7 @@ import { AffiliateLinkButton } from "@/components/AffiliateLinkButton";
 import { requireAffiliate } from "@/lib/auth";
 import { getAffiliateBaseUrl, getAffiliatePortalData } from "@/lib/db";
 import { formatCurrency } from "@/lib/money";
+import { levelProgress } from "@/lib/levels";
 import { getHoldDeadline, getReferralStatus } from "@/lib/rules";
 import { CalendarClock, HandCoins, Link2, LogOut, MessagesSquare, Trophy, Users, WalletCards } from "lucide-react";
 import Link from "next/link";
@@ -72,9 +73,14 @@ export default async function AffiliatePortalPage({
   const data = getAffiliatePortalData(session.affiliateId);
   if (!data) redirect("/socio/login");
   const params = await searchParams;
-  const copyShieldLink = `${getAffiliateBaseUrl()}/r/${encodeURIComponent(data.affiliate.code)}/copyshieldpro`;
-  const tradeShieldLink = `${getAffiliateBaseUrl()}/r/${encodeURIComponent(data.affiliate.code)}/tradeshield`;
   const memberSignupLink = `${getAffiliateBaseUrl()}/cadastro-membro?sponsor=${encodeURIComponent(data.affiliate.code)}`;
+
+  // Os numeros da oferta vem das configuracoes, nao do texto: mudar a meta no
+  // painel de admin tem de mudar a chamada que o membro le, senao a plataforma
+  // promete uma coisa e entrega outra.
+  const meta = data.settings.free_access_sales_target;
+  const janela = data.settings.free_access_window_days;
+  const nivel = levelProgress(data.stats.eligibleSales);
   const walletAddress = (network: string) => data.digitalWallets.find((wallet) => wallet.network === network)?.address ?? "";
 
   return (
@@ -99,31 +105,68 @@ export default async function AffiliatePortalPage({
         </div>
       </header>
 
-      <section className="affiliate-link-panel panel">
-        <div>
-          <h2>CopyShield Pro</h2>
-          <p>Link exclusivo para indicar o cadastro do CopyShield Pro.</p>
-          <strong>{copyShieldLink}</strong>
-        </div>
-        <AffiliateLinkButton href={copyShieldLink} />
-      </section>
+      {/* Um link so, em destaque. Tres links concorrendo na mesma tela nao dao
+          tres vezes mais indicacoes: dao uma escolha a mais antes de agir, e a
+          maioria nao escolhe nenhuma. O link do Premium Member e o unico que
+          traz gente para dentro da plataforma. */}
+      <section className="referral-hero panel">
+        <div className="referral-hero-copy">
+          <p className="eyebrow">Indique e use de graca</p>
+          <h2>
+            Indique {meta} novos membros e tenha acesso a todos os recursos Premium a cada{" "}
+            {janela} dias.
+          </h2>
 
-      <section className="affiliate-link-panel panel">
-        <div>
-          <h2>TradeShield</h2>
-          <p>Link exclusivo para indicar o cadastro do TradeShield.</p>
-          <strong>{tradeShieldLink}</strong>
-        </div>
-        <AffiliateLinkButton href={tradeShieldLink} />
-      </section>
+          <ul className="referral-hero-list">
+            <li>
+              <strong>
+                {meta} novos membros = 1 mes de Premium Member ilimitado
+              </strong>
+              <span>Enquanto voce mantiver o ritmo, nao paga mensalidade.</span>
+            </li>
+            <li>
+              <strong>
+                Mais {data.settings.network_bonus_percent}% de comissao sobre as vendas deles
+              </strong>
+              <span>De cada um dos membros que entrarem pelo seu link.</span>
+            </li>
+            <li>
+              <strong>
+                {nivel.proximo
+                  ? `Mais ${nivel.faltam} venda(s) liberada(s) e voce sobe para o nivel ${nivel.proximo.nivel} - ${nivel.proximo.nome}`
+                  : "Voce esta no nivel maximo"}
+              </strong>
+              <span>
+                Hoje voce esta no nivel {nivel.atual.nivel} - {nivel.atual.nome}. O nivel
+                conquistado nao cai no mes seguinte.
+              </span>
+            </li>
+          </ul>
 
-      <section className="affiliate-link-panel panel">
-        <div>
-          <h2>Convite de membros</h2>
-          <p>Use este link para cadastrar pessoas na sua rede. Voce so recebe bonus quando elas gerarem vendas liberadas.</p>
-          <strong>{memberSignupLink}</strong>
+          <div className="referral-hero-link">
+            <span className="muted">Seu link de indicacao</span>
+            <strong>{memberSignupLink}</strong>
+          </div>
+
+          <AffiliateLinkButton href={memberSignupLink} />
         </div>
-        <AffiliateLinkButton href={memberSignupLink} />
+
+        <aside className="referral-hero-score">
+          <div>
+            <span>Creditos de {janela} dias</span>
+            <strong>{data.stats.freeAccessCredits}</strong>
+          </div>
+          <div>
+            <span>Membros na sua rede</span>
+            <strong>{data.stats.directMembers}</strong>
+          </div>
+          <div className="referral-hero-progress">
+            <span>Progresso do nivel</span>
+            <div className="course-bar" role="img" aria-label={`${nivel.percent}% do proximo nivel`}>
+              <span style={{ width: `${nivel.percent}%` }} />
+            </div>
+          </div>
+        </aside>
       </section>
 
       <section className="kpi-grid">

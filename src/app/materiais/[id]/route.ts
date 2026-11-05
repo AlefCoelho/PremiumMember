@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAffiliateSession, getSession } from "@/lib/auth";
 import { getMemberEligibleSales } from "@/lib/community";
-import { canOpenLesson, getLessonById, getLessonBySlug, getMaterialById } from "@/lib/lessons";
+import { memberCanOpenLesson, getLessonById, getLessonBySlug, getMaterialById } from "@/lib/lessons";
 import { readMaterial } from "@/lib/storage";
 
 // Download de material de aula.
@@ -24,7 +24,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     if (!entry) return new NextResponse(null, { status: 404 });
 
     const eligibleSales = getMemberEligibleSales(affiliate.affiliateId);
-    if (!canOpenLesson(entry, eligibleSales)) return new NextResponse(null, { status: 404 });
+    if (!memberCanOpenLesson(entry, affiliate.affiliateId, eligibleSales))
+      return new NextResponse(null, { status: 404 });
   }
 
   const file = readMaterial(material.stored_path);

@@ -1,7 +1,9 @@
 import { GraduationCap, Trophy, Users } from "lucide-react";
+import Link from "next/link";
 import { requireAffiliate } from "@/lib/auth";
 import { formatJoinDate, getLeaderboard, getMemberDirectory } from "@/lib/directory";
-import { getAvatarUrls } from "@/lib/profiles";
+import { levelFor } from "@/lib/levels";
+import { getAvatarUrls, getProfileInfo } from "@/lib/profiles";
 
 export default async function MembersPage() {
   const session = await requireAffiliate();
@@ -25,7 +27,8 @@ export default async function MembersPage() {
           <p className="eyebrow">Comunidade</p>
           <h1>Membros</h1>
           <p>
-            {membros.length} membro(s) ativo(s). Quem esta aqui dentro construindo junto com voce.
+            {membros.length} membro(s) ativo(s). Toque no nome para ver o perfil, o nivel e o que a
+            pessoa ja concluiu aqui dentro.
           </p>
         </div>
       </header>
@@ -43,12 +46,15 @@ export default async function MembersPage() {
               <li className={membro.id === session.affiliateId ? "voce" : undefined} key={membro.id}>
                 <span className="leaderboard-pos">{membro.position}</span>
                 <div>
-                  <strong>
-                    {membro.name}
-                    {membro.id === session.affiliateId ? " (voce)" : ""}
-                  </strong>
+                  <Link href={`/socio/comunidade/membros/${membro.id}`}>
+                    <strong>
+                      {membro.name}
+                      {membro.id === session.affiliateId ? " (voce)" : ""}
+                    </strong>
+                  </Link>
                   <span className="muted">
-                    {membro.eligible_referrals} venda(s) - {membro.lessons_done} aula(s)
+                    {levelFor(membro.eligible_referrals).nome} - {membro.eligible_referrals} venda(s)
+                    - {membro.lessons_done} aula(s)
                   </span>
                 </div>
               </li>
@@ -66,27 +72,37 @@ export default async function MembersPage() {
         <ul>
           {membros.map((membro) => {
             const avatar = avatars.get(membro.id);
+            const info = getProfileInfo(membro.id);
+            const nivel = levelFor(membro.eligible_referrals);
+
             return (
               <li key={membro.id}>
-                {avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatar} alt="" />
-                ) : (
-                  <span className="members-avatar">{iniciais(membro.name)}</span>
-                )}
-                <div>
-                  <strong>
-                    {membro.name}
-                    {membro.id === session.affiliateId ? " (voce)" : ""}
-                  </strong>
-                  <span className="muted">Entrou em {formatJoinDate(membro.created_at)}</span>
-                </div>
-                {membro.lessons_done ? (
-                  <span className="members-badge">
-                    <GraduationCap size={13} />
-                    {membro.lessons_done}
-                  </span>
-                ) : null}
+                {/* A linha inteira e o link: num celular, alvo de toque pequeno
+                    em lista longa erra mais do que acerta. */}
+                <Link className="members-row" href={`/socio/comunidade/membros/${membro.id}`}>
+                  {avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatar} alt="" />
+                  ) : (
+                    <span className="members-avatar">{iniciais(membro.name)}</span>
+                  )}
+                  <div>
+                    <strong>
+                      {membro.name}
+                      {membro.id === session.affiliateId ? " (voce)" : ""}
+                    </strong>
+                    <span className="muted">
+                      {info.area ? `${info.area} - ` : ""}
+                      {nivel.nome} - entrou em {formatJoinDate(membro.created_at)}
+                    </span>
+                  </div>
+                  {membro.lessons_done ? (
+                    <span className="members-badge">
+                      <GraduationCap size={13} />
+                      {membro.lessons_done}
+                    </span>
+                  ) : null}
+                </Link>
               </li>
             );
           })}

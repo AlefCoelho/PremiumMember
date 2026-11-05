@@ -1,5 +1,10 @@
 import { db } from "@/lib/db";
-import { slugify } from "@/lib/community";
+import {
+  evaluateSpaceAccess,
+  getAffiliateJoinDate,
+  getGrantedSpaceIds,
+  slugify,
+} from "@/lib/community";
 
 // Aulas do Premium Member.
 //
@@ -515,6 +520,7 @@ export type LessonForMember = {
   lesson: CourseLessonRow;
   moduleTitle: string;
   spaceId: number;
+  spaceGroupId: number;
   spaceSlug: string;
   spaceName: string;
   spaceMinEligibleSales: number;
@@ -527,6 +533,7 @@ export function getLessonBySlug(slug: string): LessonForMember | undefined {
       `SELECT course_lessons.*,
               course_modules.title AS module_title,
               community_spaces.id AS space_id,
+              community_spaces.group_id AS space_group,
               community_spaces.slug AS space_slug,
               community_spaces.name AS space_name,
               community_spaces.min_eligible_sales AS space_min
@@ -542,6 +549,7 @@ export function getLessonBySlug(slug: string): LessonForMember | undefined {
     | (CourseLessonRow & {
         module_title: string;
         space_id: number;
+        space_group: number;
         space_slug: string;
         space_name: string;
         space_min: number;
@@ -549,11 +557,12 @@ export function getLessonBySlug(slug: string): LessonForMember | undefined {
     | undefined;
 
   if (!row) return undefined;
-  const { module_title, space_id, space_slug, space_name, space_min, ...lesson } = row;
+  const { module_title, space_id, space_group, space_slug, space_name, space_min, ...lesson } = row;
   return {
     lesson,
     moduleTitle: module_title,
     spaceId: space_id,
+    spaceGroupId: space_group,
     spaceSlug: space_slug,
     spaceName: space_name,
     spaceMinEligibleSales: space_min,
@@ -571,6 +580,32 @@ export function requiredSalesFor(entry: LessonForMember) {
 
 export function canOpenLesson(entry: LessonForMember, eligibleSales: number) {
   return eligibleSales >= requiredSalesFor(entry);
+}
+
+/**
+ * O acesso completo a uma aula: vendas (do espaco e da propria aula) mais a
+ * regra do espaco e do grupo — travamento premium e liberacao programada.
+ *
+ * Tudo que entrega conteudo de aula chama esta funcao, nao canOpenLesson
+ * sozinha: sem isso o endereco direto da aula furaria o travamento do espaco,
+ * e o paywall viraria decoracao da lateral.
+ */
+export function memberCanOpenLesson(
+  entry: LessonForMember,
+  affiliateId: number,
+  eligibleSales: number
+) {
+  if (!canOpenLesson(entry, eligibleSales)) return false;
+
+  const acesso = evaluateSpaceAccess({
+    spaceId: entry.spaceId,
+    groupId: entry.spaceGroupId,
+    minEligibleSales: 0,
+    eligibleSales,
+    joinedAt: getAffiliateJoinDate(affiliateId),
+    granted: getGrantedSpaceIds(affiliateId).has(entry.spaceId),
+  });
+  return acesso.ok;
 }
 
 export function isLessonCompleted(lessonId: number, affiliateId: number) {

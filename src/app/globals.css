@@ -3967,3 +3967,764 @@ a.course-card:hover {
     margin-top: 18px;
   }
 }
+
+/* ===========================================================================
+   Logo, sino, acesso por pagamento/data, perfil do membro e vitrine de
+   indicacao.
+   =========================================================================== */
+
+/* Marca -------------------------------------------------------------------- */
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-logo-mark {
+  flex: 0 0 auto;
+  display: block;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(200, 153, 47, 0.28), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.brand-logo-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-logo-text {
+  min-width: 0;
+}
+
+.brand-logo-text strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1px;
+  color: var(--sidebar-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-logo-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Foto de perfil ----------------------------------------------------------- */
+
+/* Fotos antigas foram gravadas no formato original, e `cover` recorta pelo
+   centro geometrico — numa foto em pe isso cai no peito, nao no rosto. Subir o
+   ponto de recorte resolve para o acervo que ja existe; as novas ja sobem
+   quadradas e nem chegam a ser recortadas aqui. */
+.community-avatar-photo,
+.notification-avatar img,
+.members-list li img,
+.members-row img,
+.member-profile-avatar {
+  object-position: 50% 32%;
+}
+
+.community-avatar-photo {
+  display: block;
+}
+
+/* Sino fixo ---------------------------------------------------------------- */
+
+.bell {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 60;
+}
+
+.bell-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+.bell-button:hover {
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+.bell-button.com-novidade {
+  color: var(--text);
+  border-color: rgba(200, 153, 47, 0.5);
+}
+
+/* A marcacao e um ponto, nao um numero: o pedido era sinalizar que existe algo
+   novo. Um contador no canto da tela vira cobranca; o numero exato fica na
+   pagina de notificacoes. */
+.bell-dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 0 2px var(--panel), 0 0 8px rgba(255, 234, 160, 0.7);
+}
+
+.bell-panel {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: min(330px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.bell-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bell-panel header strong {
+  font-size: 14px;
+}
+
+.bell-panel header button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.bell-panel header button:hover {
+  background: var(--panel-strong);
+  color: var(--text);
+}
+
+.bell-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.bell-panel li a,
+.bell-item-plain {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+
+.bell-panel li a:hover {
+  background: var(--panel-strong);
+}
+
+.bell-panel li.nova a,
+.bell-panel li.nova .bell-item-plain {
+  border-left-color: var(--gold);
+  background: rgba(200, 153, 47, 0.07);
+}
+
+.bell-item-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--panel-strong);
+  color: var(--gold);
+}
+
+.bell-item-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.bell-item-body strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bell-item-body span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bell-item-when {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.bell-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.bell-panel-footer em {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--red);
+  color: #1a0b0d;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+/* No celular o sino desce para nao brigar com o titulo da pagina, que comeca
+   no topo e e o que orienta onde a pessoa esta. Fica acima da barra de abas. */
+@media (max-width: 820px) {
+  .bell {
+    top: auto;
+    bottom: 84px;
+    right: 12px;
+  }
+
+  .bell-panel {
+    top: auto;
+    bottom: 52px;
+  }
+}
+
+/* Lateral: espaco travado ou agendado -------------------------------------- */
+
+.community-nav-lock {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--panel-strong);
+  color: var(--gold);
+  font-style: normal;
+}
+
+/* Tela de espaco bloqueado ------------------------------------------------- */
+
+.space-gate {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 30px 22px;
+  text-align: center;
+}
+
+.space-gate-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--panel-strong);
+  color: var(--gold);
+}
+
+.space-gate strong {
+  font-size: 18px;
+}
+
+.space-gate p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.space-gate .primary-button {
+  margin-top: 4px;
+}
+
+.space-gate.premium {
+  border-color: rgba(200, 153, 47, 0.38);
+  background: linear-gradient(180deg, rgba(200, 153, 47, 0.08), transparent 60%), var(--panel);
+}
+
+.space-gate.premium .space-gate-icon {
+  background: rgba(200, 153, 47, 0.16);
+}
+
+/* Admin: acesso e ordem ---------------------------------------------------- */
+
+.access-form {
+  gap: 14px;
+}
+
+.access-form-block {
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-strong);
+}
+
+.access-form-block > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+}
+
+.access-form-block p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* A caixa de marcar e o unico campo em linha do formulario, por isso o
+   override: o .stack que envolve tudo empilha os labels. */
+.access-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+}
+
+.access-check input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--gold);
+}
+
+.access-grants {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.access-grants > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+}
+
+.access-grant-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.access-grant-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.access-grant-list li strong {
+  display: block;
+  font-size: 13px;
+}
+
+.access-grant-list li span {
+  display: block;
+  font-size: 12px;
+}
+
+.group-order {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.group-order-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.group-order-form label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.group-order-form select {
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel-strong);
+  color: var(--text);
+}
+
+/* Novidades na pagina de notificacoes -------------------------------------- */
+
+.news-panel h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.news-panel ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.news-panel li a,
+.news-panel li > div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+}
+
+.news-panel li a:hover {
+  border-color: var(--gold);
+}
+
+.news-panel li.nova a,
+.news-panel li.nova > div {
+  border-left-color: var(--gold);
+  background: rgba(200, 153, 47, 0.07);
+}
+
+.news-panel li strong {
+  font-size: 14px;
+}
+
+.news-panel li span {
+  font-size: 12px;
+}
+
+/* Lista de membros clicavel ------------------------------------------------ */
+
+.members-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 2px;
+  border-radius: 9px;
+}
+
+.members-row:hover {
+  background: var(--panel-strong);
+}
+
+.members-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.members-row strong {
+  display: block;
+  font-size: 14px;
+}
+
+.members-row span {
+  display: block;
+  font-size: 12px;
+}
+
+.leaderboard li a:hover strong {
+  color: var(--gold);
+}
+
+/* Perfil publico do membro ------------------------------------------------- */
+
+.member-profile-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.member-profile-back:hover {
+  color: var(--text);
+}
+
+/* A borda de cima e a unica coisa que muda por nivel. Pintar o painel inteiro
+   deixaria o texto do perfil ilegivel em metade dos niveis. */
+.member-profile {
+  display: grid;
+  gap: 16px;
+  border-top: 3px solid var(--border);
+}
+
+.member-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.member-profile-avatar {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.member-profile-avatar-vazio {
+  display: grid;
+  place-items: center;
+  background: var(--panel-strong);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.member-profile-head h1 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.member-profile-head p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.member-profile-level {
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.member-profile-bio {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  background: var(--panel-strong);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.member-profile-next {
+  display: grid;
+  gap: 6px;
+}
+
+.member-profile-next span {
+  font-size: 12px;
+}
+
+.member-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.member-profile-stats article {
+  display: grid;
+  gap: 3px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-strong);
+  color: var(--gold);
+}
+
+.member-profile-stats strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.member-profile-stats span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.member-profile .outline-button {
+  justify-self: start;
+}
+
+.member-profile.nivel-bronze {
+  border-top-color: #b06a2c;
+}
+
+.member-profile.nivel-prata {
+  border-top-color: #b9c0cc;
+}
+
+.member-profile.nivel-ouro {
+  border-top-color: var(--gold);
+}
+
+.member-profile.nivel-diamante {
+  border-top-color: #67e8f9;
+}
+
+.member-profile.nivel-lenda {
+  border-top-color: #c084fc;
+}
+
+/* Vitrine de indicacao ----------------------------------------------------- */
+
+.referral-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+  gap: 22px;
+  border-color: rgba(200, 153, 47, 0.32);
+  background: linear-gradient(180deg, rgba(200, 153, 47, 0.09), transparent 55%), var(--panel);
+}
+
+.referral-hero-copy {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.referral-hero-copy h2 {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.3;
+}
+
+.referral-hero-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.referral-hero-list li {
+  display: grid;
+  gap: 2px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 9px 9px 0;
+  background: var(--panel-strong);
+}
+
+.referral-hero-list strong {
+  font-size: 14px;
+}
+
+.referral-hero-list span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.referral-hero-link {
+  display: grid;
+  gap: 4px;
+  padding: 11px 13px;
+  border: 1px dashed var(--border);
+  border-radius: 9px;
+}
+
+.referral-hero-link span {
+  font-size: 12px;
+}
+
+.referral-hero-link strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  word-break: break-all;
+  color: var(--text);
+}
+
+.referral-hero-score {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.referral-hero-score > div {
+  display: grid;
+  gap: 3px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-strong);
+}
+
+.referral-hero-score span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.referral-hero-score strong {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.referral-hero-progress .course-bar {
+  margin-top: 5px;
+}
+
+@media (max-width: 900px) {
+  .referral-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .referral-hero-copy h2 {
+    font-size: 20px;
+  }
+
+  .referral-hero-score {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  }
+}

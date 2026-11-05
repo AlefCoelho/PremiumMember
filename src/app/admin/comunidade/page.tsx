@@ -5,12 +5,15 @@ import {
   Archive,
   ArchiveRestore,
   CalendarClock,
+  Clock,
   LayoutDashboard,
   KeyRound,
+  Lock,
   LogOut,
   MessagesSquare,
   Plus,
   Trash2,
+  UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions";
@@ -18,17 +21,26 @@ import {
   createCommunityGroupAction,
   createCommunitySpaceAction,
   deleteCommunitySpaceAction,
+  grantSpaceAccessAction,
   moveCommunityGroupAction,
   moveCommunitySpaceAction,
   renameCommunityGroupAction,
+  revokeSpaceAccessAction,
+  setCommunityGroupPositionAction,
   setCommunityGroupStatusAction,
   setCommunitySpaceStatusAction,
+  setGroupAccessAction,
+  setSpaceAccessAction,
   updateCommunitySpaceAction,
 } from "@/app/admin/comunidade/actions";
+import { BrandLogo } from "@/components/BrandLogo";
 import { requireAdmin } from "@/lib/auth";
 import {
   getAdminCommunityTree,
+  getSpaceGrants,
   spaceKinds,
+  type AccessRule,
+  type AccessScope,
   type AdminCommunityGroup,
   type AdminCommunitySpace,
 } from "@/lib/community";
@@ -43,7 +55,122 @@ const okMessages: Record<string, string> = {
   "espaco-arquivado": "Espaco arquivado.",
   "espaco-reativado": "Espaco reativado.",
   "espaco-excluido": "Espaco excluido junto com as publicacoes dele.",
+  "grupo-movido": "Grupo movido. A lateral do membro ja esta na ordem nova.",
+  "acesso-salvo": "Regra de acesso salva.",
+  "acesso-liberado": "Membro liberado neste espaco.",
+  "acesso-retirado": "Acesso do membro retirado.",
 };
+
+function resumoDaRegra(rule: AccessRule) {
+  const partes: string[] = [];
+  if (rule.locked) partes.push(`Premium${rule.price_label ? ` - ${rule.price_label}` : ""}`);
+  if (rule.release_at) partes.push(`Abre em ${rule.release_at.replace(" ", " as ")}`);
+  if (rule.release_days) partes.push(`${rule.release_days} dia(s) apos a entrada do membro`);
+  return partes;
+}
+
+/**
+ * O formulario de acesso, igual para grupo e espaco.
+ *
+ * As duas regras ficam no mesmo envio porque sao a mesma decisao tomada de
+ * duas maneiras — "quem entra" e "quando entra" — e um admin que abre este
+ * painel costuma mexer nas duas de uma vez.
+ */
+function AccessPanel({
+  scope,
+  targetId,
+  rule,
+}: {
+  scope: AccessScope;
+  targetId: number;
+  rule: AccessRule;
+}) {
+  const action = scope === "group" ? setGroupAccessAction : setSpaceAccessAction;
+  const idField = scope === "group" ? "group_id" : "space_id";
+  const alvo = scope === "group" ? "grupo" : "espaco";
+
+  return (
+    <form action={action} className="stack access-form">
+      <input type="hidden" name={idField} value={targetId} />
+
+      <div className="access-form-block">
+        <strong>
+          <Lock size={14} />
+          Travar como Premium
+        </strong>
+        <p className="muted">
+          O {alvo} continua aparecendo na lateral do membro, marcado, e em vez de abrir leva ao seu
+          link de pagamento. Depois que a pessoa pagar, libere ela na lista abaixo.
+        </p>
+        <label className="access-check">
+          <input type="checkbox" name="locked" value="1" defaultChecked={rule.locked === 1} />
+          <span>Exigir pagamento para abrir este {alvo}</span>
+        </label>
+        <label>
+          Link de pagamento
+          <input
+            name="checkout_url"
+            type="url"
+            defaultValue={rule.checkout_url}
+            placeholder="https://..."
+            maxLength={300}
+          />
+        </label>
+        <div className="split-fields">
+          <label>
+            Preco (so o texto do botao)
+            <input
+              name="price_label"
+              defaultValue={rule.price_label}
+              placeholder="Ex.: R$ 97/mes"
+              maxLength={60}
+            />
+          </label>
+        </div>
+        <label>
+          Chamada da tela de bloqueio
+          <textarea
+            name="pitch"
+            rows={2}
+            defaultValue={rule.pitch}
+            placeholder="O que o membro ganha ao liberar este conteudo"
+            maxLength={400}
+          />
+        </label>
+      </div>
+
+      <div className="access-form-block">
+        <strong>
+          <Clock size={14} />
+          Liberacao programada
+        </strong>
+        <p className="muted">
+          Data fixa abre para todos ao mesmo tempo. Dias apos a entrada abre na conta de cada
+          membro, para gotejar o conteudo de quem entrou agora. Com as duas preenchidas, vale a que
+          cair mais tarde. Deixe vazio e zero para liberar na hora.
+        </p>
+        <div className="split-fields">
+          <label>
+            Abrir em (data e hora)
+            <input
+              name="release_at"
+              type="datetime-local"
+              defaultValue={rule.release_at ? rule.release_at.replace(" ", "T") : ""}
+            />
+          </label>
+          <label>
+            Ou X dias apos a entrada
+            <input name="release_days" type="number" min={0} defaultValue={rule.release_days} />
+          </label>
+        </div>
+      </div>
+
+      <button className="primary-button" type="submit">
+        Salvar acesso do {alvo}
+      </button>
+    </form>
+  );
+}
 
 function kindLabel(kind: string) {
   return spaceKinds.find((item) => item.value === kind)?.label ?? kind;
@@ -94,6 +221,8 @@ function SpaceItem({
   isLast: boolean;
 }) {
   const archived = space.status !== "active";
+  const regra = resumoDaRegra(space.rule);
+  const liberados = getSpaceGrants(space.id);
 
   return (
     <li className={archived ? "community-admin-space archived" : "community-admin-space"}>
@@ -112,6 +241,12 @@ function SpaceItem({
             </span>
             <span>{space.post_count} publicacao(oes)</span>
             <span className="mono-value">/socio/comunidade/{space.slug}</span>
+            {regra.map((texto) => (
+              <span className="badge warning" key={texto}>
+                {texto}
+              </span>
+            ))}
+            {space.grant_count ? <span>{space.grant_count} membro(s) liberado(s)</span> : null}
           </div>
           {space.description ? <p>{space.description}</p> : null}
         </div>
@@ -210,6 +345,66 @@ function SpaceItem({
           </form>
         </div>
       </details>
+
+      <details className="community-admin-editor">
+        <summary>Acesso e liberacao</summary>
+        <div className="community-admin-editor-body">
+          <AccessPanel scope="space" targetId={space.id} rule={space.rule} />
+
+          <div className="access-grants">
+            <strong>
+              <UserPlus size={14} />
+              Membros liberados neste espaco
+            </strong>
+            <p className="muted">
+              O link de pagamento e externo, entao quem confirma o pagamento e voce. Liberado aqui, o
+              membro entra mesmo com o espaco travado e sem esperar a data.
+            </p>
+
+            <form action={grantSpaceAccessAction} className="stack">
+              <input type="hidden" name="space_id" value={space.id} />
+              <div className="split-fields">
+                <label>
+                  E-mail do membro
+                  <input name="email" type="email" placeholder="email@exemplo.com" required />
+                </label>
+                <label>
+                  Nota (opcional)
+                  <input name="note" placeholder="Ex.: pago via PIX 05/11" maxLength={160} />
+                </label>
+              </div>
+              <button className="outline-button" type="submit">
+                Liberar membro
+              </button>
+            </form>
+
+            {liberados.length ? (
+              <ul className="access-grant-list">
+                {liberados.map((item) => (
+                  <li key={item.affiliate_id}>
+                    <div>
+                      <strong>{item.name}</strong>
+                      <span className="muted">
+                        {item.email}
+                        {item.note ? ` - ${item.note}` : ""}
+                      </span>
+                    </div>
+                    <form action={revokeSpaceAccessAction}>
+                      <input type="hidden" name="space_id" value={space.id} />
+                      <input type="hidden" name="affiliate_id" value={item.affiliate_id} />
+                      <button className="icon-button" type="submit" title="Retirar acesso">
+                        <Trash2 size={14} />
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">Nenhum membro liberado manualmente ainda.</p>
+            )}
+          </div>
+        </div>
+      </details>
     </li>
   );
 }
@@ -219,13 +414,18 @@ function GroupPanel({
   groups,
   isFirst,
   isLast,
+  ordem,
+  total,
 }: {
   group: AdminCommunityGroup;
   groups: AdminCommunityGroup[];
   isFirst: boolean;
   isLast: boolean;
+  ordem: number;
+  total: number;
 }) {
   const archived = group.status !== "active";
+  const regra = resumoDaRegra(group.rule);
 
   return (
     <section className="panel">
@@ -235,14 +435,45 @@ function GroupPanel({
             {group.name} {archived ? <span className="badge neutral">Arquivado</span> : null}
           </h2>
           <p>{group.spaces.length} espaco(s). A ordem aqui e a ordem da lateral em /socio/comunidade.</p>
+          {regra.length ? (
+            <div className="community-admin-meta">
+              {regra.map((texto) => (
+                <span className="badge warning" key={texto}>
+                  {texto}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
-        <MoveButtons
-          action={moveCommunityGroupAction}
-          idField="group_id"
-          id={group.id}
-          disableUp={isFirst}
-          disableDown={isLast}
-        />
+
+        <div className="group-order">
+          {/* Mandar o grupo direto para uma posicao. As setas continuam ali
+              para o ajuste de um degrau, mas mover o ultimo grupo para o topo
+              por setas exige um redirect inteiro a cada clique. */}
+          <form action={setCommunityGroupPositionAction} className="group-order-form">
+            <input type="hidden" name="group_id" value={group.id} />
+            <label>
+              Posicao
+              <select name="position" defaultValue={String(ordem)}>
+                {Array.from({ length: total }, (_, index) => index + 1).map((numero) => (
+                  <option value={numero} key={numero}>
+                    {numero}º
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className="outline-button" type="submit">
+              Mover
+            </button>
+          </form>
+          <MoveButtons
+            action={moveCommunityGroupAction}
+            idField="group_id"
+            id={group.id}
+            disableUp={isFirst}
+            disableDown={isLast}
+          />
+        </div>
       </div>
 
       {group.spaces.length ? (
@@ -284,6 +515,18 @@ function GroupPanel({
           </form>
         </div>
       </details>
+
+      <details className="community-admin-editor">
+        <summary>Acesso e liberacao do grupo</summary>
+        <div className="community-admin-editor-body">
+          <p className="muted">
+            O que estiver aqui vale para <strong>todos os espacos deste grupo</strong>. Um espaco
+            pode ser mais restrito que o grupo, nunca menos: entre a data do grupo e a do espaco,
+            vale a mais tarde.
+          </p>
+          <AccessPanel scope="group" targetId={group.id} rule={group.rule} />
+        </div>
+      </details>
     </section>
   );
 }
@@ -303,13 +546,7 @@ export default async function AdminCommunityPage({
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">PM</div>
-          <div>
-            <strong>Premium Member</strong>
-            <span>Comunidade</span>
-          </div>
-        </div>
+        <BrandLogo legenda="Comunidade" />
 
         <nav>
           <Link href="/">
@@ -368,6 +605,8 @@ export default async function AdminCommunityPage({
                   groups={groups}
                   isFirst={index === 0}
                   isLast={index === groups.length - 1}
+                  ordem={index + 1}
+                  total={groups.length}
                   key={group.id}
                 />
               ))

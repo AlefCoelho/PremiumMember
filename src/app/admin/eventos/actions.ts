@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { toggleFeatured } from "@/lib/community";
 import { createEvent, getEventById, setEventStatus, updateEvent } from "@/lib/events";
+import { publishNews } from "@/lib/news";
 
 const ADMIN_PATH = "/admin/eventos";
 
@@ -60,12 +61,20 @@ function revalidateEverywhere() {
 
 export async function createEventAction(formData: FormData) {
   await requireAdmin();
+  const titulo = requireText(formData, "title", 160);
   createEvent({
-    title: requireText(formData, "title", 160),
+    title: titulo,
     description: asText(formData, "description").slice(0, 2000),
     startsAt: requireStartsAt(formData),
     durationMinutes: asDuration(formData),
     meetUrl: asMeetUrl(formData, "meet_url"),
+  });
+
+  publishNews({
+    kind: "evento",
+    title: titulo,
+    detail: "Novo encontro na agenda",
+    href: "/socio/comunidade/eventos",
   });
 
   revalidateEverywhere();

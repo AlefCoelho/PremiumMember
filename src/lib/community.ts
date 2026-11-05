@@ -88,6 +88,42 @@ CREATE TABLE IF NOT EXISTS space_presentation (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Regra de acesso de um grupo ou de um espaco. Duas coisas moram aqui porque
+-- as duas respondem a mesma pergunta — "este membro pode abrir isto agora?" —
+-- e precisam ser avaliadas juntas:
+--
+--   1. travamento premium: o conteudo existe, aparece na lateral e leva a um
+--      link de pagamento em vez de abrir;
+--   2. liberacao programada: data fixa (release_at) ou N dias depois da
+--      entrada do membro (release_days), que e o gotejamento por turma.
+--
+-- A coluna scope guarda 'group' ou 'space' na mesma tabela, entao nao ha FK: a regra
+-- de um alvo apagado fica orfa e inofensiva, e deleteSpace limpa a dele.
+CREATE TABLE IF NOT EXISTS community_access_rules (
+  scope TEXT NOT NULL,
+  target_id INTEGER NOT NULL,
+  locked INTEGER NOT NULL DEFAULT 0,
+  checkout_url TEXT NOT NULL DEFAULT '',
+  price_label TEXT NOT NULL DEFAULT '',
+  pitch TEXT NOT NULL DEFAULT '',
+  release_at TEXT NOT NULL DEFAULT '',
+  release_days INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (scope, target_id)
+);
+
+-- Quem pagou. O link de pagamento e externo, entao a liberacao e um ato do
+-- admin: ele confere o pagamento e libera o membro aqui. Sem esta tabela o
+-- travamento premium seria enfeite — ou todo mundo entra, ou ninguem entra.
+CREATE TABLE IF NOT EXISTS space_grants (
+  space_id INTEGER NOT NULL REFERENCES community_spaces(id) ON DELETE CASCADE,
+  affiliate_id INTEGER NOT NULL REFERENCES affiliates(id) ON DELETE CASCADE,
+  note TEXT NOT NULL DEFAULT '',
+  granted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (space_id, affiliate_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_space_grants_member ON space_grants(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_community_reactions_post ON community_reactions(post_id);
 CREATE INDEX IF NOT EXISTS idx_community_favorites_member ON community_favorites(affiliate_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_spaces_group ON community_spaces(group_id, position);
@@ -109,6 +145,10 @@ export type CommunitySpace = {
   status: string;
   post_count: number;
   emoji?: string;
+  // Preenchido so em getSpacesForMember. String e nao Date de proposito: a
+  // lateral e componente de cliente, e texto pronto atravessa a fronteira sem
+  // depender de como o Next serializa cada tipo.
+  bloqueio?: { tipo: "premium" | "agenda"; texto: string } | null;
 };
 
 export type CommunityGroupWithSpaces = {
@@ -241,13 +281,245 @@ for (const group of defaultGroups) {
   }
 }
 
+/* Acesso: travamento premium e liberacao programada ------------------------- */
+
+export type AccessScope = "group" | "space";
+
+export type AccessRule = {
+  scope: AccessScope;
+  target_id: number;
+  locked: number;
+  checkout_url: string;
+  price_label: string;
+  pitch: string;
+  release_at: string;
+  release_days: number;
+};
+
+const emptyRule = (scope: AccessScope, targetId: number): AccessRule => ({
+  scope,
+  target_id: targetId,
+  locked: 0,
+  checkout_url: "",
+  price_label: "",
+  pitch: "",
+  release_at: "",
+  release_days: 0,
+});
+
+const ruleColumns =
+  "scope, target_id, locked, checkout_url, price_label, pitch, release_at, release_days";
+
+export function getAccessRule(scope: AccessScope, targetId: number): AccessRule {
+  const row = db
+    .prepare(`SELECT ${ruleColumns} FROM community_access_rules WHERE scope = ? AND target_id = ?`)
+    .get(scope, targetId) as AccessRule | undefined;
+  return row ?? emptyRule(scope, targetId);
+}
+
+export function getAccessRuleMap(scope: AccessScope): Map<number, AccessRule> {
+  const rows = db
+    .prepare(`SELECT ${ruleColumns} FROM community_access_rules WHERE scope = ?`)
+    .all(scope) as AccessRule[];
+  return new Map(rows.map((row) => [row.target_id, row]));
+}
+
+export function setAccessRule(
+  scope: AccessScope,
+  targetId: number,
+  input: {
+    locked: boolean;
+    checkoutUrl: string;
+    priceLabel: string;
+    pitch: string;
+    releaseAt: string;
+    releaseDays: number;
+  }
+) {
+  db.prepare(
+    `INSERT INTO community_access_rules
+       (scope, target_id, locked, checkout_url, price_label, pitch, release_at, release_days, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT (scope, target_id) DO UPDATE SET
+       locked = excluded.locked,
+       checkout_url = excluded.checkout_url,
+       price_label = excluded.price_label,
+       pitch = excluded.pitch,
+       release_at = excluded.release_at,
+       release_days = excluded.release_days,
+       updated_at = CURRENT_TIMESTAMP`
+  ).run(
+    scope,
+    targetId,
+    input.locked ? 1 : 0,
+    input.checkoutUrl,
+    input.priceLabel,
+    input.pitch,
+    input.releaseAt,
+    Math.max(0, Math.floor(input.releaseDays))
+  );
+}
+
+export function grantSpaceAccess(spaceId: number, affiliateId: number, note = "") {
+  db.prepare(
+    `INSERT INTO space_grants (space_id, affiliate_id, note) VALUES (?, ?, ?)
+     ON CONFLICT (space_id, affiliate_id) DO UPDATE SET note = excluded.note`
+  ).run(spaceId, affiliateId, note.slice(0, 160));
+}
+
+export function revokeSpaceAccess(spaceId: number, affiliateId: number) {
+  db.prepare("DELETE FROM space_grants WHERE space_id = ? AND affiliate_id = ?").run(
+    spaceId,
+    affiliateId
+  );
+}
+
+export function getSpaceGrants(spaceId: number) {
+  return db
+    .prepare(
+      `SELECT space_grants.affiliate_id, space_grants.note, space_grants.granted_at,
+              affiliates.name, affiliates.email
+         FROM space_grants
+         JOIN affiliates ON affiliates.id = space_grants.affiliate_id
+        WHERE space_grants.space_id = ?
+        ORDER BY space_grants.granted_at DESC`
+    )
+    .all(spaceId) as {
+    affiliate_id: number;
+    note: string;
+    granted_at: string;
+    name: string;
+    email: string;
+  }[];
+}
+
+export function getGrantedSpaceIds(affiliateId: number): Set<number> {
+  const rows = db
+    .prepare("SELECT space_id FROM space_grants WHERE affiliate_id = ?")
+    .all(affiliateId) as { space_id: number }[];
+  return new Set(rows.map((row) => row.space_id));
+}
+
+/**
+ * Quando a regra libera, em data absoluta.
+ *
+ * `release_at` e uma data que o admin escreveu; `release_days` conta a partir
+ * da entrada do membro, entao cada um tem a sua propria data. Com as duas
+ * preenchidas vale a mais tarde: quem definiu as duas quis as duas condicoes.
+ */
+function releaseMomentFor(rule: AccessRule, joinedAt: string | null) {
+  const momentos: number[] = [];
+
+  if (rule.release_at) {
+    const fixa = new Date(`${rule.release_at.replace(" ", "T")}:00`);
+    if (!Number.isNaN(fixa.getTime())) momentos.push(fixa.getTime());
+  }
+
+  if (rule.release_days > 0 && joinedAt) {
+    const entrada = new Date(`${joinedAt.replace(" ", "T")}Z`);
+    if (!Number.isNaN(entrada.getTime())) {
+      momentos.push(entrada.getTime() + rule.release_days * 24 * 60 * 60 * 1000);
+    }
+  }
+
+  if (!momentos.length) return null;
+  return new Date(Math.max(...momentos));
+}
+
+export type SpaceAccess =
+  | { ok: true }
+  | { ok: false; motivo: "vendas"; faltam: number; exigido: number }
+  | { ok: false; motivo: "premium"; checkoutUrl: string; priceLabel: string; pitch: string }
+  | { ok: false; motivo: "agenda"; liberaEm: Date };
+
+/**
+ * A regra de acesso de um espaco num lugar so, para a lateral, a pagina do
+ * espaco e a acao de publicar darem sempre a mesma resposta.
+ *
+ * A ordem importa: vendas primeiro (e o criterio que o membro resolve
+ * indicando), depois agenda, depois pagamento. Quem ja foi liberado pelo admin
+ * passa direto pelos dois ultimos — ele pagou, nao faz sentido continuar
+ * esperando a data da turma dele.
+ */
+export function evaluateSpaceAccess(input: {
+  spaceId: number;
+  groupId: number;
+  minEligibleSales: number;
+  eligibleSales: number;
+  joinedAt: string | null;
+  granted: boolean;
+  spaceRule?: AccessRule;
+  groupRule?: AccessRule;
+  agora?: Date;
+}): SpaceAccess {
+  if (input.minEligibleSales > input.eligibleSales) {
+    return {
+      ok: false,
+      motivo: "vendas",
+      exigido: input.minEligibleSales,
+      faltam: input.minEligibleSales - input.eligibleSales,
+    };
+  }
+
+  if (input.granted) return { ok: true };
+
+  const agora = input.agora ?? new Date();
+  const regras = [
+    input.groupRule ?? getAccessRule("group", input.groupId),
+    input.spaceRule ?? getAccessRule("space", input.spaceId),
+  ];
+
+  // A data mais distante entre grupo e espaco e a que vale: se o grupo abre em
+  // marco, um espaco dentro dele nao pode abrir em janeiro.
+  let liberaEm: Date | null = null;
+  for (const regra of regras) {
+    const momento = releaseMomentFor(regra, input.joinedAt);
+    if (momento && momento.getTime() > agora.getTime()) {
+      if (!liberaEm || momento.getTime() > liberaEm.getTime()) liberaEm = momento;
+    }
+  }
+  if (liberaEm) return { ok: false, motivo: "agenda", liberaEm };
+
+  // Travamento do espaco ganha do grupo so por ser mais especifico; o texto e o
+  // link mostrados sao os da regra que travou.
+  const travada = regras.reverse().find((regra) => regra.locked === 1);
+  if (travada) {
+    return {
+      ok: false,
+      motivo: "premium",
+      checkoutUrl: travada.checkout_url,
+      priceLabel: travada.price_label,
+      pitch: travada.pitch,
+    };
+  }
+
+  return { ok: true };
+}
+
 export function getMemberEligibleSales(affiliateId: number) {
   const affiliate = getAffiliateSummaries().find((item) => item.id === affiliateId);
   return affiliate?.eligible_referrals ?? 0;
 }
 
-export function getSpacesForMember(eligibleSales: number): CommunitySpace[] {
-  return db
+export function formatReleaseMoment(data: Date) {
+  return data.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * Espacos que o membro ve na lateral.
+ *
+ * Travado por venda continua saindo da lista: e um espaco que ele nem deveria
+ * saber que existe. Travado por pagamento ou por data FICA na lista, marcado —
+ * ninguem compra o que nao viu, e ninguem espera por uma data que nao conhece.
+ */
+export function getSpacesForMember(eligibleSales: number, affiliateId?: number): CommunitySpace[] {
+  const espacos = db
     .prepare(
       `SELECT community_spaces.*,
               community_groups.name AS group_name,
@@ -268,6 +540,50 @@ export function getSpacesForMember(eligibleSales: number): CommunitySpace[] {
                 community_spaces.position, community_spaces.id`
     )
     .all(eligibleSales) as CommunitySpace[];
+
+  if (!affiliateId) return espacos;
+
+  const joinedAt = getAffiliateJoinDate(affiliateId);
+  const granted = getGrantedSpaceIds(affiliateId);
+  const regrasEspaco = getAccessRuleMap("space");
+  const regrasGrupo = getAccessRuleMap("group");
+  const agora = new Date();
+
+  return espacos.map((espaco) => {
+    const acesso = evaluateSpaceAccess({
+      spaceId: espaco.id,
+      groupId: espaco.group_id,
+      minEligibleSales: espaco.min_eligible_sales,
+      eligibleSales,
+      joinedAt,
+      granted: granted.has(espaco.id),
+      spaceRule: regrasEspaco.get(espaco.id) ?? emptyRule("space", espaco.id),
+      groupRule: regrasGrupo.get(espaco.group_id) ?? emptyRule("group", espaco.group_id),
+      agora,
+    });
+
+    if (acesso.ok) return { ...espaco, bloqueio: null };
+    if (acesso.motivo === "premium") {
+      return {
+        ...espaco,
+        bloqueio: { tipo: "premium" as const, texto: acesso.priceLabel || "Premium" },
+      };
+    }
+    if (acesso.motivo === "agenda") {
+      return {
+        ...espaco,
+        bloqueio: { tipo: "agenda" as const, texto: formatReleaseMoment(acesso.liberaEm) },
+      };
+    }
+    return { ...espaco, bloqueio: null };
+  });
+}
+
+export function getAffiliateJoinDate(affiliateId: number) {
+  const row = db.prepare("SELECT created_at FROM affiliates WHERE id = ?").get(affiliateId) as
+    | { created_at: string }
+    | undefined;
+  return row?.created_at ?? null;
 }
 
 export function groupSpaces(spaces: CommunitySpace[]): CommunityGroupWithSpaces[] {
@@ -417,7 +733,7 @@ export function createComment(input: {
 
 export function getCommunityPortalData(affiliateId: number) {
   const eligibleSales = getMemberEligibleSales(affiliateId);
-  const spaces = getSpacesForMember(eligibleSales);
+  const spaces = getSpacesForMember(eligibleSales, affiliateId);
   return {
     eligibleSales,
     spaces,
@@ -449,6 +765,8 @@ export type AdminCommunitySpace = {
   status: string;
   post_count: number;
   emoji?: string;
+  rule: AccessRule;
+  grant_count: number;
 };
 
 export type AdminCommunityGroup = {
@@ -458,6 +776,7 @@ export type AdminCommunityGroup = {
   position: number;
   status: string;
   spaces: AdminCommunitySpace[];
+  rule: AccessRule;
 };
 
 export function slugify(value: string) {
@@ -518,16 +837,29 @@ export function getAdminCommunityTree(): AdminCommunityGroup[] {
               (
                 SELECT COUNT(*) FROM community_posts
                 WHERE community_posts.space_id = community_spaces.id
-              ) AS post_count
+              ) AS post_count,
+              (
+                SELECT COUNT(*) FROM space_grants
+                WHERE space_grants.space_id = community_spaces.id
+              ) AS grant_count
        FROM community_spaces
        LEFT JOIN space_presentation ON space_presentation.space_id = community_spaces.id
        ORDER BY community_spaces.position, community_spaces.id`
     )
     .all() as AdminCommunitySpace[];
 
+  const regrasEspaco = getAccessRuleMap("space");
+  const regrasGrupo = getAccessRuleMap("group");
+
   return groups.map((group) => ({
     ...group,
-    spaces: spaces.filter((space) => space.group_id === group.id),
+    rule: regrasGrupo.get(group.id) ?? emptyRule("group", group.id),
+    spaces: spaces
+      .filter((space) => space.group_id === group.id)
+      .map((space) => ({
+        ...space,
+        rule: regrasEspaco.get(space.id) ?? emptyRule("space", space.id),
+      })),
   }));
 }
 
@@ -630,9 +962,17 @@ export function setSpaceStatus(spaceId: number, status: "active" | "archived") {
   db.prepare("UPDATE community_spaces SET status = ? WHERE id = ?").run(status, spaceId);
 }
 
-// ON DELETE CASCADE leva posts e comentarios do espaco junto.
+// ON DELETE CASCADE leva posts e comentarios do espaco junto. A regra de acesso
+// nao tem FK (a tabela e compartilhada com grupos), entao sai na mao: deixada
+// para tras, ela voltaria a valer se o SQLite reaproveitasse o id.
 export function deleteSpace(spaceId: number) {
-  db.prepare("DELETE FROM community_spaces WHERE id = ?").run(spaceId);
+  const apagar = db.transaction(() => {
+    db.prepare("DELETE FROM community_access_rules WHERE scope = 'space' AND target_id = ?").run(
+      spaceId
+    );
+    db.prepare("DELETE FROM community_spaces WHERE id = ?").run(spaceId);
+  });
+  apagar();
 }
 
 function swapPositions(
@@ -661,6 +1001,33 @@ export function moveGroup(groupId: number, direction: "up" | "down") {
     .prepare("SELECT id, position FROM community_groups ORDER BY position, id")
     .all() as { id: number; position: number }[];
   swapPositions("community_groups", rows, groupId, direction);
+}
+
+/**
+ * Manda o grupo direto para a posicao N.
+ *
+ * As setas existem, mas mover o ultimo grupo para o topo exige clicar varias
+ * vezes e esperar um redirect inteiro a cada clique — e a posicao escolhida
+ * num campo resolve em um envio. Tambem normaliza as posicoes: a semente
+ * inicial pode ter empates, e com empate a ordem depende do id.
+ */
+export function setGroupPosition(groupId: number, position: number) {
+  const rows = db
+    .prepare("SELECT id FROM community_groups ORDER BY position, id")
+    .all() as { id: number }[];
+
+  const atual = rows.findIndex((row) => row.id === groupId);
+  if (atual < 0) return;
+
+  const destino = Math.min(Math.max(Math.floor(position), 1), rows.length) - 1;
+  const ordem = rows.map((row) => row.id);
+  ordem.splice(destino, 0, ordem.splice(atual, 1)[0]);
+
+  const update = db.prepare("UPDATE community_groups SET position = ? WHERE id = ?");
+  const reordenar = db.transaction(() => {
+    ordem.forEach((id, index) => update.run(index + 1, id));
+  });
+  reordenar();
 }
 
 export function moveSpace(spaceId: number, direction: "up" | "down") {

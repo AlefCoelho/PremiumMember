@@ -13,6 +13,9 @@ import {
   containsExternalLink,
   createComment,
   createPost,
+  evaluateSpaceAccess,
+  getAffiliateJoinDate,
+  getGrantedSpaceIds,
   getMemberEligibleSales,
   getPostById,
   getSpaceBySlug,
@@ -22,7 +25,8 @@ import {
   toggleFavorite,
 } from "@/lib/community";
 import { getEventById, toggleRsvp } from "@/lib/events";
-import { removeAvatar, setAvatar } from "@/lib/profiles";
+import { markNewsRead } from "@/lib/news";
+import { removeAvatar, setAvatar, setProfileInfo } from "@/lib/profiles";
 import { saveImage } from "@/lib/storage";
 
 function asText(formData: FormData, key: string) {
@@ -48,9 +52,18 @@ export async function createCommunityPostAction(formData: FormData) {
 
   const space = getSpaceBySlug(spaceSlug);
   if (!space) throw new Error("Espaco nao encontrado.");
-  if (space.min_eligible_sales > getMemberEligibleSales(session.affiliateId)) {
-    throw new Error("Voce ainda nao tem acesso a este espaco.");
-  }
+
+  // Mesma regra da pagina do espaco, e nao so a de vendas: sem isto um POST
+  // direto publicaria dentro de um espaco travado ou ainda nao liberado.
+  const acesso = evaluateSpaceAccess({
+    spaceId: space.id,
+    groupId: space.group_id,
+    minEligibleSales: space.min_eligible_sales,
+    eligibleSales: getMemberEligibleSales(session.affiliateId),
+    joinedAt: getAffiliateJoinDate(session.affiliateId),
+    granted: getGrantedSpaceIds(session.affiliateId).has(space.id),
+  });
+  if (!acesso.ok) throw new Error("Voce ainda nao tem acesso a este espaco.");
 
   const postId = createPost({
     spaceId: space.id,
@@ -208,6 +221,27 @@ export async function removeAvatarAction() {
 export async function markNotificationsReadAction() {
   const session = await requireAffiliate();
   markAllRead(session.affiliateId);
+  // As novidades da plataforma zeram junto: para o membro, "marcar tudo como
+  // lido" e um gesto so, e deixar o ponto do sino aceso depois dele seria
+  // confuso.
+  markNewsRead(session.affiliateId);
   revalidatePath("/socio/comunidade/notificacoes");
-  revalidatePath("/socio/comunidade");
+  revalidatePath("/socio/comunidade", "layout");
+}
+
+export async function updateProfileInfoAction(formData: FormData) {
+  const session = await requireAffiliate();
+  const area = asText(formData, "area").slice(0, 80);
+  const bio = asText(formData, "bio").slice(0, 400);
+
+  // Mesma regra do feed: nada de link externo, inclusive no perfil — senao o
+  // perfil vira o buraco por onde a divulgacao externa entra.
+  if (containsExternalLink(`${area} ${bio}`)) {
+    redirect("/socio/comunidade/perfil?erro=link");
+  }
+
+  setProfileInfo(session.affiliateId, { area, bio });
+  revalidatePath("/socio/comunidade/perfil");
+  revalidatePath("/socio/comunidade/membros");
+  redirect("/socio/comunidade/perfil?perfil=1");
 }

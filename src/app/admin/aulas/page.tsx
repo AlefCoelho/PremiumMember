@@ -46,6 +46,7 @@ import {
 } from "@/lib/lessons";
 import { getSpaceById } from "@/lib/community";
 import { MAX_MATERIAL_BYTES, publicUrl } from "@/lib/storage";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const okMessages: Record<string, string> = {
   "modulo-criado": "Modulo criado.",
@@ -96,13 +97,7 @@ export default async function AdminLessonsPage({
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">PM</div>
-          <div>
-            <strong>Premium Member</strong>
-            <span>Aulas</span>
-          </div>
-        </div>
+        <BrandLogo legenda="Aulas" />
 
         <nav>
           <Link href="/">

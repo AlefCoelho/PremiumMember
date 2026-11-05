@@ -5,6 +5,7 @@ import { adminCreateResetLinkAction } from "@/app/socio/senha/actions";
 import { requireAdmin } from "@/lib/auth";
 import { getAffiliateById, getAffiliateSummaries } from "@/lib/db";
 import { buildResetLink, isMailConfigured, TOKEN_TTL_MINUTES } from "@/lib/password-reset";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default async function AdminPasswordsPage({
   searchParams,
@@ -23,13 +24,7 @@ export default async function AdminPasswordsPage({
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">PM</div>
-          <div>
-            <strong>Premium Member</strong>
-            <span>Senhas</span>
-          </div>
-        </div>
+        <BrandLogo legenda="Senhas" />
 
         <nav>
           <Link href="/">

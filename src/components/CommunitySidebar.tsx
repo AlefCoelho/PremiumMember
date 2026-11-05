@@ -5,9 +5,11 @@ import {
   Bell,
   Bookmark,
   CalendarClock,
+  Clock,
   GraduationCap,
   LayoutGrid,
   LifeBuoy,
+  Lock,
   MessagesSquare,
   Sparkles,
   UserRound,
@@ -28,14 +30,17 @@ const kindIcon = {
 //
 // `naBarra: false` fica so no computador: a barra do celular aguenta cinco
 // abas com alvo de toque confortavel; na sexta cada uma fica estreita demais.
+// Notificacoes saiu da barra do celular: o sino fixo no canto da tela ja avisa
+// de qualquer pagina, e a vaga liberada foi para Membros, que e onde o membro
+// descobre quem mais esta aqui. No computador o item continua na lista.
 const principais = [
   { href: "/socio/comunidade", label: "Feed", curto: "Feed", Icon: Sparkles, naBarra: true },
   { href: "/socio/comunidade/cursos", label: "Cursos", curto: "Cursos", Icon: GraduationCap, naBarra: true },
-  { href: "/socio/comunidade/notificacoes", label: "Notificacoes", curto: "Avisos", Icon: Bell, naBarra: true },
+  { href: "/socio/comunidade/membros", label: "Membros", curto: "Membros", Icon: Users, naBarra: true },
   { href: "/socio/comunidade/favoritos", label: "Favoritos", curto: "Salvos", Icon: Bookmark, naBarra: true },
-  { href: "/socio/comunidade/eventos", label: "Eventos & Encontros", curto: "Eventos", Icon: CalendarClock, naBarra: false },
-  { href: "/socio/comunidade/membros", label: "Membros", curto: "Membros", Icon: Users, naBarra: false },
   { href: "/socio/comunidade/perfil", label: "Meu perfil", curto: "Perfil", Icon: UserRound, naBarra: true },
+  { href: "/socio/comunidade/notificacoes", label: "Notificacoes", curto: "Avisos", Icon: Bell, naBarra: false },
+  { href: "/socio/comunidade/eventos", label: "Eventos & Encontros", curto: "Eventos", Icon: CalendarClock, naBarra: false },
 ] as const;
 
 export function CommunitySidebar({
@@ -118,7 +123,27 @@ export function CommunitySidebar({
                           <Icon size={15} />
                         )}
                         <span>{space.name}</span>
-                        {space.post_count ? <em>{space.post_count}</em> : null}
+                        {/* Espaco travado ou agendado continua clicavel: a
+                            pagina dele e que explica o que falta e leva ao
+                            pagamento. Aqui vai so o sinal. */}
+                        {space.bloqueio ? (
+                          <em
+                            className="community-nav-lock"
+                            title={
+                              space.bloqueio.tipo === "premium"
+                                ? `Premium: ${space.bloqueio.texto}`
+                                : `Abre em ${space.bloqueio.texto}`
+                            }
+                          >
+                            {space.bloqueio.tipo === "premium" ? (
+                              <Lock size={12} />
+                            ) : (
+                              <Clock size={12} />
+                            )}
+                          </em>
+                        ) : space.post_count ? (
+                          <em>{space.post_count}</em>
+                        ) : null}
                       </Link>
                     </li>
                   );

@@ -11,6 +11,61 @@ CREATE TABLE IF NOT EXISTS affiliate_profiles (
 );
 `);
 
+// Tabela propria, e nao colunas novas em affiliate_profiles, pela mesma razao
+// de sempre: o projeto nunca roda ALTER TABLE, e um CREATE TABLE IF NOT EXISTS
+// sobe em producao sem migracao e sem risco para quem ja tem foto gravada.
+db.exec(`
+CREATE TABLE IF NOT EXISTS affiliate_profile_info (
+  affiliate_id INTEGER PRIMARY KEY REFERENCES affiliates(id) ON DELETE CASCADE,
+  area TEXT NOT NULL DEFAULT '',
+  bio TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+`);
+
+export type ProfileInfo = { area: string; bio: string };
+
+const emptyInfo: ProfileInfo = { area: "", bio: "" };
+
+export function getProfileInfo(affiliateId: number): ProfileInfo {
+  const row = db
+    .prepare("SELECT area, bio FROM affiliate_profile_info WHERE affiliate_id = ?")
+    .get(affiliateId) as ProfileInfo | undefined;
+  return row ?? emptyInfo;
+}
+
+export function setProfileInfo(affiliateId: number, input: ProfileInfo) {
+  db.prepare(
+    `INSERT INTO affiliate_profile_info (affiliate_id, area, bio, updated_at)
+     VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT (affiliate_id) DO UPDATE SET
+       area = excluded.area,
+       bio = excluded.bio,
+       updated_at = CURRENT_TIMESTAMP`
+  ).run(affiliateId, input.area.slice(0, 80), input.bio.slice(0, 400));
+}
+
+// As areas sugeridas sao uma lista, nao uma restricao: o campo aceita texto
+// livre, porque ninguem acerta de antemao em que area um membro atua.
+export const areasSugeridas = [
+  "Marketing digital",
+  "Trafego pago",
+  "Copywriting",
+  "Design",
+  "Programacao",
+  "Vendas",
+  "Trading",
+  "Financas",
+  "Educacao",
+  "Saude",
+  "Advocacia",
+  "Contabilidade",
+  "Imoveis",
+  "Comercio",
+  "Servicos",
+  "Estudante",
+] as const;
+
 export function getAvatarPath(affiliateId: number) {
   const row = db
     .prepare("SELECT avatar_path FROM affiliate_profiles WHERE affiliate_id = ?")

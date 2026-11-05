@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAffiliate } from "@/lib/auth";
 import { containsExternalLink, getMemberEligibleSales } from "@/lib/community";
 import {
-  canOpenLesson,
+  memberCanOpenLesson,
   createLessonComment,
   getLessonBySlug,
   setLessonCompleted,
@@ -20,7 +20,7 @@ export async function toggleLessonDoneAction(formData: FormData) {
 
   // Mesma regra do conteudo: aula travada nao pode ser marcada como concluida,
   // senao o progresso do membro andaria sem ele assistir nada.
-  if (!canOpenLesson(entry, getMemberEligibleSales(session.affiliateId))) {
+  if (!memberCanOpenLesson(entry, session.affiliateId, getMemberEligibleSales(session.affiliateId))) {
     throw new Error("Esta aula ainda nao esta liberada para voce.");
   }
 
@@ -39,7 +39,7 @@ export async function toggleLessonFavoriteAction(formData: FormData) {
   const entry = slug ? getLessonBySlug(slug) : undefined;
   if (!entry) throw new Error("Aula nao encontrada.");
 
-  if (!canOpenLesson(entry, getMemberEligibleSales(session.affiliateId))) {
+  if (!memberCanOpenLesson(entry, session.affiliateId, getMemberEligibleSales(session.affiliateId))) {
     throw new Error("Esta aula ainda nao esta liberada para voce.");
   }
 
@@ -56,7 +56,7 @@ export async function createLessonCommentAction(formData: FormData) {
   const entry = slug ? getLessonBySlug(slug) : undefined;
   if (!entry) throw new Error("Aula nao encontrada.");
 
-  if (!canOpenLesson(entry, getMemberEligibleSales(session.affiliateId))) {
+  if (!memberCanOpenLesson(entry, session.affiliateId, getMemberEligibleSales(session.affiliateId))) {
     throw new Error("Esta aula ainda nao esta liberada para voce.");
   }
 

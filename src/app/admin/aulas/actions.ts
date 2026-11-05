@@ -34,6 +34,7 @@ import {
 } from "@/lib/lessons";
 import { getSpaceById, updateSpace } from "@/lib/community";
 import { MAX_MATERIAL_BYTES, deleteImage, saveImage, saveMaterial } from "@/lib/storage";
+import { publishNews } from "@/lib/news";
 
 const ADMIN_PATH = "/admin/aulas";
 
@@ -203,7 +204,19 @@ export async function createLessonAction(formData: FormData) {
   const moduleId = requireId(formData, "module_id");
   const row = requireExistingModule(moduleId);
 
-  createLesson({ moduleId, ...readLessonFields(formData) });
+  const campos = readLessonFields(formData);
+  const criada = createLesson({ moduleId, ...campos });
+
+  // O aviso sai na criacao, nao na edicao: corrigir um titulo nao e novidade,
+  // e o sino do membro perderia o sentido se piscasse a cada ajuste de texto.
+  const curso = getSpaceById(row.space_id);
+  publishNews({
+    kind: "aula",
+    title: campos.title,
+    detail: curso ? `Nova aula em ${curso.name}` : "Nova aula publicada",
+    href: `/socio/aula/${criada.slug}`,
+  });
+
   revalidateLessons();
   back(row.space_id, "aula-criada");
 }

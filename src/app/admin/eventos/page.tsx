@@ -8,6 +8,7 @@ import {
 } from "@/app/admin/eventos/actions";
 import { requireAdmin } from "@/lib/auth";
 import { formatEventDate, getAllEvents, getEventAttendees, isEventPast } from "@/lib/events";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const okMessages: Record<string, string> = {
   criado: "Evento criado e ja visivel para os membros.",
@@ -39,13 +40,7 @@ export default async function AdminEventsPage({
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">PM</div>
-          <div>
-            <strong>Premium Member</strong>
-            <span>Eventos</span>
-          </div>
-        </div>
+        <BrandLogo legenda="Eventos" />
 
         <nav>
           <Link href="/">

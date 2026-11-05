@@ -48,6 +48,7 @@ import {
 } from "@/lib/db";
 import { formatCurrency } from "@/lib/money";
 import { getHoldDeadline, getReferralStatus } from "@/lib/rules";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const navItems = [
   { label: "Visao geral", icon: LayoutDashboard },
@@ -393,13 +394,7 @@ export default async function Home() {
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">PM</div>
-          <div>
-            <strong>Premium Member</strong>
-            <span>Membros afiliados</span>
-          </div>
-        </div>
+        <BrandLogo legenda="Membros afiliados" />
 
         <nav>
           {navItems.map((item, index) => (

@@ -1,10 +1,11 @@
 import { markNotificationsReadAction } from "@/app/socio/comunidade/actions";
 import { requireAffiliate } from "@/lib/auth";
 import { isReactionKind, reactionKinds } from "@/lib/community";
+import { getNews } from "@/lib/news";
 import { getNotifications } from "@/lib/notifications";
 import { getAvatarUrls } from "@/lib/profiles";
 import { publicUrl } from "@/lib/storage";
-import { Bell, MessageSquare } from "lucide-react";
+import { Bell, MessageSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const reactionLabel = new Map(reactionKinds.map((item) => [item.value, item]));
@@ -18,7 +19,10 @@ function quando(valor: string) {
 export default async function CommunityNotificationsPage() {
   const session = await requireAffiliate();
   const items = getNotifications(session.affiliateId);
-  const naoLidas = items.filter((item) => !item.read_at).length;
+  const novidades = getNews(session.affiliateId, 20);
+  const naoLidas =
+    items.filter((item) => !item.read_at).length +
+    novidades.filter((item) => !item.read_at).length;
   const avatars = getAvatarUrls(
     items.filter((item) => item.actor_type === "member").map((item) => item.actor_id)
   );
@@ -44,6 +48,35 @@ export default async function CommunityNotificationsPage() {
           </form>
         ) : null}
       </header>
+
+      {novidades.length ? (
+        <section className="panel news-panel">
+          <h2>
+            <Sparkles size={16} />
+            Novidades da plataforma
+          </h2>
+          <p className="muted">Aula, espaco e encontro novos publicados pela equipe.</p>
+          <ul>
+            {novidades.map((item) => {
+              const conteudo = (
+                <>
+                  <strong>{item.title}</strong>
+                  <span className="muted">
+                    {item.detail}
+                    {item.detail ? " - " : ""}
+                    {quando(item.created_at)}
+                  </span>
+                </>
+              );
+              return (
+                <li className={item.read_at ? undefined : "nova"} key={item.id}>
+                  {item.href ? <Link href={item.href}>{conteudo}</Link> : <div>{conteudo}</div>}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="community-feed">
         {items.length ? (
