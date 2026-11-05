@@ -3,7 +3,6 @@ import Link from "next/link";
 import { requireAffiliate } from "@/lib/auth";
 import { getMemberEligibleSales } from "@/lib/community";
 import { getCourseGallery } from "@/lib/lessons";
-import { publicUrl } from "@/lib/storage";
 
 export default async function CoursesGalleryPage() {
   const session = await requireAffiliate();
@@ -52,7 +51,7 @@ export default async function CoursesGalleryPage() {
       ) : (
         <div className="course-gallery">
           {ordenados.map((curso) => {
-            const capa = publicUrl(curso.cover_path);
+            const capa = curso.cover_url;
             const faltam = curso.min_eligible_sales - eligibleSales;
 
             // Curso travado aparece na vitrine, fechado: o membro precisa ver

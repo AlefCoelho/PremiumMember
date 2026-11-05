@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { youtubeThumb } from "@/lib/youtube";
 import {
   evaluateSpaceAccess,
   getAffiliateJoinDate,
@@ -663,11 +664,13 @@ export function isLessonKind(value: string): value is LessonKind {
   return lessonKinds.some((item) => item.value === value);
 }
 
+// A coluna cover_path continua no banco mas nao e mais lida nem escrita: a
+// capa do curso agora vem da miniatura do YouTube. O projeto nunca derruba
+// coluna, e deixar a antiga parada nao custa nada.
 export type SpacePresentation = {
   space_id: number;
   emoji: string;
   headline: string;
-  cover_path: string;
   featured: number;
 };
 
@@ -675,58 +678,48 @@ const emptyPresentation = (spaceId: number): SpacePresentation => ({
   space_id: spaceId,
   emoji: "",
   headline: "",
-  cover_path: "",
   featured: 0,
 });
 
 export function getSpacePresentation(spaceId: number): SpacePresentation {
   const row = db
-    .prepare("SELECT space_id, emoji, headline, cover_path, featured FROM space_presentation WHERE space_id = ?")
+    .prepare("SELECT space_id, emoji, headline, featured FROM space_presentation WHERE space_id = ?")
     .get(spaceId) as SpacePresentation | undefined;
   return row ?? emptyPresentation(spaceId);
 }
 
 export function getSpacePresentationMap(): Map<number, SpacePresentation> {
   const rows = db
-    .prepare("SELECT space_id, emoji, headline, cover_path, featured FROM space_presentation")
+    .prepare("SELECT space_id, emoji, headline, featured FROM space_presentation")
     .all() as SpacePresentation[];
   return new Map(rows.map((row) => [row.space_id, row]));
 }
 
-/**
- * Grava a vitrine do curso. `cover_path` so e tocado quando vem um valor: o
- * formulario de texto nao pode apagar a capa que o admin subiu antes.
- */
+/** Grava a vitrine do curso: emoji, chamada e destaque. */
 export function setSpacePresentation(
   spaceId: number,
-  input: { emoji: string; headline: string; featured: boolean; coverPath?: string }
+  input: { emoji: string; headline: string; featured: boolean }
 ) {
-  const current = getSpacePresentation(spaceId);
-  const cover = input.coverPath ?? current.cover_path;
-
   db.prepare(
-    `INSERT INTO space_presentation (space_id, emoji, headline, cover_path, featured, updated_at)
-     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `INSERT INTO space_presentation (space_id, emoji, headline, featured, updated_at)
+     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(space_id) DO UPDATE SET
        emoji = excluded.emoji,
        headline = excluded.headline,
-       cover_path = excluded.cover_path,
        featured = excluded.featured,
        updated_at = CURRENT_TIMESTAMP`
-  ).run(spaceId, input.emoji, input.headline, cover, input.featured ? 1 : 0);
+  ).run(spaceId, input.emoji, input.headline, input.featured ? 1 : 0);
 }
 
-export function clearCourseCover(spaceId: number) {
-  db.prepare("UPDATE space_presentation SET cover_path = '' WHERE space_id = ?").run(spaceId);
-}
-
-export type LessonPresentation = { lesson_id: number; kind: string; thumb_path: string };
+// thumb_path tambem ficou para tras: a miniatura e a do YouTube. O que resta
+// aqui e o tipo da aula, que o admin escolhe (video, material ou texto).
+export type LessonPresentation = { lesson_id: number; kind: string };
 
 export function getLessonPresentationMap(lessonIds: number[]): Map<number, LessonPresentation> {
   if (lessonIds.length === 0) return new Map();
   const rows = db
     .prepare(
-      `SELECT lesson_id, kind, thumb_path FROM lesson_presentation
+      `SELECT lesson_id, kind FROM lesson_presentation
        WHERE lesson_id IN (${lessonIds.map(() => "?").join(",")})`
     )
     .all(...lessonIds) as LessonPresentation[];
@@ -738,26 +731,18 @@ export function getLessonPresentation(lessonId: number): LessonPresentation {
     getLessonPresentationMap([lessonId]).get(lessonId) ?? {
       lesson_id: lessonId,
       kind: "video",
-      thumb_path: "",
     }
   );
 }
 
-export function setLessonPresentation(
-  lessonId: number,
-  input: { kind: LessonKind; thumbPath?: string }
-) {
-  const current = getLessonPresentation(lessonId);
-  const thumb = input.thumbPath ?? current.thumb_path;
-
+export function setLessonPresentation(lessonId: number, input: { kind: LessonKind }) {
   db.prepare(
-    `INSERT INTO lesson_presentation (lesson_id, kind, thumb_path, updated_at)
-     VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    `INSERT INTO lesson_presentation (lesson_id, kind, updated_at)
+     VALUES (?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(lesson_id) DO UPDATE SET
        kind = excluded.kind,
-       thumb_path = excluded.thumb_path,
        updated_at = CURRENT_TIMESTAMP`
-  ).run(lessonId, input.kind, thumb);
+  ).run(lessonId, input.kind);
 }
 
 export type CourseSummary = {
@@ -792,10 +777,39 @@ export function formatCourseDuration(minutes: number) {
   return `${horas} h ${resto} min`;
 }
 
+/** A capa do curso: a miniatura da primeira aula em video que ele tiver. */
+export function getCourseCovers(): Map<number, string> {
+  const rows = db
+    .prepare(
+      `SELECT course_modules.space_id AS space_id,
+              course_lessons.video_provider,
+              course_lessons.video_id
+         FROM course_lessons
+         JOIN course_modules ON course_modules.id = course_lessons.module_id
+        WHERE course_lessons.status = 'active'
+          AND course_modules.status = 'active'
+          AND course_lessons.video_provider = 'youtube'
+          AND course_lessons.video_id != ''
+        ORDER BY course_modules.space_id,
+                 course_modules.position, course_modules.id,
+                 course_lessons.position, course_lessons.id`
+    )
+    .all() as { space_id: number; video_provider: string; video_id: string }[];
+
+  const capas = new Map<number, string>();
+  for (const row of rows) {
+    // A consulta ja vem na ordem do curso, entao a primeira linha de cada
+    // espaco e a primeira aula dele.
+    if (capas.has(row.space_id)) continue;
+    capas.set(row.space_id, youtubeThumb(row.video_provider, row.video_id, "capa"));
+  }
+  return capas;
+}
+
 export type CourseCard = CourseSpace & {
   emoji: string;
   headline: string;
-  cover_path: string;
+  cover_url: string;
   featured: number;
   total: number;
   completed: number;
@@ -828,6 +842,7 @@ export function getCourseGallery(affiliateId: number, eligibleSales: number): Co
   if (spaces.length === 0) return [];
 
   const presentation = getSpacePresentationMap();
+  const covers = getCourseCovers();
   const counts = db
     .prepare(
       `SELECT course_modules.space_id AS space_id,
@@ -854,7 +869,7 @@ export function getCourseGallery(affiliateId: number, eligibleSales: number): Co
       ...space,
       emoji: meta.emoji,
       headline: meta.headline,
-      cover_path: meta.cover_path,
+      cover_url: covers.get(space.id) ?? "",
       featured: meta.featured,
       total: count.total,
       completed: count.completed,

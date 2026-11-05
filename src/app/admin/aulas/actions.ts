@@ -15,9 +15,6 @@ import {
   getLessonById,
   getLessonMaterials,
   getMaterialById,
-  clearCourseCover,
-  getSpacePresentation,
-  getLessonPresentation,
   getModuleById,
   isLessonKind,
   isModuleStatus,
@@ -33,7 +30,7 @@ import {
   type VideoProvider,
 } from "@/lib/lessons";
 import { getSpaceById, updateSpace } from "@/lib/community";
-import { MAX_MATERIAL_BYTES, deleteImage, saveImage, saveMaterial } from "@/lib/storage";
+import { MAX_MATERIAL_BYTES, deleteImage, saveMaterial } from "@/lib/storage";
 import { publishNews } from "@/lib/news";
 
 const ADMIN_PATH = "/admin/aulas";
@@ -356,47 +353,20 @@ export async function updateSpacePresentationAction(formData: FormData) {
     minEligibleSales: space.min_eligible_sales,
   });
 
-  let coverPath: string | undefined;
-  const cover = formData.get("cover");
-  if (cover instanceof File && cover.size > 0) {
-    const saved = await saveImage(cover, "capas");
-    if (!saved.ok) {
-      throw new Error(
-        saved.reason === "tamanho"
-          ? "A capa passou de 2 MB. Reduza a imagem e tente de novo."
-          : "Formato de capa nao aceito. Use JPG, PNG ou WebP."
-      );
-    }
-    // Troca de capa: o arquivo antigo sai do disco, senao fica orfao para sempre.
-    const anterior = getSpacePresentation(spaceId).cover_path;
-    if (anterior) deleteImage(anterior);
-    coverPath = saved.storedPath;
-  }
-
+  // Capa nao entra mais aqui: ela e a miniatura da primeira aula no YouTube.
+  // Upload de capa custava disco da VPS e um passo a mais em cada curso, para
+  // repetir uma imagem que o YouTube ja hospeda de graca.
   setSpacePresentation(spaceId, {
     emoji: asText(formData, "emoji").slice(0, 8),
     headline: asText(formData, "headline").slice(0, 160),
     featured: asText(formData, "featured") === "1",
-    coverPath,
   });
 
   revalidateLessons();
   back(spaceId, "vitrine-salva");
 }
 
-export async function removeCourseCoverAction(formData: FormData) {
-  await requireAdmin();
-  const spaceId = requireId(formData, "space_id");
-
-  const atual = getSpacePresentation(spaceId).cover_path;
-  if (atual) deleteImage(atual);
-  clearCourseCover(spaceId);
-
-  revalidateLessons();
-  back(spaceId, "capa-removida");
-}
-
-/** Tipo da aula e miniatura: os dois definem como a aula aparece na trilha. */
+/** O tipo da aula: video, material ou texto. A miniatura vem do YouTube. */
 export async function updateLessonPresentationAction(formData: FormData) {
   await requireAdmin();
   const lessonId = requireId(formData, "lesson_id");
@@ -406,23 +376,7 @@ export async function updateLessonPresentationAction(formData: FormData) {
   const kind = asText(formData, "lesson_kind");
   if (!isLessonKind(kind)) throw new Error("Tipo de aula invalido.");
 
-  let thumbPath: string | undefined;
-  const thumb = formData.get("thumb");
-  if (thumb instanceof File && thumb.size > 0) {
-    const saved = await saveImage(thumb, "capas");
-    if (!saved.ok) {
-      throw new Error(
-        saved.reason === "tamanho"
-          ? "A miniatura passou de 2 MB. Reduza a imagem e tente de novo."
-          : "Formato de miniatura nao aceito. Use JPG, PNG ou WebP."
-      );
-    }
-    const anterior = getLessonPresentation(lessonId).thumb_path;
-    if (anterior) deleteImage(anterior);
-    thumbPath = saved.storedPath;
-  }
-
-  setLessonPresentation(lessonId, { kind, thumbPath });
+  setLessonPresentation(lessonId, { kind });
   revalidateLessons();
   back(row.space_id, "aula-salva");
 }

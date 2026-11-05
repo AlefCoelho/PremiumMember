@@ -23,7 +23,6 @@ import {
   memberCanOpenLesson,
   getLessonBySlug,
   getLessonMaterials,
-  getLessonPresentationMap,
   getMemberCourse,
   getLessonComments,
   getNextLesson,
@@ -98,9 +97,6 @@ export default async function LessonPage({
   // O trilho do lado mostra o curso inteiro, para o membro nao precisar voltar
   // a pagina do curso so para saber onde esta.
   const course = getMemberCourse(entry.spaceId, session.affiliateId, eligibleSales);
-  const presentation = getLessonPresentationMap(
-    course.modules.flatMap((modulo) => modulo.lessons.map((aula) => aula.id))
-  );
 
   return (
     <main className="lesson-shell">
@@ -143,7 +139,6 @@ export default async function LessonPage({
           currentLessonId={entry.lesson.id}
           completed={course.completed}
           total={course.total}
-          presentation={Object.fromEntries(presentation)}
         />
 
         <article className="lesson-content">

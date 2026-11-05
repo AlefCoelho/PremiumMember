@@ -21,7 +21,6 @@ import {
   deleteLessonAction,
   deleteMaterialAction,
   deleteModuleAction,
-  removeCourseCoverAction,
   updateSpacePresentationAction,
   updateLessonPresentationAction,
   moveLessonAction,
@@ -36,6 +35,7 @@ import {
   formatCourseDuration,
   getAdminCourse,
   getSpacePresentation,
+  getCourseCovers,
   getCourseSummary,
   getCourseSpaces,
   getLessonMaterials,
@@ -88,6 +88,8 @@ export default async function AdminLessonsPage({
   const modules = selected ? getAdminCourse(selected.id) : [];
   const moduleOptions = modules.map((item) => ({ id: item.id, title: item.title }));
   const vitrine = selected ? getSpacePresentation(selected.id) : null;
+  // A capa e a miniatura da primeira aula em video, nao um arquivo enviado.
+  const capaDoCurso = selected ? (getCourseCovers().get(selected.id) ?? "") : "";
   const resumo = selected ? getCourseSummary(selected.id) : null;
   const espaco = selected ? getSpaceById(selected.id) : undefined;
   const aulaMeta = getLessonPresentationMap(
@@ -245,10 +247,6 @@ export default async function AdminLessonsPage({
                         placeholder="Uma frase sobre o que o membro ganha aqui"
                       />
                     </label>
-                    <label>
-                      Capa (JPG, PNG ou WebP, ate 2 MB)
-                      <input name="cover" type="file" accept="image/*" />
-                    </label>
                     <label className="checkbox-field">
                       <input
                         name="featured"
@@ -266,9 +264,9 @@ export default async function AdminLessonsPage({
                   <div className="course-vitrine-preview">
                     <span className="muted">Como aparece na galeria</span>
                     <article className="course-card">
-                      {vitrine.cover_path ? (
+                      {capaDoCurso ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={publicUrl(vitrine.cover_path) ?? ""} alt="" />
+                        <img src={capaDoCurso} alt="" />
                       ) : (
                         <div className="course-card-cover-vazia">
                           {vitrine.emoji || <ImageIcon size={22} />}
@@ -287,14 +285,11 @@ export default async function AdminLessonsPage({
                       </div>
                     </article>
 
-                    {vitrine.cover_path ? (
-                      <form action={removeCourseCoverAction}>
-                        <input type="hidden" name="space_id" value={selected.id} />
-                        <button className="outline-button" type="submit">
-                          Remover capa
-                        </button>
-                      </form>
-                    ) : null}
+                    <p className="muted">
+                      {capaDoCurso
+                        ? "A capa e a miniatura da primeira aula em video deste curso. Para trocar, troque a capa do video no YouTube."
+                        : "A capa aparece assim que o curso tiver uma aula com video do YouTube."}
+                    </p>
                   </div>
                 </div>
               </section>
@@ -519,20 +514,8 @@ export default async function AdminLessonsPage({
                                           ))}
                                         </select>
                                       </label>
-                                      <label>
-                                        Miniatura (ate 2 MB)
-                                        <input name="thumb" type="file" accept="image/*" />
-                                      </label>
-                                      {aulaMeta.get(lesson.id)?.thumb_path ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img
-                                          className="lesson-thumb-preview"
-                                          src={
-                                            publicUrl(aulaMeta.get(lesson.id)?.thumb_path) ?? ""
-                                          }
-                                          alt=""
-                                        />
-                                      ) : null}
+                                      {/* Sem campo de miniatura: a trilha usa a
+                                          capa do proprio video no YouTube. */}
                                       <button className="outline-button" type="submit">
                                         Salvar aparencia
                                       </button>

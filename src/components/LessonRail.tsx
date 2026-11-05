@@ -3,7 +3,8 @@
 import { CheckCircle2, Circle, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { LessonPresentation, MemberModule } from "@/lib/lessons";
+import type { MemberModule } from "@/lib/lessons";
+import { youtubeThumb } from "@/lib/youtube";
 
 /**
  * O trilho do curso ao lado da aula.
@@ -18,13 +19,11 @@ export function LessonRail({
   currentLessonId,
   completed,
   total,
-  presentation,
 }: {
   modules: MemberModule[];
   currentLessonId: number;
   completed: number;
   total: number;
-  presentation: Record<number, LessonPresentation>;
 }) {
   const [aberto, setAberto] = useState(true);
 
@@ -57,8 +56,6 @@ export function LessonRail({
             <h3>{modulo.title}</h3>
             <ul>
               {modulo.lessons.map((aula) => {
-                const meta = presentation[aula.id];
-
                 if (!aula.unlocked) {
                   return (
                     <li className="locked" key={aula.id}>
@@ -75,9 +72,9 @@ export function LessonRail({
                     ) : (
                       <Circle size={14} />
                     )}
-                    {meta?.thumb_path ? (
+                    {youtubeThumb(aula.video_provider, aula.video_id) ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={`/uploads/${meta.thumb_path}`} alt="" />
+                      <img src={youtubeThumb(aula.video_provider, aula.video_id)} alt="" loading="lazy" />
                     ) : null}
                     <Link href={`/socio/aula/${aula.slug}`}>{aula.title}</Link>
                   </li>

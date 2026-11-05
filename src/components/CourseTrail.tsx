@@ -2,6 +2,7 @@ import { CheckCircle2, Circle, Clock, FileDown, Lock, PlayCircle } from "lucide-
 import Link from "next/link";
 import type { CourseSummary, LessonPresentation, MemberModule } from "@/lib/lessons";
 import { formatCourseDuration } from "@/lib/lessons";
+import { youtubeThumb } from "@/lib/youtube";
 
 // A trilha do curso como o membro ve.
 //
@@ -111,9 +112,16 @@ export function CourseTrail({
                       ) : (
                         <Circle size={18} />
                       )}
-                      {meta?.thumb_path ? (
+                      {/* A miniatura e a do proprio video no YouTube: nada
+                          para o admin enviar e nada ocupando disco. */}
+                      {youtubeThumb(lesson.video_provider, lesson.video_id) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img className="course-lesson-thumb" src={`/uploads/${meta.thumb_path}`} alt="" />
+                        <img
+                          className="course-lesson-thumb"
+                          src={youtubeThumb(lesson.video_provider, lesson.video_id)}
+                          alt=""
+                          loading="lazy"
+                        />
                       ) : null}
                       <div>
                         <Link href={`/socio/aula/${lesson.slug}`}>{lesson.title}</Link>

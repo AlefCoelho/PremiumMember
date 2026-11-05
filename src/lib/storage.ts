@@ -75,7 +75,7 @@ export type SaveResult = { ok: true; storedPath: string } | { ok: false; reason:
 
 export async function saveImage(
   file: File,
-  folder: "avatars" | "posts" | "capas"
+  folder: "avatars" | "posts"
 ): Promise<SaveResult> {
   if (!file || file.size === 0) return { ok: false, reason: "vazio" };
 
@@ -126,7 +126,7 @@ export function deleteImage(storedPath: string) {
 // Só aceita o formato que nos mesmos geramos. Sem isso, um caminho vindo da URL
 // poderia subir de diretorio e ler arquivo do servidor.
 export function isSafeStoredPath(storedPath: string) {
-  return /^(avatars|posts|capas)\/[a-f0-9]{32}\.(webp|jpg|png)$/.test(storedPath);
+  return /^(avatars|posts)\/[a-f0-9]{32}\.(webp|jpg|png)$/.test(storedPath);
 }
 
 export function isSafeMaterialPath(storedPath: string) {
