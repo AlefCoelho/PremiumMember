@@ -3,13 +3,14 @@ import Link from "next/link";
 import { requireAffiliate } from "@/lib/auth";
 import { formatJoinDate, getLeaderboard, getMemberDirectory } from "@/lib/directory";
 import { levelFor } from "@/lib/levels";
-import { getAvatarUrls, getProfileInfo } from "@/lib/profiles";
+import { getAvatarUrls, getProfileInfoMap } from "@/lib/profiles";
 
 export default async function MembersPage() {
   const session = await requireAffiliate();
   const membros = getMemberDirectory();
   const ranking = getLeaderboard();
   const avatars = getAvatarUrls(membros.map((item) => item.id));
+  const perfis = getProfileInfoMap(membros.map((item) => item.id));
 
   function iniciais(nome: string) {
     return nome
@@ -72,7 +73,7 @@ export default async function MembersPage() {
         <ul>
           {membros.map((membro) => {
             const avatar = avatars.get(membro.id);
-            const info = getProfileInfo(membro.id);
+            const info = perfis.get(membro.id);
             const nivel = levelFor(membro.eligible_referrals);
 
             return (
@@ -91,9 +92,15 @@ export default async function MembersPage() {
                       {membro.name}
                       {membro.id === session.affiliateId ? " (voce)" : ""}
                     </strong>
+                    {/* A chamada que o membro escreveu vem na frente do resto:
+                        e ela que diz quem a pessoa e, muito melhor que a data
+                        de entrada. Sem chamada, cai na area e no nivel. */}
                     <span className="muted">
-                      {info.area ? `${info.area} - ` : ""}
-                      {nivel.nome} - entrou em {formatJoinDate(membro.created_at)}
+                      {info?.headline ||
+                        [info?.area, nivel.nome, info?.location]
+                          .filter(Boolean)
+                          .join(" - ") ||
+                        `${nivel.nome} - entrou em ${formatJoinDate(membro.created_at)}`}
                     </span>
                   </div>
                   {membro.lessons_done ? (

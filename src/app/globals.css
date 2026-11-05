@@ -4728,3 +4728,115 @@ a.course-card:hover {
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 }
+
+/* Perfil ampliado: chamada, local e redes ---------------------------------- */
+
+.perfil-redes {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-strong);
+}
+
+.perfil-redes legend {
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.perfil-redes p {
+  margin: 0 0 2px;
+  font-size: 12px;
+}
+
+.perfil-redes label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+/* O dominio fixo colado no campo mostra, sem explicar, que ali vai so o
+   usuario — o membro ve o endereco se formando enquanto digita. */
+.perfil-rede-campo {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.perfil-rede-campo em {
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  border-right: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.perfil-rede-campo input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 9px 10px;
+}
+
+.perfil-rede-campo input:focus {
+  outline: none;
+}
+
+.perfil-rede-campo:focus-within {
+  border-color: var(--gold);
+}
+
+@media (max-width: 620px) {
+  /* No celular o dominio ocupa metade do campo e sobra pouco para o usuario:
+     vira linha de cima, com o campo inteiro embaixo. */
+  .perfil-rede-campo {
+    flex-direction: column;
+  }
+
+  .perfil-rede-campo em {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 5px 9px;
+  }
+}
+
+.member-profile-headline {
+  margin: 2px 0 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.member-profile-redes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.member-profile-redes a {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-strong);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.member-profile-redes a:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}

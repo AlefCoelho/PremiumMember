@@ -6,7 +6,7 @@ import {
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { requireAffiliate } from "@/lib/auth";
 import { getAffiliateById } from "@/lib/db";
-import { areasSugeridas, getAvatarUrl, getProfileInfo } from "@/lib/profiles";
+import { areasSugeridas, getAvatarUrl, getProfileInfo, redes } from "@/lib/profiles";
 import Link from "next/link";
 
 const erros: Record<string, string> = {
@@ -99,18 +99,42 @@ export default async function CommunityProfilePage({
 
           <form action={updateProfileInfoAction} className="stack">
             <label>
-              Em que area voce atua
-              {/* Lista de sugestoes com <datalist>, nao <select>: ninguem
-                  acerta de antemao todas as areas, e um menu fechado forcaria
-                  o membro a escolher algo que nao e o dele. */}
+              Chamada
               <input
-                name="area"
-                list="areas-sugeridas"
-                defaultValue={info.area}
-                placeholder="Ex.: Trafego pago"
-                maxLength={80}
+                name="headline"
+                defaultValue={info.headline}
+                placeholder="Ex.: Construindo minha rede com trafego pago"
+                maxLength={100}
               />
+              <span className="form-help">
+                Uma frase que aparece logo abaixo do seu nome, na lista e no seu perfil.
+              </span>
             </label>
+
+            <div className="split-fields">
+              <label>
+                Em que area voce atua
+                {/* Lista de sugestoes com <datalist>, nao <select>: ninguem
+                    acerta de antemao todas as areas, e um menu fechado forcaria
+                    o membro a escolher algo que nao e o dele. */}
+                <input
+                  name="area"
+                  list="areas-sugeridas"
+                  defaultValue={info.area}
+                  placeholder="Ex.: Trafego pago"
+                  maxLength={80}
+                />
+              </label>
+              <label>
+                Cidade e estado
+                <input
+                  name="location"
+                  defaultValue={info.location}
+                  placeholder="Ex.: Fortaleza, CE"
+                  maxLength={80}
+                />
+              </label>
+            </div>
             <datalist id="areas-sugeridas">
               {areasSugeridas.map((area) => (
                 <option value={area} key={area} />
@@ -127,6 +151,42 @@ export default async function CommunityProfilePage({
                 maxLength={400}
               />
             </label>
+
+            <fieldset className="perfil-redes">
+              <legend>Suas redes</legend>
+              <p className="muted">
+                So o nome de usuario, sem o endereco completo. Se colar o link inteiro, a gente
+                tira o usuario dele.
+              </p>
+              {redes.map((rede) => (
+                <label key={rede.chave}>
+                  {rede.label}
+                  <span className="perfil-rede-campo">
+                    <em>{rede.base.replace("https://", "")}</em>
+                    <input
+                      name={rede.chave}
+                      defaultValue={info[rede.chave]}
+                      placeholder="seuusuario"
+                      maxLength={120}
+                    />
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+
+            <label className="checkbox-field">
+              <input
+                type="checkbox"
+                name="listed"
+                value="1"
+                defaultChecked={info.listed === 1}
+              />
+              Mostrar meu perfil na lista de membros
+            </label>
+            <span className="form-help">
+              Desligado, voce some da lista e do ranking. Suas publicacoes e comentarios continuam
+              aparecendo normalmente, com seu nome e sua foto.
+            </span>
 
             <button className="primary-button" type="submit">
               Salvar perfil

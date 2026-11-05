@@ -3,7 +3,7 @@ import { db, getAffiliateSummaries } from "@/lib/db";
 // lesson_progress, consultadas aqui. Sem o import, uma pagina que chegasse
 // primeiro a este modulo quebraria na primeira consulta.
 import "@/lib/lessons";
-import { getProfileInfo } from "@/lib/profiles";
+import { getProfileInfo, getProfileInfoMap, type ProfileInfo } from "@/lib/profiles";
 
 // Diretorio de membros e ranking.
 //
@@ -30,11 +30,22 @@ function lessonsDoneByMember(): Map<number, number> {
   return new Map(rows.map((row) => [row.affiliate_id, row.total]));
 }
 
-export function getMemberDirectory(): DirectoryMember[] {
+/**
+ * O diretorio de membros.
+ *
+ * `incluirOcultos` existe para o perfil: quem desligou a listagem sai da lista
+ * e do ranking, mas continua tendo perfil — senao o link que ele mesmo abre em
+ * "ver meu perfil", e o nome dele numa publicacao, levariam a um 404.
+ */
+export function getMemberDirectory(incluirOcultos = false): DirectoryMember[] {
   const feitas = lessonsDoneByMember();
+  // getAffiliateSummaries recalcula comissao de todo mundo; uma chamada so.
+  const afiliados = getAffiliateSummaries();
+  const perfis = getProfileInfoMap(afiliados.map((item) => item.id));
 
-  return getAffiliateSummaries()
+  return afiliados
     .filter((item) => item.status === "active")
+    .filter((item) => incluirOcultos || (perfis.get(item.id)?.listed ?? 1) === 1)
     .map((item) => ({
       id: item.id,
       name: item.name,
@@ -68,8 +79,7 @@ export function getLeaderboard(limit = 20): RankedMember[] {
 }
 
 export type MemberProfile = DirectoryMember & {
-  area: string;
-  bio: string;
+  info: ProfileInfo;
   courses_done: number;
   courses_total: number;
 };
@@ -86,7 +96,7 @@ export type MemberProfile = DirectoryMember & {
  * daria ponto para todo mundo.
  */
 export function getMemberProfile(affiliateId: number): MemberProfile | undefined {
-  const membro = getMemberDirectory().find((item) => item.id === affiliateId);
+  const membro = getMemberDirectory(true).find((item) => item.id === affiliateId);
   if (!membro) return undefined;
 
   const info = getProfileInfo(affiliateId);
@@ -109,8 +119,7 @@ export function getMemberProfile(affiliateId: number): MemberProfile | undefined
 
   return {
     ...membro,
-    area: info.area,
-    bio: info.bio,
+    info,
     courses_total: cursos.length,
     courses_done: cursos.filter((curso) => curso.total > 0 && curso.feitas >= curso.total).length,
   };

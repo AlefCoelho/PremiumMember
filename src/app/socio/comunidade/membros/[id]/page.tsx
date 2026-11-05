@@ -1,10 +1,18 @@
-import { ArrowLeft, Briefcase, CalendarDays, GraduationCap, Trophy, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Briefcase,
+  CalendarDays,
+  GraduationCap,
+  MapPin,
+  Trophy,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAffiliate } from "@/lib/auth";
 import { formatJoinDate, getMemberProfile } from "@/lib/directory";
 import { levelProgress, membershipLength } from "@/lib/levels";
-import { getAvatarUrl } from "@/lib/profiles";
+import { getAvatarUrl, redesDoPerfil } from "@/lib/profiles";
 
 function iniciais(nome: string) {
   return nome
@@ -37,6 +45,7 @@ export default async function MemberProfilePage({
   const avatar = getAvatarUrl(affiliateId);
   const nivel = levelProgress(membro.eligible_referrals);
   const souEu = affiliateId === session.affiliateId;
+  const links = redesDoPerfil(membro.info);
 
   return (
     <>
@@ -66,20 +75,47 @@ export default async function MemberProfilePage({
               <Trophy size={14} />
               Nivel {nivel.atual.nivel} - {nivel.atual.nome}
             </p>
-            {membro.area ? (
+            {membro.info.headline ? (
+              <p className="member-profile-headline">{membro.info.headline}</p>
+            ) : null}
+            {membro.info.area ? (
               <p className="muted">
                 <Briefcase size={13} />
-                {membro.area}
+                {membro.info.area}
+              </p>
+            ) : null}
+            {membro.info.location ? (
+              <p className="muted">
+                <MapPin size={13} />
+                {membro.info.location}
               </p>
             ) : null}
             <p className="muted">
               <CalendarDays size={13} />
               Membro desde {formatJoinDate(membro.created_at)} ({membershipLength(membro.created_at)})
             </p>
+
+            {links.length ? (
+              <div className="member-profile-redes">
+                {links.map((rede) => (
+                  // O endereco e montado por nos a partir do usuario guardado,
+                  // entao nunca e um link arbitrario que o membro colou.
+                  <a
+                    key={rede.chave}
+                    href={rede.url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    title={`${rede.label}: @${rede.usuario}`}
+                  >
+                    {rede.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 
-        {membro.bio ? <p className="member-profile-bio">{membro.bio}</p> : null}
+        {membro.info.bio ? <p className="member-profile-bio">{membro.info.bio}</p> : null}
 
         {nivel.proximo ? (
           <div className="member-profile-next">

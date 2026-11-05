@@ -233,14 +233,28 @@ export async function updateProfileInfoAction(formData: FormData) {
   const session = await requireAffiliate();
   const area = asText(formData, "area").slice(0, 80);
   const bio = asText(formData, "bio").slice(0, 400);
+  const headline = asText(formData, "headline").slice(0, 100);
+  const location = asText(formData, "location").slice(0, 80);
 
-  // Mesma regra do feed: nada de link externo, inclusive no perfil — senao o
-  // perfil vira o buraco por onde a divulgacao externa entra.
-  if (containsExternalLink(`${area} ${bio}`)) {
+  // Mesma regra do feed nos campos de texto livre: nada de link externo, senao
+  // o perfil vira o buraco por onde a divulgacao que o feed barra entra.
+  // Os campos de rede social nao passam por aqui de proposito — eles guardam
+  // so o nome de usuario, e o dominio quem monta somos nos.
+  if (containsExternalLink(`${area} ${bio} ${headline} ${location}`)) {
     redirect("/socio/comunidade/perfil?erro=link");
   }
 
-  setProfileInfo(session.affiliateId, { area, bio });
+  setProfileInfo(session.affiliateId, {
+    area,
+    bio,
+    headline,
+    location,
+    instagram: asText(formData, "instagram"),
+    linkedin: asText(formData, "linkedin"),
+    twitter: asText(formData, "twitter"),
+    facebook: asText(formData, "facebook"),
+    listed: asText(formData, "listed") === "1" ? 1 : 0,
+  });
   revalidatePath("/socio/comunidade/perfil");
   revalidatePath("/socio/comunidade/membros");
   redirect("/socio/comunidade/perfil?perfil=1");
