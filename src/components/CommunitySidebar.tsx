@@ -11,6 +11,7 @@ import {
   MessagesSquare,
   Sparkles,
   UserRound,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,14 +23,19 @@ const kindIcon = {
   lessons: GraduationCap,
 } as const;
 
-// Os cinco destinos fixos. No computador sao a lista de cima da lateral; no
-// celular viram a barra de baixo, como num app.
+// Os destinos fixos. No computador sao a lista de cima da lateral; no celular
+// viram a barra de baixo, como num app.
+//
+// `naBarra: false` fica so no computador: a barra do celular aguenta cinco
+// abas com alvo de toque confortavel; na sexta cada uma fica estreita demais.
 const principais = [
-  { href: "/socio/comunidade", label: "Feed", curto: "Feed", Icon: Sparkles },
-  { href: "/socio/comunidade/notificacoes", label: "Notificacoes", curto: "Avisos", Icon: Bell },
-  { href: "/socio/comunidade/favoritos", label: "Favoritos", curto: "Salvos", Icon: Bookmark },
-  { href: "/socio/comunidade/eventos", label: "Eventos & Encontros", curto: "Eventos", Icon: CalendarClock },
-  { href: "/socio/comunidade/perfil", label: "Meu perfil", curto: "Perfil", Icon: UserRound },
+  { href: "/socio/comunidade", label: "Feed", curto: "Feed", Icon: Sparkles, naBarra: true },
+  { href: "/socio/comunidade/cursos", label: "Cursos", curto: "Cursos", Icon: GraduationCap, naBarra: true },
+  { href: "/socio/comunidade/notificacoes", label: "Notificacoes", curto: "Avisos", Icon: Bell, naBarra: true },
+  { href: "/socio/comunidade/favoritos", label: "Favoritos", curto: "Salvos", Icon: Bookmark, naBarra: true },
+  { href: "/socio/comunidade/eventos", label: "Eventos & Encontros", curto: "Eventos", Icon: CalendarClock, naBarra: false },
+  { href: "/socio/comunidade/membros", label: "Membros", curto: "Membros", Icon: Users, naBarra: false },
+  { href: "/socio/comunidade/perfil", label: "Meu perfil", curto: "Perfil", Icon: UserRound, naBarra: true },
 ] as const;
 
 export function CommunitySidebar({
@@ -60,10 +66,17 @@ export function CommunitySidebar({
   return (
     <nav className="community-nav">
       <div className="community-nav-primary">
-        {principais.map(({ href, label, curto, Icon }) => {
+        {principais.map(({ href, label, curto, Icon, naBarra }) => {
           const active = pathname === href;
+          const classes = [
+            "community-nav-feed",
+            active ? "active" : "",
+            naBarra ? "" : "so-no-computador",
+          ]
+            .filter(Boolean)
+            .join(" ");
           return (
-            <Link className={active ? "community-nav-feed active" : "community-nav-feed"} href={href} key={href}>
+            <Link className={classes} href={href} key={href}>
               <Icon size={16} />
               <span className="community-nav-label">{label}</span>
               <span className="community-nav-label-curto">{curto}</span>
@@ -96,7 +109,14 @@ export function CommunitySidebar({
                   return (
                     <li key={space.id}>
                       <Link className={active ? "active" : undefined} href={href}>
-                        <Icon size={15} />
+                        {/* O emoji que o admin escolheu substitui o icone do
+                            tipo: e o que torna a lateral reconhecivel de
+                            relance. Sem emoji, cai no icone de sempre. */}
+                        {space.emoji ? (
+                          <span className="community-nav-emoji">{space.emoji}</span>
+                        ) : (
+                          <Icon size={15} />
+                        )}
                         <span>{space.name}</span>
                         {space.post_count ? <em>{space.post_count}</em> : null}
                       </Link>

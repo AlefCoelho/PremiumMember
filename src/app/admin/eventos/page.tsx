@@ -1,4 +1,4 @@
-import { CalendarClock, KeyRound, LayoutDashboard, LogOut, MessagesSquare, Plus, Users } from "lucide-react";
+import { CalendarClock, GraduationCap, KeyRound, LayoutDashboard, LogOut, MessagesSquare, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions";
 import {
@@ -55,6 +55,10 @@ export default async function AdminEventsPage({
           <Link href="/admin/comunidade">
             <MessagesSquare size={18} />
             Comunidade
+          </Link>
+          <Link href="/admin/aulas">
+            <GraduationCap size={18} />
+            Aulas
           </Link>
           <a className="active" href="#eventos">
             <CalendarClock size={18} />

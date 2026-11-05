@@ -1,4 +1,5 @@
 import {
+  GraduationCap,
   ArrowDown,
   ArrowUp,
   Archive,
@@ -128,10 +129,16 @@ function SpaceItem({
         <div className="community-admin-editor-body">
           <form action={updateCommunitySpaceAction} className="stack">
             <input type="hidden" name="space_id" value={space.id} />
-            <label>
-              Nome
-              <input name="name" defaultValue={space.name} maxLength={80} required />
-            </label>
+            <div className="split-fields">
+              <label>
+                Nome
+                <input name="name" defaultValue={space.name} maxLength={80} required />
+              </label>
+              <label>
+                Emoji
+                <input name="emoji" defaultValue={space.emoji} maxLength={8} placeholder="Ex.: 📍" />
+              </label>
+            </div>
             <label>
               Descricao
               <input name="description" defaultValue={space.description} maxLength={400} />
@@ -313,6 +320,10 @@ export default async function AdminCommunityPage({
             <MessagesSquare size={18} />
             Grupos e espacos
           </a>
+          <Link href="/admin/aulas">
+            <GraduationCap size={18} />
+            Aulas
+          </Link>
           <Link href="/admin/eventos">
             <CalendarClock size={18} />
             Eventos

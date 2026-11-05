@@ -8,6 +8,8 @@ import {
   getMemberEligibleSales,
   getPostImagePaths,
 } from "@/lib/community";
+import { getFavoriteLessons } from "@/lib/lessons";
+import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 
 export default async function CommunityFavoritesPage() {
@@ -16,6 +18,7 @@ export default async function CommunityFavoritesPage() {
   const posts = attachPostMeta(getFavoritePosts(session.affiliateId, eligibleSales), session.affiliateId);
   const avatars = getAvatarUrls(posts.map((post) => post.author_id));
   const images = getPostImagePaths(posts.map((post) => post.id));
+  const aulas = getFavoriteLessons(session.affiliateId, eligibleSales);
 
   return (
     <>
@@ -23,9 +26,28 @@ export default async function CommunityFavoritesPage() {
         <div>
           <p className="eyebrow">Minha area</p>
           <h1>Favoritos</h1>
-          <p>As publicacoes que voce salvou para ler depois.</p>
+          <p>As publicacoes e as aulas que voce salvou para ver depois.</p>
         </div>
       </header>
+
+      {aulas.length ? (
+        <section className="panel favorite-lessons">
+          <h2>
+            <GraduationCap size={16} />
+            Aulas salvas
+          </h2>
+          <ul>
+            {aulas.map((aula) => (
+              <li key={aula.id}>
+                <Link href={`/socio/aula/${aula.slug}`}>{aula.title}</Link>
+                <span className="muted">
+                  {aula.space_name} - {aula.module_title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="community-feed">
         {posts.length ? (
@@ -40,8 +62,10 @@ export default async function CommunityFavoritesPage() {
           ))
         ) : (
           <div className="panel community-empty">
-            <strong>Nenhum favorito ainda.</strong>
-            <p>Use o marcador no canto de uma publicacao para guardar aqui.</p>
+            <strong>
+              {aulas.length ? "Nenhuma publicacao salva." : "Nenhum favorito ainda."}
+            </strong>
+            <p>Use o marcador no canto de uma publicacao ou de uma aula para guardar aqui.</p>
             <Link className="primary-button" href="/socio/comunidade">
               Ir para o feed
             </Link>

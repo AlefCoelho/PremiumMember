@@ -1,4 +1,5 @@
 import {
+  GraduationCap,
   AlertTriangle,
   BadgeDollarSign,
   CalendarClock,
@@ -410,6 +411,10 @@ export default async function Home() {
           <Link href="/admin/comunidade">
             <MessagesSquare size={18} />
             Comunidade
+          </Link>
+          <Link href="/admin/aulas">
+            <GraduationCap size={18} />
+            Aulas
           </Link>
           <Link href="/admin/eventos">
             <CalendarClock size={18} />

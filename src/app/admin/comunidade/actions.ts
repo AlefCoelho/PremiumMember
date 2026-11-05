@@ -18,6 +18,7 @@ import {
   updateSpace,
   type SpaceKind,
 } from "@/lib/community";
+import { getSpacePresentation, setSpacePresentation } from "@/lib/lessons";
 
 const ADMIN_PATH = "/admin/comunidade";
 
@@ -142,6 +143,16 @@ export async function updateCommunitySpaceAction(formData: FormData) {
   requireExistingSpace(spaceId);
   requireExistingGroup(groupId);
   updateSpace(spaceId, { groupId, name, description, kind, minEligibleSales });
+
+  // O emoji e a cara do espaco na lateral do membro. Mora em
+  // space_presentation; capa e chamada sao preservadas.
+  const atual = getSpacePresentation(spaceId);
+  setSpacePresentation(spaceId, {
+    emoji: asText(formData, "emoji").slice(0, 8),
+    headline: atual.headline,
+    featured: atual.featured === 1,
+  });
+
   revalidateCommunity();
   redirect(`${ADMIN_PATH}?ok=espaco-salvo`);
 }

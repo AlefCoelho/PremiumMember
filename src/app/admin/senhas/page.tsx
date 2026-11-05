@@ -1,4 +1,4 @@
-import { KeyRound, LayoutDashboard, LogOut, MessagesSquare } from "lucide-react";
+import { GraduationCap, KeyRound, LayoutDashboard, LogOut, MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions";
 import { adminCreateResetLinkAction } from "@/app/socio/senha/actions";
@@ -39,6 +39,10 @@ export default async function AdminPasswordsPage({
           <Link href="/admin/comunidade">
             <MessagesSquare size={18} />
             Comunidade
+          </Link>
+          <Link href="/admin/aulas">
+            <GraduationCap size={18} />
+            Aulas
           </Link>
           <a className="active" href="#senhas">
             <KeyRound size={18} />

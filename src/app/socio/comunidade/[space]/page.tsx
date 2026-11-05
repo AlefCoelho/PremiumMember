@@ -11,6 +11,13 @@ import {
   getSpaceBySlug,
   getSpacePosts,
 } from "@/lib/community";
+import { CourseTrail } from "@/components/CourseTrail";
+import {
+  getComingSoonModules,
+  getCourseSummary,
+  getLessonPresentationMap,
+  getMemberCourse,
+} from "@/lib/lessons";
 import { notFound } from "next/navigation";
 
 const kindLabel: Record<string, string> = {
@@ -41,6 +48,37 @@ export default async function CommunitySpacePage({
           desbloquear.
         </p>
       </div>
+    );
+  }
+
+  // Espaco de aulas nao e feed: e trilha. O membro vem aqui para assistir, nao
+  // para publicar, entao o compositor nem aparece.
+  if (space.kind === "lessons") {
+    const eligibleSales = getMemberEligibleSales(session.affiliateId);
+    const course = getMemberCourse(space.id, session.affiliateId, eligibleSales);
+
+    return (
+      <>
+        <header className="community-header">
+          <div>
+            <p className="eyebrow">{kindLabel.lessons}</p>
+            <h1>{space.name}</h1>
+            <p>{space.description}</p>
+          </div>
+        </header>
+
+        <CourseTrail
+          modules={course.modules}
+          total={course.total}
+          completed={course.completed}
+          eligibleSales={eligibleSales}
+          summary={getCourseSummary(space.id)}
+          presentation={getLessonPresentationMap(
+            course.modules.flatMap((modulo) => modulo.lessons.map((aula) => aula.id))
+          )}
+          comingSoon={getComingSoonModules(space.id)}
+        />
+      </>
     );
   }
 

@@ -74,6 +74,20 @@ CREATE TABLE IF NOT EXISTS community_featured_posts (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Apresentacao do espaco: emoji na lateral, capa e chamada na galeria de
+-- cursos. Fica aqui, junto de community_spaces, porque community.ts consulta
+-- esta tabela e os modulos carregam nesta ordem — se a criacao ficasse em
+-- lessons.ts, a primeira consulta da lateral quebraria.
+-- Tabela separada porque o projeto nunca usa ALTER TABLE.
+CREATE TABLE IF NOT EXISTS space_presentation (
+  space_id INTEGER PRIMARY KEY REFERENCES community_spaces(id) ON DELETE CASCADE,
+  emoji TEXT NOT NULL DEFAULT '',
+  headline TEXT NOT NULL DEFAULT '',
+  cover_path TEXT NOT NULL DEFAULT '',
+  featured INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_community_reactions_post ON community_reactions(post_id);
 CREATE INDEX IF NOT EXISTS idx_community_favorites_member ON community_favorites(affiliate_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_spaces_group ON community_spaces(group_id, position);
@@ -94,6 +108,7 @@ export type CommunitySpace = {
   position: number;
   status: string;
   post_count: number;
+  emoji?: string;
 };
 
 export type CommunityGroupWithSpaces = {
@@ -237,6 +252,7 @@ export function getSpacesForMember(eligibleSales: number): CommunitySpace[] {
       `SELECT community_spaces.*,
               community_groups.name AS group_name,
               community_groups.slug AS group_slug,
+              COALESCE(space_presentation.emoji, '') AS emoji,
               (
                 SELECT COUNT(*) FROM community_posts
                 WHERE community_posts.space_id = community_spaces.id
@@ -244,6 +260,7 @@ export function getSpacesForMember(eligibleSales: number): CommunitySpace[] {
               ) AS post_count
        FROM community_spaces
        JOIN community_groups ON community_groups.id = community_spaces.group_id
+       LEFT JOIN space_presentation ON space_presentation.space_id = community_spaces.id
        WHERE community_spaces.status = 'active'
          AND community_groups.status = 'active'
          AND community_spaces.min_eligible_sales <= ?
@@ -431,6 +448,7 @@ export type AdminCommunitySpace = {
   position: number;
   status: string;
   post_count: number;
+  emoji?: string;
 };
 
 export type AdminCommunityGroup = {
@@ -452,8 +470,21 @@ export function slugify(value: string) {
     .slice(0, 60);
 }
 
+// Rotas estaticas de /socio/comunidade. Um espaco com um destes slugs ficaria
+// invisivel: o Next atende o segmento fixo e nunca chega no [space].
+const reservedSlugs = new Set([
+  "cursos",
+  "eventos",
+  "membros",
+  "favoritos",
+  "notificacoes",
+  "perfil",
+  "aula",
+]);
+
 function createUniqueSlug(table: "community_groups" | "community_spaces", name: string, fallback: string) {
-  const base = slugify(name) || fallback;
+  const bruto = slugify(name) || fallback;
+  const base = reservedSlugs.has(bruto) ? `${bruto}-espaco` : bruto;
   const exists = db.prepare(`SELECT id FROM ${table} WHERE slug = ?`);
   if (!exists.get(base)) return base;
   for (let attempt = 2; attempt < 200; attempt += 1) {
@@ -483,11 +514,13 @@ export function getAdminCommunityTree(): AdminCommunityGroup[] {
               community_spaces.min_eligible_sales,
               community_spaces.position,
               community_spaces.status,
+              COALESCE(space_presentation.emoji, '') AS emoji,
               (
                 SELECT COUNT(*) FROM community_posts
                 WHERE community_posts.space_id = community_spaces.id
               ) AS post_count
        FROM community_spaces
+       LEFT JOIN space_presentation ON space_presentation.space_id = community_spaces.id
        ORDER BY community_spaces.position, community_spaces.id`
     )
     .all() as AdminCommunitySpace[];

@@ -169,3 +169,126 @@ Runbook completo em `DEPLOY.md`, atualizado em 2026-11-04 para bater com a reali
 A pasta de producao nao e repositorio git. Atualizar o GitHub e passo **separado**: depois
 do deploy, `main`, `feat/comunidade` e `feat/admin-comunidade` sao avancadas por
 fast-forward para o mesmo commit.
+
+## 2026-11-04 — acesso de admin regerado
+- `contatoalefcoelho@gmail.com` (admin id 91) teve a senha redefinida e o login foi
+  testado em producao: entra em https://premiummember.online/login e chega ao painel.
+  O hash foi conferido contra a senha depois de gravado (aquele bug do `$` expandido
+  pelo shell nao volta: o UPDATE foi por arquivo .sql via scp, nao por linha de comando).
+- Backup do banco em /root/backups/pre-senha-admin-*.sqlite antes do UPDATE.
+- `admin.premiummember.online` AINDA NAO RESOLVE. Falta o registro A na Hostinger
+  (admin -> 2.24.65.26). Depois: ssh premium-vps "bash /root/ativar-subdominio-admin.sh --aplicar".
+  Enquanto isso o painel funciona normalmente no dominio principal, em /login.
+- As aulas sao configuradas em /admin/comunidade: o espaco "Formacao Premium Member"
+  ja existe com kind=lessons dentro do grupo "Aulas".
+
+## 2026-11-04 — area de aulas implementada (NAO publicada)
+Decisao do Alef: video no YouTube nao listado. Arquitetura em ARQUITETURA-AULAS.md.
+
+Pronto e com `npx tsc --noEmit` e `npx next build` passando:
+- `src/lib/lessons.ts`: tabelas course_modules, course_lessons, lesson_materials,
+  lesson_progress (aditivas). O curso e o espaco kind='lessons'.
+  `extractYoutubeId` aceita watch?v=, youtu.be, /embed/, /shorts/, /live/ e id cru.
+  `requiredSalesFor`/`canOpenLesson`: vale a exigencia MAIS ALTA entre espaco e aula.
+- `src/lib/storage.ts`: `saveMaterial` (PDF/ZIP/planilha/doc/imagem, teto de 15 MB,
+  abaixo do client_max_body_size de 20 MB do nginx), `readMaterial`, `isSafeMaterialPath`.
+- `src/app/materiais/[id]/route.ts`: download que RECALCULA a elegibilidade por
+  download. Nao reaproveita /uploads de proposito.
+- `/admin/aulas` (page + actions): modulos e aulas com criar/renomear/reordenar/
+  arquivar/excluir, materiais, link do YouTube. Link "Aulas" somado aos 4 navs admin.
+- Membro: `[space]/page.tsx` desvia para `CourseTrail` quando kind='lessons';
+  `[space]/aula/[slug]/page.tsx` com player youtube-nocookie 16:9, materiais,
+  concluir aula e proxima. Aula travada aparece fechada dizendo quantas vendas faltam.
+- CSS novo no fim de globals.css, com bloco @media (max-width: 820px).
+
+### O que FALTA
+1. Teste no navegador incompleto: criei modulo e aula pelo painel local e a pagina
+   mostrou os dois, mas NAO consegui confirmar no banco — o `next dev` ja rodando
+   (PID 26992, porta 3021) grava num data/ que nao e PremiumMember/data nem
+   .next/standalone/data. Derrube esse processo e suba um dev limpo antes de confiar.
+2. Trilha e pagina de aula do MEMBRO nunca foram abertas. Testar antes de publicar.
+3. Nao publicado em producao. Nenhum commit feito.
+4. `getLessonCountBySpace()` existe e nao e usada (era para a lateral).
+5. Disco da VPS em 89%: limpar antes de abrir upload de material.
+
+## 2026-11-05 — Etapa 1 das aulas pronta (NAO publicada)
+Base pedida pelo Alef: "tudo que foi mapeado e uma sessao que o admin pode mudar
+— titulo e o que ela sera". Entao nada de estrutura fixa no codigo.
+
+- Tabelas novas `course_presentation` (emoji, headline, cover_path, featured) e
+  `lesson_presentation` (kind, thumb_path). Sao tabelas-satelite de proposito:
+  community_spaces e course_lessons nao recebem ALTER, regra do projeto.
+- `/admin/aulas` ganhou o painel **Vitrine do curso**: titulo, emoji, descricao,
+  chamada, capa (upload) e destaque, com previa do card ao lado. O titulo e a
+  descricao sao gravados em community_spaces pelo mesmo formulario — o admin nao
+  precisa saber dessa divisao.
+- Por aula: **tipo** (video / material / texto) e **miniatura**, em formulario
+  proprio para nao reenviar imagem ao salvar texto.
+- Membro: galeria `/socio/comunidade/cursos` (capa, %, grupo, chamada, travado
+  aparece fechado), "Continue de onde parou", e **Cursos** na lateral (a barra de
+  baixo do celular foi para 6 colunas).
+- Resumo "N secoes - N aulas - X h Y min" no topo do curso.
+- **A aula saiu de `/socio/comunidade/[space]/aula/[slug]` para `/socio/aula/[slug]`**
+  para escapar do layout da comunidade e abrir em tela cheia, com trilho do curso
+  ao lado (`LessonRail`, cliente, aberto no desktop e fechado no celular).
+- `storage.ts` aceita a pasta `capas`.
+- Slugs reservados em community.ts: um espaco chamado "Cursos"/"Eventos"/etc
+  ficaria invisivel atras da rota estatica. Agora ganha sufixo `-espaco`.
+
+### Bug encontrado no teste (corrigido)
+O textarea manda **CRLF**, entao `split(/\n{2,}/)` nunca casava e o corpo da aula
+virava um paragrafo so. Normaliza `\r\n` antes de separar.
+
+### Testado no navegador, logado como membro
+Vitrine salva; aula criada com id do YouTube extraido da URL completa; trilha com
+resumo; aula em tela cheia com player; concluir vai de 0/2 para 1/2 e 50%; aula
+travada bloqueia com "Faltam 3" sem vazar conteudo; celular em 375px com barra de
+6 abas legivel.
+
+### Falta
+- Nao publicado, nenhum commit. Banco de producao nao tem as tabelas novas (elas
+  sao criadas sozinhas no primeiro boot, por CREATE TABLE IF NOT EXISTS).
+- Etapas 2 a 4 do MAPEAMENTO-REFERENCIA.md (arsenal/"Em Breve", comentario por
+  aula, favoritar aula, emoji na lateral, membros e ranking).
+- Disco da VPS em 89%: limpar antes de abrir upload de capa e material.
+
+## 2026-11-05 — Etapas 2, 3 e 4 no ar (DEPLOY FEITO)
+Autorizado pelo Alef: "segue todas as etapas e ao concluir faca o deploy".
+
+- **Etapa 2**: modulo com situacao `coming_soon` ("Em breve": aparece na trilha,
+  fechado e sem aula). Tipo de aula video / material / texto.
+- **Etapa 3**: comentario por aula (`lesson_comments`, com a mesma proibicao de
+  link externo do feed), favoritar aula (`lesson_favorites`, aparece em
+  Favoritos como "Aulas salvas"), emoji por espaco na lateral (editavel em
+  /admin/comunidade e na vitrine de /admin/aulas).
+- **Etapa 4**: `/socio/comunidade/membros` com diretorio e ranking. O ranking
+  ordena por vendas liberadas e, no empate, por aulas concluidas; quem esta
+  zerado em tudo fica de fora. Nao expoe e-mail, telefone, PIX nem dinheiro.
+- `course_presentation` virou **`space_presentation`** e a criacao da tabela
+  mudou para community.ts: community.ts consulta essa tabela e carrega ANTES de
+  lessons.ts — se a criacao ficasse la, a primeira consulta da lateral quebrava.
+- Barra de baixo do celular voltou para 5 abas (Feed, Cursos, Avisos, Salvos,
+  Perfil). Eventos e Membros ficam so no computador (`naBarra: false`).
+
+### ARMADILHA DO DEPLOY — ler antes do proximo
+`npm run build` gera os estaticos em `.next/static`, mas o servico roda
+`node .next/standalone/server.js`, que serve a partir de
+`.next/standalone/.next/static`. **Sem copiar, o CSS da 404 e o site inteiro
+fica sem estilo.** Foi o que aconteceu neste deploy; achei porque fui conferir o
+arquivo .css servido, nao so o build. Todo deploy precisa de:
+
+    cp -r .next/static .next/standalone/.next/
+    cp -r public .next/standalone/ 2>/dev/null || true
+
+Depois CONFERIR com `curl -o /dev/null -w '%{http_code}'` no .css que o HTML
+referencia. Build verde nao prova que o CSS esta sendo servido.
+
+### Verificado em producao depois do deploy
+/apresentacao 200, /login 200, /socio/login 200, rotas fechadas 307, CSS 200 com
+as 8 classes novas (63 KB), 17 afiliados e 2 admins intactos, uploads
+preservados, 0 erro no log. Backup do banco e dos uploads antes do deploy.
+
+### Falta
+- Nenhum commit no git ainda.
+- DNS de admin.premiummember.online continua sem resolver (falta o registro A).
+- Disco em 89%.
