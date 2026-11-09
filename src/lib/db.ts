@@ -571,6 +571,19 @@ export function getAdminByEmail(email: string) {
     | undefined;
 }
 
+export function getAdminById(id: number) {
+  return sqlite.prepare("SELECT * FROM admins WHERE id = ?").get(id) as
+    | { id: number; email: string; password_hash: string }
+    | undefined;
+}
+
+// A semente do admin usa INSERT OR IGNORE, entao trocar ADMIN_PASSWORD no
+// ambiente nao mexe num admin que ja existe. Esta e a unica forma de mudar a
+// senha pelo proprio painel.
+export function setAdminPasswordHash(id: number, passwordHash: string) {
+  sqlite.prepare("UPDATE admins SET password_hash = ? WHERE id = ?").run(passwordHash, id);
+}
+
 export function getAffiliateByCode(code: string) {
   return sqlite.prepare("SELECT * FROM affiliates WHERE code = ? COLLATE NOCASE").get(code) as
     | {

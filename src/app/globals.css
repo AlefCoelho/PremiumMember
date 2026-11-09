@@ -4840,3 +4840,64 @@ a.course-card:hover {
   border-color: var(--gold);
   color: var(--text);
 }
+
+/* Troca da senha do admin ---------------------------------------------------- */
+
+.senha-admin-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+/* O e-mail da conta ocupa a linha inteira, acima dos campos. */
+.senha-admin-form > p {
+  flex: 1 0 100%;
+  margin: 0;
+}
+
+.senha-admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 200px;
+  min-width: 180px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.senha-admin-form input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.senha-admin-form input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.senha-admin-form button {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  width: auto;
+  height: 40px;
+}
+
+.senha-admin-form code {
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .senha-admin-form label,
+  .senha-admin-form button {
+    flex: 1 0 100%;
+  }
+}

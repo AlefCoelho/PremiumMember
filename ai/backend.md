@@ -60,7 +60,8 @@ Duas sessoes independentes, ambas JWT assinado com `JWT_SECRET` em cookie httpOn
 | admin | `sp_session` | 7d | `requireAdmin()` -> `/login` |
 | membro | `sp_affiliate_session` | 14d | `requireAffiliate()` -> `/socio/login` |
 
-Senhas com `bcryptjs` (10 rounds). Membro sem `password_hash` ou com `status != 'active'`
+Senhas com `bcryptjs` (10 rounds). O admin troca a propria em `/admin/senhas`
+(`changeAdminPasswordAction`, `setAdminPasswordHash`); ver `known-issues.md` item 0.1. Membro sem `password_hash` ou com `status != 'active'`
 nao loga. Trocar `JWT_SECRET` desloga todo mundo.
 
 ## Redefinicao de senha do membro
