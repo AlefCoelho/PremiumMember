@@ -12,6 +12,18 @@ Se for criada algum dia, entra na mesma protecao.)
 Depois de todo deploy, conferir `affiliates: 17` e `admins: 2` **apos** o restart. Mudou?
 Rollback na hora.
 
+## 0.1 `ADMIN_PASSWORD` so vale na primeira subida
+
+A semente do admin em `db.ts` usa `INSERT OR IGNORE`: depois que a conta existe, trocar
+`ADMIN_PASSWORD` no ambiente e reiniciar **nao muda a senha**. Parece que deveria, e nao muda.
+
+Trocar: `/admin/senhas` -> "Minha senha de administrador" (pede a senha atual).
+Recuperar sem acesso: `node scripts/resetar-senha-admin.js <email> <senha>` na VPS, guia em
+`scripts/SENHA-ADMIN.md`. O deploy copia so `src/`, entao `scripts/` pode nao estar na VPS.
+
+Nao "conserte" a semente para reler a variavel a cada subida: isso desfaria, a cada restart,
+a senha que o admin escolheu pelo painel.
+
 ## 1. `SOCIOS_DB_PATH` + saida standalone (critico)
 
 `next.config.ts` usa `output: "standalone"`. Sem `SOCIOS_DB_PATH` absoluto, `db.ts` cai em
