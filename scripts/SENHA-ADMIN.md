@@ -11,6 +11,14 @@ nao troca.
 
 ---
 
+## Caso 0 — Voce esqueceu e quer receber um link por e-mail
+
+Na tela de login, clique em **Esqueci a senha**, informe o e-mail do administrador e abra o
+link que chegar. Ele vale 30 minutos e serve uma vez.
+
+**So funciona depois de ligar o envio de e-mail**, o que e feito uma vez:
+`scripts/EMAIL-RESEND-PASSO-A-PASSO.md`. Enquanto nao estiver ligado, a tela avisa e nao envia.
+
 ## Caso 1 — Voce consegue entrar e quer trocar
 
 1. Entre em https://premiummember.online/login
