@@ -134,7 +134,9 @@ export function isMailConfigured() {
   );
 }
 
-export async function sendResetEmail(to: string, name: string, link: string) {
+// Envio generico pela API do Resend. Devolve false em vez de lancar: quem chama
+// decide o que dizer a pessoa, e nunca mostra o motivo tecnico da falha.
+export async function sendMail(input: { to: string; subject: string; text: string }) {
   if (!isMailConfigured()) return false;
 
   try {
@@ -146,17 +148,9 @@ export async function sendResetEmail(to: string, name: string, link: string) {
       },
       body: JSON.stringify({
         from: (process.env.MAIL_FROM ?? "").trim(),
-        to,
-        subject: "Redefinir sua senha - Premium Member",
-        text: [
-          `Ola, ${name}.`,
-          "",
-          "Voce pediu para redefinir a senha do seu acesso ao Premium Member.",
-          `Abra este link para criar uma senha nova: ${link}`,
-          "",
-          `O link vale por ${TOKEN_TTL_MINUTES} minutos e so pode ser usado uma vez.`,
-          "Se nao foi voce que pediu, ignore esta mensagem: sua senha atual continua valendo.",
-        ].join("\n"),
+        to: input.to,
+        subject: input.subject,
+        text: input.text,
       }),
     });
 
@@ -164,6 +158,22 @@ export async function sendResetEmail(to: string, name: string, link: string) {
   } catch {
     return false;
   }
+}
+
+export async function sendResetEmail(to: string, name: string, link: string) {
+  return sendMail({
+    to,
+    subject: "Redefinir sua senha - Premium Member",
+    text: [
+      `Ola, ${name}.`,
+      "",
+      "Voce pediu para redefinir a senha do seu acesso ao Premium Member.",
+      `Abra este link para criar uma senha nova: ${link}`,
+      "",
+      `O link vale por ${TOKEN_TTL_MINUTES} minutos e so pode ser usado uma vez.`,
+      "Se nao foi voce que pediu, ignore esta mensagem: sua senha atual continua valendo.",
+    ].join("\n"),
+  });
 }
 
 export { TOKEN_TTL_MINUTES };

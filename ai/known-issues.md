@@ -21,6 +21,12 @@ Trocar: `/admin/senhas` -> "Minha senha de administrador" (pede a senha atual).
 Recuperar sem acesso: `node scripts/resetar-senha-admin.js <email> <senha>` na VPS, guia em
 `scripts/SENHA-ADMIN.md`. O deploy copia so `src/`, entao `scripts/` pode nao estar na VPS.
 
+Esqueci a senha do admin: `/login/esqueci-senha` -> link por e-mail (30 min, uso unico), em
+`src/lib/admin-reset.ts` e tabela propria `admin_password_resets`. **So funciona com
+`RESEND_API_KEY` e `MAIL_FROM` no servico** (guia `scripts/EMAIL-RESEND-PASSO-A-PASSO.md`);
+sem eles a tela avisa e nao gera token. Trocar a senha por esse caminho NAO derruba sessao de
+admin ja aberta: o JWT e sem estado e vale ate 7 dias.
+
 Nao "conserte" a semente para reler a variavel a cada subida: isso desfaria, a cada restart,
 a senha que o admin escolheu pelo painel.
 
