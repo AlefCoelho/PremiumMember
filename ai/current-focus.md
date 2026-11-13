@@ -1,5 +1,30 @@
 # Estado atual
 
+## Atualizacao de 2026-11-12: "Esqueci a senha" do admin em producao
+
+O **PR #7** (`esqueci-senha-admin`, commit de codigo `a8a0f3f`) foi para a VPS em 2026-11-12,
+copiando so os 7 arquivos de `src/` do PR (sem `--delete`) e rodando `npm run build`, sem
+`npm ci`. O PR **continua aberto e em draft no GitHub**: producao roda o codigo da branch,
+nao o do `main`. Mesclar fica para o Alef.
+
+Antes do deploy, producao era equivalente ao `main` em `24d34f8` (o `diff` so mostrava CRLF
+contra LF; a pasta `src/app/r/` tem um diretorio orfao com crase no nome, por isso nada de
+`rsync --delete`). Backup em `/root/backups/` com a etiqueta `2026-11-12-1924`: banco, uploads
+e `src/` anterior (rollback).
+
+Conferido depois do restart: 21 afiliados, 2 admins, 0 referrals e 0 saques (iguais aos de
+antes; o numero 17 de 2026-11-04 esta velho), `admin_password_resets` criada e com 0 linhas
+(37 para 38 tabelas), `data/uploads/` intacto (3 avatares, 0 posts), `/login`,
+`/login/esqueci-senha` e `/login/redefinir-senha` com 200, link "Esqueci a senha" no login,
+nenhum erro no journal.
+
+**O e-mail continua desligado**: `RESEND_API_KEY` e `MAIL_FROM` nao estao no servico. Em
+`/login/esqueci-senha` a tela avisa que o envio de e-mail nao esta configurado e nao gera
+token. Recuperar a senha do admin: `scripts/SENHA-ADMIN.md` (pela VPS) ou ligar o e-mail com
+`scripts/EMAIL-RESEND-PASSO-A-PASSO.md`. A senha do admin nao foi alterada.
+
+---
+
 Atualizado em 2026-11-04. **As notificacoes da comunidade estao em producao** desde
 2026-11-04. Conferido depois do restart: 17 afiliados, 2 admins, `community_notifications`
 criada, `data/uploads/` intacto com `avatars/` e `posts/`, e as classes `notification-row` e
