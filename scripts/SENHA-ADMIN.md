@@ -32,7 +32,9 @@ Vale a partir do proximo login. Minimo de 8 caracteres.
 
 ## Caso 2 — Voce esqueceu e nao consegue entrar
 
-Tres comandos na VPS. Nada e apagado, e nao precisa reiniciar nada.
+Dois comandos na VPS. Nada e apagado e nao precisa reiniciar nada. **Voce digita a senha na
+tela, escondida e duas vezes**, entao nao ha aspas nem caracteres especiais para errar, e ela
+nao fica no historico do terminal.
 
 ### Passo 1
 
@@ -40,42 +42,30 @@ Tres comandos na VPS. Nada e apagado, e nao precisa reiniciar nada.
 ssh premium-vps
 ```
 
-### Passo 2 — Ver qual e o e-mail do admin
+### Passo 2 — Uma linha, copie inteira
+
+Troque so o e-mail, se o seu for outro:
 
 ```
-sqlite3 /home/user/htdocs/socios-premiums/data/socios-premiums.sqlite "SELECT email FROM admins;"
+cd /home/user/htdocs/socios-premiums && curl -sL -o scripts/resetar-senha-admin.js https://raw.githubusercontent.com/AlefCoelho/PremiumMember/main/scripts/resetar-senha-admin.js && SOCIOS_DB_PATH=/home/user/htdocs/socios-premiums/data/socios-premiums.sqlite node scripts/resetar-senha-admin.js contatoalefcoelho@gmail.com
 ```
 
-**Deve aparecer:** um ou dois e-mails. Copie o seu.
-
-### Passo 3 — Definir a senha nova
-
-Troque `SEU-EMAIL` e `SUA-SENHA-NOVA`:
+O terminal pergunta:
 
 ```
-cd /home/user/htdocs/socios-premiums && SOCIOS_DB_PATH=/home/user/htdocs/socios-premiums/data/socios-premiums.sqlite node scripts/resetar-senha-admin.js SEU-EMAIL SUA-SENHA-NOVA
+Digite a senha nova (nao aparece na tela):
+Repita a senha nova:
 ```
+
+Digite, aperte Enter, digite de novo, Enter. **Nada aparece enquanto voce digita. E normal.**
 
 **Deve aparecer:** `pronto: a senha de ... foi trocada e conferida.`
 
-Se o e-mail estiver errado, o proprio comando lista os e-mails que existem.
+Se as duas digitadas forem diferentes, o comando avisa e **nao altera nada**: repita o passo 2.
+Se o e-mail estiver errado, ele lista os e-mails que existem.
 
-**Se disser `Cannot find module ... resetar-senha-admin.js`:** o arquivo ainda nao esta na
-VPS. O deploy copia so a pasta `src/`, e este script mora em `scripts/`. Baixe-o uma vez:
-
-```
-mkdir -p /home/user/htdocs/socios-premiums/scripts && curl -sL -o /home/user/htdocs/socios-premiums/scripts/resetar-senha-admin.js https://raw.githubusercontent.com/AlefCoelho/PremiumMember/main/scripts/resetar-senha-admin.js
-```
-
-e repita o passo 3.
-
-### Passo 4 — Limpar a senha do historico do terminal
-
-A senha ficou escrita no comando. Apague:
-
-```
-history -c && history -w
-```
+A primeira parte da linha (`curl`) baixa a versao mais recente do script, porque o deploy
+normal copia so `src/` e nao atualiza `scripts/`.
 
 ---
 

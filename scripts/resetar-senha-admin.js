@@ -4,26 +4,97 @@
 // o caminho normal e /admin/senhas -> "Minha senha de administrador".
 //
 // Rodar NA VPS, da pasta do projeto:
-//   node scripts/resetar-senha-admin.js <email> <senha-nova>
+//   node scripts/resetar-senha-admin.js <email>
 //
-// Nao aceita senha por variavel de ambiente nem a le de arquivo de proposito:
-// o comando fica no historico do shell, e e melhor que isso esteja visivel do
-// que escondido num arquivo que ninguem lembra de apagar.
+// Sem a senha na linha de comando, o script PERGUNTA na tela, com a digitacao
+// escondida e pedindo duas vezes. E o modo recomendado: a senha nao fica no
+// historico do terminal e nao sofre com aspas nem com caracteres como $ e !,
+// que o terminal interpreta antes de o script ver.
+//
+// Ainda aceita a senha como segundo argumento (uso em scripts), mas nesse modo
+// os caracteres especiais exigem aspas simples e a senha fica no historico.
 
 const path = require("node:path");
 const fs = require("node:fs");
 
-const [, , email, senha] = process.argv;
+const MINIMO = 8;
 
-if (!email || !senha) {
-  console.error("uso: node scripts/resetar-senha-admin.js <email> <senha-nova>");
+// Le uma linha sem mostrar o que e digitado. Precisa de terminal interativo.
+function lerEscondido(pergunta) {
+  return new Promise((resolve, reject) => {
+    const entrada = process.stdin;
+    if (!entrada.isTTY) {
+      reject(new Error("sem terminal interativo: passe a senha como segundo argumento."));
+      return;
+    }
+
+    process.stdout.write(pergunta);
+    let texto = "";
+    entrada.setRawMode(true);
+    entrada.resume();
+    entrada.setEncoding("utf8");
+
+    const fim = () => {
+      entrada.setRawMode(false);
+      entrada.pause();
+      entrada.removeListener("data", aoReceber);
+      process.stdout.write("\n");
+    };
+
+    const aoReceber = (caractere) => {
+      for (const c of caractere) {
+        if (c === "\r" || c === "\n") {
+          fim();
+          resolve(texto);
+          return;
+        }
+        if (c === "\u0003") {
+          fim();
+          reject(new Error("cancelado."));
+          return;
+        }
+        if (c === "\u007f" || c === "\b") {
+          texto = texto.slice(0, -1);
+          continue;
+        }
+        if (c >= " ") texto += c;
+      }
+    };
+
+    entrada.on("data", aoReceber);
+  });
+}
+
+async function obterSenha(argumento) {
+  if (argumento) return argumento;
+
+  const primeira = await lerEscondido("Digite a senha nova (nao aparece na tela): ");
+  if (primeira.length < MINIMO) {
+    throw new Error(`a senha precisa de pelo menos ${MINIMO} caracteres.`);
+  }
+  const segunda = await lerEscondido("Repita a senha nova: ");
+  if (primeira !== segunda) {
+    throw new Error("as duas senhas digitadas sao diferentes. Nada foi alterado.");
+  }
+  return primeira;
+}
+
+function falhar(mensagem) {
+  console.error(`erro: ${mensagem}`);
   process.exit(1);
 }
 
-if (senha.length < 8) {
-  console.error("erro: a senha precisa de pelo menos 8 caracteres.");
+async function main() {
+const [, , email, senhaArgumento] = process.argv;
+
+if (!email) {
+  console.error("uso: node scripts/resetar-senha-admin.js <email>");
   process.exit(1);
 }
+
+const senha = await obterSenha(senhaArgumento).catch((e) => falhar(e.message));
+
+if (senha.length < MINIMO) falhar(`a senha precisa de pelo menos ${MINIMO} caracteres.`);
 
 const dbPath = process.env.SOCIOS_DB_PATH ?? path.join(process.cwd(), "data", "socios-premiums.sqlite");
 
@@ -38,7 +109,7 @@ const bcrypt = require("bcryptjs");
 
 const db = new Database(dbPath);
 
-const admin = db.prepare("SELECT id, email FROM admins WHERE email = ?").get(email);
+const admin = db.prepare("SELECT id, email FROM admins WHERE email = ?").get(email.trim().toLowerCase());
 
 if (!admin) {
   const existentes = db.prepare("SELECT email FROM admins ORDER BY id").all();
@@ -60,3 +131,6 @@ if (!bcrypt.compareSync(senha, depois.password_hash)) {
 console.log(`pronto: a senha de ${admin.email} foi trocada e conferida.`);
 console.log("entre em https://premiummember.online/login");
 console.log("nao e preciso reiniciar o servico: a senha e lida do banco a cada login.");
+}
+
+main();
