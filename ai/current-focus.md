@@ -20,10 +20,13 @@ antes; o numero 17 de 2026-11-04 esta velho), `admin_password_resets` criada e c
 `/login/esqueci-senha` e `/login/redefinir-senha` com 200, link "Esqueci a senha" no login,
 nenhum erro no journal.
 
-**O e-mail continua desligado**: `RESEND_API_KEY` e `MAIL_FROM` nao estao no servico. Em
-`/login/esqueci-senha` a tela avisa que o envio de e-mail nao esta configurado e nao gera
-token. Recuperar a senha do admin: `scripts/SENHA-ADMIN.md` (pela VPS) ou ligar o e-mail com
-`scripts/EMAIL-RESEND-PASSO-A-PASSO.md`. A senha do admin nao foi alterada.
+**O e-mail foi LIGADO depois (2026-11-20)**, pelo Alef, com `scripts/ligar-email.sh` (copia
+em `/root/ligar-email.sh` na VPS): `RESEND_API_KEY` e `MAIL_FROM` ficam no `.env.local`, o
+`EnvironmentFile` do unit, e nao na linha `Environment=`, porque `systemctl cat` imprime o unit
+em texto aberto. O Alef confirmou que o "Esqueci a senha" funciona. Para trocar a chave, rode o
+script de novo: ele nao duplica linha, guarda copia do arquivo e desfaz sozinho se o servico nao
+subir. O resto deste bloco, escrito antes, descreve o estado de 2026-11-12. A senha do admin
+nao foi alterada.
 
 ---
 ## Deploy de 2026-11-09: troca de senha do admin (PR #6) — historico
@@ -206,8 +209,9 @@ Sobre os saques, ver o item 6 acima: conferido, nao ha nenhum.
 ## Antes de divulgar para alunos novos
 
 - Cadastro publico **funciona**: `/cadastro-membro` cria conta, loga e abre a dashboard.
-- Recuperacao de senha **funciona, sem e-mail automatico** enquanto `RESEND_API_KEY` nao for
-  configurada. O admin gera o link em `/admin/senhas` e entrega.
+- Recuperacao de senha **funcionava sem e-mail automatico** ate 2026-11-20, quando `RESEND_API_KEY` foi
+  configurada: o link agora vai por e-mail. Gerar o link em `/admin/senhas` e entregar a mao
+  continua valendo como plano B.
 - Pagamento **nao funciona**: InfinitePay desligada, sistema externo provisorio no lugar.
 
 ## Deploy, resumido
