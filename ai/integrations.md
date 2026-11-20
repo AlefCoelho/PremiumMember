@@ -23,6 +23,11 @@ Consequencia: nenhuma comissao entra automaticamente. `paid_at` e lancado pelo a
 
 ## E-mail (Resend) — opcional
 
+Usado por `sendMail()` em `src/lib/password-reset.ts` (generico) e dai por
+`sendResetEmail` (membro) e `requestAdminReset` (admin). Falha de envio devolve `false` e e
+registrada no journal sem endereco nem token; a resposta ao usuario nunca muda, para nao
+revelar quem e administrador.
+
 So existe com `RESEND_API_KEY` **e** `MAIL_FROM`. `isMailConfigured()` decide; sem elas o
 sistema **nao finge que mandou** — o admin gera o link em `/admin/senhas` e entrega pelo
 canal que ja usa com o membro. Chamada HTTP direta a `api.resend.com`, sem dependencia nova.

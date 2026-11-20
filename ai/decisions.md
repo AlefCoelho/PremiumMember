@@ -24,3 +24,6 @@
 | O sistema nao cria a sala do Meet | o admin cola o link; menos integracao para manter |
 | Validacao devolve aviso na pagina, nunca lanca | excecao dava tela de erro de servidor |
 | Imagem de area fechada exige sessao para ser servida | sao fotos de pessoas, nao abrem para a internet |
+| Recuperacao de senha do admin em modulo e tabela separados da do membro | um link de membro nunca serve para o painel, e o TTL do admin e menor (30 min) |
+| O link de redefinicao so sai por e-mail, nunca volta ao navegador de quem pediu | devolver o link entregaria o painel a quem soubesse o e-mail |
+| Esqueci a senha do admin responde igual para e-mail conhecido, desconhecido e pedido repetido | a tela e publica; nao pode revelar quem e administrador |

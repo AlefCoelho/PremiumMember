@@ -4901,3 +4901,19 @@ a.course-card:hover {
     flex: 1 0 100%;
   }
 }
+
+/* Link secundario das telas de login e recuperacao de senha ------------------ */
+
+.login-alt-link {
+  display: block;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.login-alt-link:hover {
+  color: var(--text);
+}

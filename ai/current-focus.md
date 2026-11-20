@@ -1,8 +1,34 @@
 # Estado atual
 
-## Deploy de 2026-11-09: troca de senha do admin (PR #6)
+## Atualizacao de 2026-11-12: "Esqueci a senha" do admin em producao
 
-**Producao esta no commit `24d34f8`** (merge do PR #6, `senha-admin`, sobre `4f28756`). O
+O **PR #7** (`esqueci-senha-admin`, commit de codigo `a8a0f3f`) foi para a VPS em 2026-11-12,
+copiando so os 7 arquivos de `src/` do PR (sem `--delete`) e rodando `npm run build`, sem
+`npm ci`. Ate a mesclagem, producao rodava o codigo da branch e nao o do `main`: um deploy feito a
+partir do `main` nesse intervalo teria tirado o "Esqueci a senha" do ar sem aviso. **Ao
+mesclar o PR #7, `main` volta a bater com a producao.** Confira com
+`git log origin/main --oneline | grep -i 'esqueci'` antes de qualquer deploy.
+
+Antes do deploy, producao era equivalente ao `main` em `24d34f8` (o `diff` so mostrava CRLF
+contra LF; a pasta `src/app/r/` tem um diretorio orfao com crase no nome, por isso nada de
+`rsync --delete`). Backup em `/root/backups/` com a etiqueta `2026-11-12-1924`: banco, uploads
+e `src/` anterior (rollback).
+
+Conferido depois do restart: 21 afiliados, 2 admins, 0 referrals e 0 saques (iguais aos de
+antes; o numero 17 de 2026-11-04 esta velho), `admin_password_resets` criada e com 0 linhas
+(37 para 38 tabelas), `data/uploads/` intacto (3 avatares, 0 posts), `/login`,
+`/login/esqueci-senha` e `/login/redefinir-senha` com 200, link "Esqueci a senha" no login,
+nenhum erro no journal.
+
+**O e-mail continua desligado**: `RESEND_API_KEY` e `MAIL_FROM` nao estao no servico. Em
+`/login/esqueci-senha` a tela avisa que o envio de e-mail nao esta configurado e nao gera
+token. Recuperar a senha do admin: `scripts/SENHA-ADMIN.md` (pela VPS) ou ligar o e-mail com
+`scripts/EMAIL-RESEND-PASSO-A-PASSO.md`. A senha do admin nao foi alterada.
+
+---
+## Deploy de 2026-11-09: troca de senha do admin (PR #6) — historico
+
+Producao passou ao commit `24d34f8` nesse dia (merge do PR #6, `senha-admin`, sobre `4f28756`). O
 admin troca a propria senha em `/admin/senhas` ("Minha senha de administrador") e ha
 `scripts/resetar-senha-admin.js` para quando ele estiver trancado fora. A semente do admin usa
 `INSERT OR IGNORE`, entao mudar `ADMIN_PASSWORD` no ambiente nao altera uma conta existente;
@@ -30,7 +56,7 @@ Nenhuma tabela criada ou alterada, nenhuma dependencia nova (so `npm run build`,
 normal copia so `src/`, entao `resetar-senha-admin.js` la dentro nao se atualiza sozinho: se o
 script mudar no repositorio, copie-o a mao.
 
-Os numeros e o commit das secoes abaixo sao de 2026-11-04 e estao defasados. Para saber o que
+Os numeros desta secao e das abaixo sao antigos e estao defasados. Para saber o que
 esta no ar, pergunte ao banco e ao servico, nao a este arquivo.
 
 
