@@ -4,8 +4,10 @@
 
 O **PR #7** (`esqueci-senha-admin`, commit de codigo `a8a0f3f`) foi para a VPS em 2026-11-12,
 copiando so os 7 arquivos de `src/` do PR (sem `--delete`) e rodando `npm run build`, sem
-`npm ci`. O PR **continua aberto e em draft no GitHub**: producao roda o codigo da branch,
-nao o do `main`. Mesclar fica para o Alef.
+`npm ci`. Ate a mesclagem, producao rodava o codigo da branch e nao o do `main`: um deploy feito a
+partir do `main` nesse intervalo teria tirado o "Esqueci a senha" do ar sem aviso. **Ao
+mesclar o PR #7, `main` volta a bater com a producao.** Confira com
+`git log origin/main --oneline | grep -i 'esqueci'` antes de qualquer deploy.
 
 Antes do deploy, producao era equivalente ao `main` em `24d34f8` (o `diff` so mostrava CRLF
 contra LF; a pasta `src/app/r/` tem um diretorio orfao com crase no nome, por isso nada de
@@ -24,6 +26,39 @@ token. Recuperar a senha do admin: `scripts/SENHA-ADMIN.md` (pela VPS) ou ligar 
 `scripts/EMAIL-RESEND-PASSO-A-PASSO.md`. A senha do admin nao foi alterada.
 
 ---
+## Deploy de 2026-11-09: troca de senha do admin (PR #6) — historico
+
+Producao passou ao commit `24d34f8` nesse dia (merge do PR #6, `senha-admin`, sobre `4f28756`). O
+admin troca a propria senha em `/admin/senhas` ("Minha senha de administrador") e ha
+`scripts/resetar-senha-admin.js` para quando ele estiver trancado fora. A semente do admin usa
+`INSERT OR IGNORE`, entao mudar `ADMIN_PASSWORD` no ambiente nao altera uma conta existente;
+a semente **nao** foi alterada.
+
+Conferido depois do restart:
+
+- **Contagens iguais as de antes do deploy:** 19 afiliados, 2 admins (`11:admin@premiummember.local`,
+  `91:contatoalefcoelho@gmail.com`), 0 em `referrals`, `withdrawals` e `payment_orders`.
+  O numero de afiliados era 17 em 2026-11-04 e cresce sozinho por `/cadastro-membro`.
+- `data/uploads/` intacto: 3 avatares, 0 imagens de posts.
+- `https://premiummember.online/login` e `/socio/login` respondem 200.
+- A classe `senha-admin-form` esta na folha de estilo servida (200, 75959 bytes).
+- Nenhum erro no journal do servico nos 3 minutos seguintes ao restart.
+- `node scripts/resetar-senha-admin.js` sem argumentos, na pasta do projeto na VPS, imprime a
+  linha de uso e sai com codigo 1. Prova que o script chegou; nao foi rodado com e-mail e senha.
+
+Nenhuma tabela criada ou alterada, nenhuma dependencia nova (so `npm run build`, sem
+`npm ci`). A senha do admin **nao foi trocada** por esta sessao: o Alef troca logado.
+
+**Ponto de rollback, na VPS em `/root/backups/`** (sufixo `pre-senha-admin-2026-11-09-2157`):
+`socios-...sqlite` (por `.backup`), `uploads-...tar.gz` e `src-...tar.gz`.
+
+**`scripts/` passou a existir na VPS** (`/home/user/htdocs/socios-premiums/scripts/`). O deploy
+normal copia so `src/`, entao `resetar-senha-admin.js` la dentro nao se atualiza sozinho: se o
+script mudar no repositorio, copie-o a mao.
+
+Os numeros desta secao e das abaixo sao antigos e estao defasados. Para saber o que
+esta no ar, pergunte ao banco e ao servico, nao a este arquivo.
+
 
 Atualizado em 2026-11-04. **As notificacoes da comunidade estao em producao** desde
 2026-11-04. Conferido depois do restart: 17 afiliados, 2 admins, `community_notifications`
@@ -79,7 +114,7 @@ https://premiummember.online — VPS `root@2.24.65.26` (atalho SSH `premium-vps`
 nginx, Node v22.23.1. Banco em `data/socios-premiums.sqlite`, com `SOCIOS_DB_PATH` absoluto
 no unit do systemd.
 
-Producao: **17 afiliados, 1 admin** (em 2026-11-04). Conferir esses dois numeros **depois**
+Producao: **19 afiliados, 2 admins** (em 2026-11-09). Conferir esses dois numeros **depois**
 de todo restart — nao para proteger os registros, e sim para detectar se o app subiu
 apontando para outro banco. Contagem muito menor que a esperada significa que o
 `SOCIOS_DB_PATH` se perdeu.
