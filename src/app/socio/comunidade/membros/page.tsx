@@ -2,6 +2,7 @@ import { GraduationCap, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { requireAffiliate } from "@/lib/auth";
 import { formatJoinDate, getLeaderboard, getMemberDirectory } from "@/lib/directory";
+import { getAdminAffiliateIds } from "@/lib/admin-member";
 import { levelFor } from "@/lib/levels";
 import { getAvatarUrls, getProfileInfoMap } from "@/lib/profiles";
 
@@ -11,6 +12,7 @@ export default async function MembersPage() {
   const ranking = getLeaderboard();
   const avatars = getAvatarUrls(membros.map((item) => item.id));
   const perfis = getProfileInfoMap(membros.map((item) => item.id));
+  const equipe = getAdminAffiliateIds();
 
   function iniciais(nome: string) {
     return nome
@@ -91,6 +93,7 @@ export default async function MembersPage() {
                     <strong>
                       {membro.name}
                       {membro.id === session.affiliateId ? " (voce)" : ""}
+                      {equipe.has(membro.id) ? <span className="badge neutral team-badge">Equipe</span> : null}
                     </strong>
                     {/* A chamada que o membro escreveu vem na frente do resto:
                         e ela que diz quem a pessoa e, muito melhor que a data

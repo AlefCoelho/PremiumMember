@@ -47,6 +47,7 @@ import {
 import { getSpaceById } from "@/lib/community";
 import { MAX_MATERIAL_BYTES, publicUrl } from "@/lib/storage";
 import { BrandLogo } from "@/components/BrandLogo";
+import { EnterCommunity } from "@/components/EnterCommunity";
 
 const okMessages: Record<string, string> = {
   "modulo-criado": "Modulo criado.",
@@ -123,6 +124,8 @@ export default async function AdminLessonsPage({
             Senhas
           </Link>
         </nav>
+
+        <EnterCommunity />
 
         <form action={logoutAction} className="logout-form">
           <button type="submit">

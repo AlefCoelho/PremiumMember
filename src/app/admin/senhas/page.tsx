@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getAffiliateById, getAffiliateSummaries } from "@/lib/db";
 import { buildResetLink, isMailConfigured, TOKEN_TTL_MINUTES } from "@/lib/password-reset";
 import { BrandLogo } from "@/components/BrandLogo";
+import { EnterCommunity } from "@/components/EnterCommunity";
 
 export default async function AdminPasswordsPage({
   searchParams,
@@ -56,6 +57,8 @@ export default async function AdminPasswordsPage({
             Senhas
           </a>
         </nav>
+
+        <EnterCommunity />
 
         <form action={logoutAction} className="logout-form">
           <button type="submit">

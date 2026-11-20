@@ -9,6 +9,7 @@ import {
 import { requireAdmin } from "@/lib/auth";
 import { formatEventDate, getAllEvents, getEventAttendees, isEventPast } from "@/lib/events";
 import { BrandLogo } from "@/components/BrandLogo";
+import { EnterCommunity } from "@/components/EnterCommunity";
 
 const okMessages: Record<string, string> = {
   criado: "Evento criado e ja visivel para os membros.",
@@ -64,6 +65,8 @@ export default async function AdminEventsPage({
             Senhas
           </Link>
         </nav>
+
+        <EnterCommunity />
 
         <form action={logoutAction} className="logout-form">
           <button type="submit">

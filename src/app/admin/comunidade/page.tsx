@@ -34,6 +34,7 @@ import {
   updateCommunitySpaceAction,
 } from "@/app/admin/comunidade/actions";
 import { BrandLogo } from "@/components/BrandLogo";
+import { EnterCommunity } from "@/components/EnterCommunity";
 import { requireAdmin } from "@/lib/auth";
 import {
   getAdminCommunityTree,
@@ -570,6 +571,8 @@ export default async function AdminCommunityPage({
             Senhas
           </Link>
         </nav>
+
+        <EnterCommunity />
 
         <form action={logoutAction} className="logout-form">
           <button type="submit">

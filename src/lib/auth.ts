@@ -64,6 +64,27 @@ export async function createAffiliateSession(email: string, password: string) {
   return true;
 }
 
+/**
+ * Abre a sessao de membro sem senha. So pode ser chamada depois de
+ * requireAdmin(): quem chama ja provou ser o administrador, e a conta aberta e
+ * a que a ponte vinculou a ele — nunca um id vindo do navegador.
+ */
+export async function openAffiliateSessionFor(affiliate: { id: number; email: string; code: string }) {
+  const token = jwt.sign(
+    { affiliateId: affiliate.id, email: affiliate.email, code: affiliate.code },
+    JWT_SECRET,
+    { expiresIn: "14d" }
+  );
+  const cookieStore = await cookies();
+  cookieStore.set(AFFILIATE_COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 14,
+  });
+}
+
 export async function destroySession() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);

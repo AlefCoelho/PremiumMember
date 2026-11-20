@@ -3,6 +3,7 @@ import { db, getAffiliateSummaries } from "@/lib/db";
 // lesson_progress, consultadas aqui. Sem o import, uma pagina que chegasse
 // primeiro a este modulo quebraria na primeira consulta.
 import "@/lib/lessons";
+import { getAdminAffiliateIds } from "@/lib/admin-member";
 import { getProfileInfo, getProfileInfoMap, type ProfileInfo } from "@/lib/profiles";
 
 // Diretorio de membros e ranking.
@@ -66,7 +67,11 @@ export type RankedMember = DirectoryMember & { position: number };
  * ninguem, e no comeco da comunidade a maioria esta zerada.
  */
 export function getLeaderboard(limit = 20): RankedMember[] {
+  // A conta de membro do administrador nao disputa o ranking: ele e a equipe, e
+  // um placar com o dono da plataforma no topo desanima quem esta competindo.
+  const equipe = getAdminAffiliateIds();
   return getMemberDirectory()
+    .filter((item) => !equipe.has(item.id))
     .filter((item) => item.eligible_referrals > 0 || item.lessons_done > 0)
     .sort(
       (a, b) =>

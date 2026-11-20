@@ -49,6 +49,7 @@ import {
 import { formatCurrency } from "@/lib/money";
 import { getHoldDeadline, getReferralStatus } from "@/lib/rules";
 import { BrandLogo } from "@/components/BrandLogo";
+import { EnterCommunity } from "@/components/EnterCommunity";
 
 const navItems = [
   { label: "Visao geral", icon: LayoutDashboard },
@@ -420,6 +421,8 @@ export default async function Home() {
             Senhas
           </Link>
         </nav>
+
+        <EnterCommunity />
 
         <form action={logoutAction} className="logout-form">
           <button type="submit">

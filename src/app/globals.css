@@ -4917,3 +4917,53 @@ a.course-card:hover {
 .login-alt-link:hover {
   color: var(--text);
 }
+
+/* Ponte admin -> comunidade ------------------------------------------------ */
+
+.enter-community {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.enter-community label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: #a9b4c7;
+}
+
+.enter-community input {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.enter-community button {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid rgba(200, 153, 47, 0.45);
+  border-radius: 7px;
+  background: rgba(200, 153, 47, 0.1);
+  color: var(--gold-bright);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.enter-community button:hover {
+  background: rgba(200, 153, 47, 0.18);
+}
+
+.team-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+  font-size: 11px;
+}

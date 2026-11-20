@@ -11,6 +11,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAffiliate } from "@/lib/auth";
 import { formatJoinDate, getMemberProfile } from "@/lib/directory";
+import { getAdminAffiliateIds } from "@/lib/admin-member";
 import { levelProgress, membershipLength } from "@/lib/levels";
 import { getAvatarUrl, redesDoPerfil } from "@/lib/profiles";
 
@@ -70,7 +71,12 @@ export default async function MemberProfilePage({
           )}
 
           <div>
-            <h1>{membro.name}</h1>
+            <h1>
+              {membro.name}
+              {getAdminAffiliateIds().has(membro.id) ? (
+                <span className="badge neutral team-badge">Equipe</span>
+              ) : null}
+            </h1>
             <p className="member-profile-level">
               <Trophy size={14} />
               Nivel {nivel.atual.nivel} - {nivel.atual.nome}
